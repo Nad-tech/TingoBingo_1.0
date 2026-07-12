@@ -1,5 +1,6 @@
 #pragma once
 
+#include "raylib.h"
 class Object
 {
 public:
@@ -10,5 +11,5 @@ public:
     void Draw() const;
 
 private:
-
+    Vector2 position;
 };

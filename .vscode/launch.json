@@ -5,7 +5,7 @@
             "name": "Debug Template",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Template.exe",
+            "program": "${workspaceFolder}/build/TingoBingo.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

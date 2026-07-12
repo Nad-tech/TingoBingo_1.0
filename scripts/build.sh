@@ -1,7 +1,7 @@
 #!/bin/bash
 # Use the Bash shell to run this script.
 
-EXE_NAME="Template"
+EXE_NAME="TingoBingo"
 
 echo "Building..."
 echo "Using GDB debugger"

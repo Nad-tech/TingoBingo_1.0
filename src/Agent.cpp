@@ -9,7 +9,7 @@ Agent::Agent()
 
 void Agent::Update(float dt)
 {
-
+    position.x -= 100 * dt;
 }
 
 void Agent::Draw() const

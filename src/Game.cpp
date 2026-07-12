@@ -43,6 +43,8 @@ void Game::Run()
 	while (!WindowShouldClose()) 
 	{
 		HandleInput();
+		
+		dt = GetFrameTime();
 		Update(dt);
 		
 		BeginDrawing();

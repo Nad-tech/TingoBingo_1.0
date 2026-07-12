@@ -13,5 +13,5 @@
 
 constexpr int SCREEN_WIDTH = 700;
 constexpr int SCREEN_HEIGHT = 600;
-constexpr char WINDOW_TITLE[] = "Game";
+constexpr char WINDOW_TITLE[] = "TingoBingo";
 constexpr int TARGET_FPS = 60;
