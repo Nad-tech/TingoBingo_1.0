@@ -1,0 +1,149 @@
+.
+├── .git/
+│   ├── COMMIT_EDITMSG
+│   ├── config
+│   ├── description
+│   ├── gk/
+│   │   ├── config
+│   ├── HEAD
+│   ├── hooks/
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── sendemail-validate.sample
+│   │   ├── update.sample
+│   ├── index
+│   ├── info/
+│   │   ├── exclude
+│   ├── logs/
+│   │   ├── HEAD
+│   │   ├── refs/
+│   │   │   ├── heads/
+│   │   │   │   ├── main
+│   │   │   ├── remotes/
+│   │   │   │   ├── origin/
+│   │   │   │   │   ├── main
+│   ├── objects/
+│   │   ├── 18/
+│   │   │   ├── d792b3470420740a0db0226f1b17e12f58ca39
+│   │   ├── 20/
+│   │   │   ├── 9044aee19e029f38cc642a1295b4dc9f666d46
+│   │   ├── 21/
+│   │   │   ├── d17e32603e081fd9eb8ffedd27731e44b30ff2
+│   │   ├── 2d/
+│   │   │   ├── d1b983d3c93fe8b57af6bbf9ea440358ac4bc4
+│   │   ├── 33/
+│   │   │   ├── cb68c0cab63a3e98099edb0feb4ba3395366da
+│   │   ├── 54/
+│   │   │   ├── 046468773551201f372e52650265ec00777056
+│   │   │   ├── f370d86f09944b0a084463e84fc98902e63705
+│   │   ├── 56/
+│   │   │   ├── a1d919940f877321603687440124a19e939d45
+│   │   ├── 58/
+│   │   │   ├── 092dcef1565d54127af19b5dd0f561fc88d203
+│   │   │   ├── cd441da3992a91f42faebdd1bf24c069114961
+│   │   ├── 5a/
+│   │   │   ├── 05e7a7b5e1d082c1172c8d206d6386b775a629
+│   │   ├── 60/
+│   │   │   ├── 724ccf8525758f8d40c4f39610d3983e89096f
+│   │   ├── 62/
+│   │   │   ├── cb7c801f71f3feea4bfda2527e4a1f5e7dcddc
+│   │   ├── 64/
+│   │   │   ├── e7cb5129ca0b9a7ac34e1f8f6ac65031e4960a
+│   │   ├── 69/
+│   │   │   ├── 04c57be105a5c1f22a597a799f958cffaf7fb3
+│   │   ├── 73/
+│   │   │   ├── 9dd90b2a6968a6e9f1328ba549df236fe9c31d
+│   │   ├── 74/
+│   │   │   ├── ac8de8e71999db223d405a606b6d1b019f35b7
+│   │   ├── 78/
+│   │   │   ├── be1064bc5e81516bbda4e560631e1ac89c2cac
+│   │   ├── 7d/
+│   │   │   ├── 795e67ec8c23b27e2739560396b7dc0e36e7a5
+│   │   ├── 8e/
+│   │   │   ├── 838b0fa1045f5f7e4ba419a779b0993433dda3
+│   │   ├── 9b/
+│   │   │   ├── f6ca3e01ec3a416ddb571638c70e3c3bf3ab7d
+│   │   ├── a5/
+│   │   │   ├── 0b22bac2e2b51dd57c036d0e97b2871dfe6607
+│   │   │   ├── 77ec89b0fff5e5257365caf9e1f3068eb2a68d
+│   │   ├── ab/
+│   │   │   ├── cc91acef907e8980c876470f3fe3f1ab1eaf21
+│   │   ├── b3/
+│   │   │   ├── 63e2c5cb4f57067d4a00bdec26299fe01093bc
+│   │   ├── ba/
+│   │   │   ├── 9cc98ba8cd05cbf2ff53f69a36d6748fde7f8f
+│   │   ├── bd/
+│   │   │   ├── f36a9b45ce30309d4e67273c9474b46615a59b
+│   │   ├── d0/
+│   │   │   ├── b0e754f0080073eda5e6167e33bdc6e93f7c8f
+│   │   ├── d5/
+│   │   │   ├── 64d0bc3dd917926892c55e3706cc116d5b165e
+│   │   ├── e3/
+│   │   │   ├── 747b27ee7c307d95cafc107ae340035f8ff626
+│   │   ├── e6/
+│   │   │   ├── 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+│   │   ├── eb/
+│   │   │   ├── 552de4ddfeb670f19ef6af2a89f2c3d58084ef
+│   │   ├── ef/
+│   │   │   ├── f94f70e64195c7b01bd9e2bfa11d7baf088429
+│   │   ├── fa/
+│   │   │   ├── 41f0febdd093fdfc2ec6a2f61b127fa5f9a7a6
+│   │   ├── info/
+│   │   ├── pack/
+│   ├── refs/
+│   │   ├── heads/
+│   │   │   ├── main
+│   │   ├── remotes/
+│   │   │   ├── origin/
+│   │   │   │   ├── main
+│   │   ├── tags/
+├── .gitignore
+├── .vscode/
+│   ├── launch.json
+│   ├── settings.json
+│   ├── tasks.json
+├── assets/
+│   ├── fonts/
+│   │   ├── .gitkeep
+│   ├── images/
+│   │   ├── .gitkeep
+│   ├── sounds/
+│   │   ├── .gitkeep
+├── build/
+│   ├── .exe
+│   ├── Template.exe
+├── FileStructure.txt
+├── include/
+│   ├── Agent.h
+│   ├── Constants.h
+│   ├── Game.h
+│   ├── Input.h
+│   ├── Object.h
+│   ├── Utils.h
+├── ProjectDump.txt
+├── README.md
+├── scripts/
+│   ├── build.sh
+│   ├── buildProjectDump.sh
+│   ├── buildProjectTree.sh
+├── src/
+│   ├── Agent.cpp
+│   ├── Game.cpp
+│   ├── Input.cpp
+│   ├── main.cpp
+│   ├── Object.cpp
+├── utilities/
+│   ├── projectDump.cpp
+│   ├── projectDump.exe
+│   ├── projectTree.cpp
+│   ├── projectTree.exe

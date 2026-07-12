@@ -1,0 +1,455 @@
+=====================================
+.\include\Agent.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+class Agent 
+{
+public:
+	
+	Agent();
+	
+	void Update(float dt);
+	void Draw() const;
+	
+private:
+	
+	Vector2 position;	
+};
+
+
+=====================================
+.\include\Constants.h
+=====================================
+
+//==================================================
+//
+// Template Project
+//
+// Version 1.0
+//
+// Raylib
+// C++20
+//
+//==================================================
+
+#pragma once
+
+constexpr int SCREEN_WIDTH = 700;
+constexpr int SCREEN_HEIGHT = 600;
+constexpr char WINDOW_TITLE[] = "Game";
+constexpr int TARGET_FPS = 60;
+
+
+=====================================
+.\include\Game.h
+=====================================
+
+#pragma once
+
+#include "Agent.h"
+#include "Object.h"
+
+class Game
+{
+public:
+	
+	void Run();
+	
+private:
+	
+	void Initialise();
+	void HandleInput();
+	void Update();
+	void Draw();
+	void Shutdown();
+	
+	Agent agent;
+	Object object;
+};
+
+
+=====================================
+.\include\Input.h
+=====================================
+
+
+
+=====================================
+.\include\Object.h
+=====================================
+
+#pragma once
+
+class Object
+{
+public:
+
+    Object();
+
+    void Update(float dt);
+    void Draw() const;
+
+private:
+
+};
+
+
+=====================================
+.\include\Utils.h
+=====================================
+
+
+
+=====================================
+.\src\Agent.cpp
+=====================================
+
+#include "Agent.h"
+
+Agent::Agent()
+{
+	position = {600, 350};
+
+	//varialbles
+}
+
+void Agent::Update(float dt)
+{
+
+}
+
+void Agent::Draw() const
+{
+	DrawRectangle(
+        position.x - 35,
+        position.y + 30,
+        70,
+        70,
+        GRAY
+    );
+}
+	
+
+
+=====================================
+.\src\Game.cpp
+=====================================
+
+#include "raylib.h"
+
+#include "Game.h"
+#include "Constants.h"
+
+
+void  Game::Initialise()
+{
+	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+	
+	SetTargetFPS(TARGET_FPS);
+}
+
+void Game::HandleInput(){}
+
+void Game::Update()
+{
+	float dt = GetFrameTime();
+	
+	agent.Update(dt);
+	object.Update(dt);
+}
+
+void Game::Draw()
+{
+	ClearBackground(RAYWHITE);
+
+	DrawText("Game", 20, 20, 30, BLACK);
+	
+	agent.Draw();
+}
+
+void Game::Shutdown()
+{
+	CloseWindow();
+}
+
+void Game::Run()
+{
+	Initialise();
+	
+	while (!WindowShouldClose()) 
+	{
+		HandleInput();
+		Update();
+		
+		BeginDrawing();
+		
+		Draw();
+		
+		EndDrawing();
+	}
+	
+	Shutdown();
+}
+
+
+=====================================
+.\src\Input.cpp
+=====================================
+
+
+
+=====================================
+.\src\main.cpp
+=====================================
+
+#include "Game.h"
+
+int main ()
+{
+	Game app;
+	app.Run();
+	
+	return 0;
+}
+
+
+=====================================
+.\src\Object.cpp
+=====================================
+
+#include "Object.h"
+
+Object::Object()
+{
+
+}
+
+void Object::Update(float dt)
+{
+
+}
+
+void Object::Draw() const
+{
+
+}
+
+
+=====================================
+.\utilities\projectDump.cpp
+=====================================
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+namespace fs = std::filesystem;
+
+int main()
+{
+    std::ofstream out("ProjectDump.txt");
+
+    for (const auto& entry : fs::recursive_directory_iterator("."))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        if (entry.path().filename() == "ProjectDump.txt")
+            continue;
+
+        if (entry.path().string().find("build") != std::string::npos)
+            continue;
+
+        std::string ext = entry.path().extension().string();
+
+        if (ext == ".cpp" || ext == ".h")
+        {
+            out << "=====================================\n";
+            out << entry.path().string() << "\n";
+            out << "=====================================\n\n";
+
+            std::ifstream in(entry.path());
+
+            std::string line;
+            while (std::getline(in, line))
+            {
+                out << line << '\n';
+            }
+
+            out << "\n\n";
+        }
+    }
+
+    std::cout << "Finished!\n";
+}
+
+
+=====================================
+.\utilities\projectTree.cpp
+=====================================
+
+// iostream gives us std::cout for printing to the console.
+#include <iostream>
+
+// fstream lets us create and write to files.
+#include <fstream>
+
+// filesystem provides tools for working with files and folders.
+#include <filesystem>
+
+// Create a shorter name.
+// Instead of writing std::filesystem everywhere,
+// we can just write fs.
+namespace fs = std::filesystem;
+
+//---------------------------------------------------------------
+// PrintTree
+//
+// Recursively prints the contents of a folder.
+//
+// Parameters:
+//
+// path  - The folder we are currently scanning.
+// out   - The output file we are writing to.
+// depth - How deep we are in the folder structure.
+//         Used only to indent the output nicely.
+//---------------------------------------------------------------
+void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
+{
+    // directory_iterator loops through every file and folder
+    // inside "path".
+    for (const auto& entry : fs::directory_iterator(path))
+    {
+        //-------------------------------------------------------
+        // Print indentation.
+        //
+        // If we're inside several folders, print
+        // "│   " once for each level.
+        //
+        // Example:
+        //
+        // Root
+        // │
+        // ├── Folder
+        // │   ├── File.txt
+        //-------------------------------------------------------
+        for (int i = 0; i < depth; i++)
+            out << "│   ";
+
+        //-------------------------------------------------------
+        // Print the file or folder name.
+        //
+        // entry.path()
+        //      Returns the complete path.
+        //
+        // filename()
+        //      Extracts just the name.
+        //
+        // string()
+        //      Converts it into a std::string.
+        //-------------------------------------------------------
+        out << "├── " << entry.path().filename().string();
+
+        //-------------------------------------------------------
+        // If this entry is a directory,
+        // add a "/" after its name.
+        //-------------------------------------------------------
+        if (entry.is_directory())
+            out << "/";
+
+        // Move to the next line.
+        out << '\n';
+
+        //-------------------------------------------------------
+        // If this entry is another folder,
+        // call PrintTree AGAIN.
+        //
+        // This is called RECURSION.
+        //
+        // Example:
+        //
+        // Root
+        // ├── Animals
+        //
+        // PrintTree("Root")
+        //     finds Animals
+        //
+        // PrintTree("Animals")
+        //     scans everything inside Animals
+        //-------------------------------------------------------
+        if (entry.is_directory())
+        {
+            // depth + 1 means the next level is indented
+            // one extra step.
+            PrintTree(entry.path(), out, depth + 1);
+        }
+    }
+}
+
+int main()
+{
+    //-----------------------------------------------------------
+    // "." means "the current folder".
+    //
+    // If you run the program from:
+    //
+    // C:\Projects\Boids
+    //
+    // then "." refers to:
+    //
+    // C:\Projects\Boids
+    //-----------------------------------------------------------
+    fs::path root = ".";
+
+    //-----------------------------------------------------------
+    // Create an output file.
+    //
+    // If it doesn't exist,
+    // it will be created.
+    //
+    // If it already exists,
+    // it will be overwritten.
+    //-----------------------------------------------------------
+    std::ofstream out("FileStructure.txt");
+
+    //-----------------------------------------------------------
+    // Check that the file opened successfully.
+    //
+    // "!out" means "opening failed".
+    //-----------------------------------------------------------
+    if (!out)
+    {
+        std::cout << "Couldn't create output file.\n";
+        return 1;      // Return an error code.
+    }
+
+    //-----------------------------------------------------------
+    // Write the root folder name.
+    //
+    // root.string() converts the filesystem path
+    // into ordinary text.
+    //-----------------------------------------------------------
+    out << root.string() << '\n';
+
+    //-----------------------------------------------------------
+    // Scan the directory tree.
+    //
+    // This one function call does all the work.
+    //-----------------------------------------------------------
+    PrintTree(root, out);
+
+    //-----------------------------------------------------------
+    // Tell the user we're finished.
+    //-----------------------------------------------------------
+    std::cout << "Done! Wrote FileStructure.txt\n";
+
+    // Returning 0 means the program completed successfully.
+    return 0;
+}
+
+
