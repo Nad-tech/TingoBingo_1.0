@@ -10,8 +10,12 @@ public:
 	
 	void Update(float dt);
 	void Draw() const;
+	void LoadResources();
+	void UnloadResources();
+
 	
 private:
 	
-	Vector2 position;	
+	Texture2D headTexture;
+	Vector2 position;
 };

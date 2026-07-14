@@ -8,6 +8,8 @@ void  Game::Initialise()
 {
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
 	
+	agent.LoadResources();
+
 	SetTargetFPS(TARGET_FPS);
 }
 
@@ -32,6 +34,7 @@ void Game::Draw()
 void Game::Shutdown()
 {
 	CloseWindow();
+	agent.UnloadResources();
 }
 
 void Game::Run()
