@@ -14,18 +14,13 @@ Agent::Agent()
 
 void Agent::Update(float dt)
 {
-    position.x -= 100 * dt;
-
-    if (position.x + headTexture.width * tingoHeadScale <= 0) 
-    {
-        position.x = SCREEN_WIDTH;
-    }
+    
 }
 
 void Agent::Draw() const
 {
 	DrawTextureEx(
-        headTexture,
+        headTextureBlank,
         position,
         0.0f,
         tingoHeadScale,
@@ -35,24 +30,24 @@ void Agent::Draw() const
 
 void Agent::LoadResources()
 {
-    headTexture = LoadTexture("../assets/images/TingoHead.png");
+    headTextureBlank = LoadTexture("../assets/images/TingoHeadBlank.png");
 
     if (!IsTextureValid(headTexture))
     {
-        TraceLog(LOG_ERROR, "Failed to load TingoHead.png");
+        TraceLog(LOG_ERROR, "Failed to load TingoHeadBlank.png");
     }
 
-    TraceLog(LOG_INFO, "TingoHead.png: Texture size: %d x %d",
+    TraceLog(LOG_INFO, "TingoHeadBlank.png: Texture size: %d x %d",
              headTexture.width,
              headTexture.height);
 
     position = {
-        (SCREEN_WIDTH - headTexture.width * tingoHeadScale) / 2 , 
-        (SCREEN_HEIGHT - headTexture. height * tingoHeadScale) / 2
+        (SCREEN_WIDTH - headTextureBlank.width * tingoHeadScale) / 2 , 
+        (SCREEN_HEIGHT - headTextureBlank. height * tingoHeadScale) / 2
     };
 }
 
 void Agent::UnloadResources()
 {
-    UnloadTexture(headTexture);
+    UnloadTexture(headTextureBlank);
 }

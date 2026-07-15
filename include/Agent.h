@@ -17,5 +17,6 @@ public:
 private:
 	
 	Texture2D headTexture;
+	Texture2D headTextureBlank;
 	Vector2 position;
 };
