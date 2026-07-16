@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Agent.h"
+#include "Robot.h"
 #include "Object.h"
 
 class Game
@@ -12,11 +12,13 @@ public:
 private:
 	
 	void Initialise();
+	void Shutdown();
+
 	void HandleInput();
 	void Update(const float dt);
 	void Draw();
-	void Shutdown();
 	
-	Agent agent;
+	
+	Robot robot;
 	Object object;
 };

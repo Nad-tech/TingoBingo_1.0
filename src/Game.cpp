@@ -8,7 +8,8 @@ void  Game::Initialise()
 {
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
 	
-	agent.LoadResources();
+	robot.Initialise();
+	object.Initialise();
 
 	SetTargetFPS(TARGET_FPS);
 }
@@ -17,24 +18,23 @@ void Game::HandleInput(){}
 
 void Game::Update(const float dt)
 {	
-	agent.Update(dt);
+	robot.Update(dt);
 	object.Update(dt);
 }
 
 void Game::Draw()
 {
-	ClearBackground(RAYWHITE);
-
-	DrawText(WINDOW_TITLE, 20, 20, 30, BLACK);
+	ClearBackground(BLACK);
 	
-	agent.Draw();
+	robot.Draw();
 	object.Draw();
 }
 
 void Game::Shutdown()
 {
 	CloseWindow();
-	agent.UnloadResources();
+	robot.Shutdown();
+	object.Shutdown();
 }
 
 void Game::Run()
