@@ -1,17 +1,21 @@
 #include "Object.h"
-#include "raylib.h"
 
-Object::Object()
+void Object::Initialise() 
 {
-    position = {20, 20};
+    texture = LoadTexture("assets/images/TingoBingo/head/antenna.png");
+
+    position = { 0.0f, 0.0f };
+    rotation = 0.0f;
+    scale = 1.0f;
 }
 
 void Object::Update(float dt)
 {
-    position.y += 100 * dt;
+    (void)dt;
 }
 
-void Object::Draw() const
+void Object::Draw() const 
 {
-    DrawCircle(position.x, position.y, 10,RED);
+    DrawCircle(10,10,10,RED);
 }
+

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "raylib.h"
-#include "./head/Head.h"
+#include "head/Head.h"
 
 class Robot 
 {

@@ -2,25 +2,23 @@
 
 #include "raylib.h"
 
-class SpritePart 
+class SpritePart
 {
-    public:
+public:
+    virtual ~SpritePart() = default;
 
-        void Initialise();
-        void Shutdown();
+    virtual void Initialise() {}
+    virtual void Update(float dt) {(void)dt;}
+    virtual void Draw() const {}
+    virtual void Shutdown() {UnloadTexture(texture);}
 
-        void Update();
-        void Draw() const;
+    void SetPosition(Vector2 p) { position = p; }
+    void SetRotation(float r) { rotation = r; }
+    void SetScale(float s) { scale = s; }
 
-        void SetPosition(Vector2 p);
-        void SetRotation(float r);
-        void SetScale(float s);
-
-    protected:
-        Vector2 position;
-        float rotation;
-        float scale;
-
-    private:
-        Texture2D texture;
+protected:
+    Vector2 position{};
+    float rotation = 0.0f;
+    float scale = 1.0f;
+    Texture2D texture{};
 };

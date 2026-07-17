@@ -1,121 +1,105 @@
 #!/bin/bash
-# Use the Bash shell to run this script.
-
-EXE_NAME="TingoBingo"
-
-echo "Building..."
-echo "Using GDB debugger"
 
 set -e
 
+EXE_NAME="TingoBingo"
 
-# ------------------------------------------------------------
-# Change the current working directory to the project root.
-#
-# Why?
-#
-# If this script lives in:
-#
-# Project/
-# ├── scripts/
-# │   └── build.sh
-# ├── src/
-# ├── include/
-# └── tools/
-#
-# and you double-click it or run it from somewhere else,
-# the "current directory" might not be the project folder.
-#
-# This line guarantees that we always start from
-# the project's root directory.
-# ------------------------------------------------------------
+cd "$(dirname "$0")/.."
 
-cd "$(dirname "$0")"
+echo "Building $EXE_NAME..."
 
-# Breakdown:
-#
-# $0
-# ----
-# The name (or path) of the script that is currently running.
-#
-# Example:
-#
-# scripts/build.sh
-#
-# or perhaps
-#
-# /home/dan/Boids/scripts/build.sh
-#
-# depending on how it was started.
-#
-#
-# dirname
-# -------
-# Extracts only the directory portion.
-#
-# Example:
-#
-# Input:
-#
-# scripts/build.sh
-#
-# Output:
-#
-# scripts
-#
-#
-# "$( ... )"
-# ----------
-# Command substitution.
-#
-# Run the command inside the brackets first,
-# then use its result.
-#
-# Example:
-#
-# $(date)
-#
-# becomes
-#
-# Thu Jul 9 ...
-#
-#
-# 
-# ------------------------------------------------------------
-# Print the current directory.
-#
-# This is just for debugging.
-# It's useful while learning to make sure
-# you're actually in the folder you expect.
-# ------------------------------------------------------------
+mkdir -p build
 
-echo "Now in:"
+rm -f build/TingoBingo.exe
 
-# pwd = Print Working Directory.
-#
-# It prints the folder you're currently "standing in".
-#
-# Example:
-#
-# C:/Users/Dan/Documents/Boids
-#
-pwd
-
-mkdir -p ../build
+echo src/*.cpp
 
 g++ \
     -g \
-    -Wall -Wextra \
+    -Wall \
+    -Wextra \
     -std=c++23 \
-    -I../include \
-    ../src/*.cpp \
-    -o ../build/$EXE_NAME.exe \
+    -Iinclude \
+    src/*.cpp \
+    src/head/*.cpp \
+    -o build/$EXE_NAME.exe \
     -lraylib \
     -lopengl32 \
     -lgdi32 \
     -lwinmm
 
 echo "Build successful"
-echo "Executing $EXE_NAME.exe"
-../build/$EXE_NAME.exe &
+echo "Running $EXE_NAME..."
 
+./build/$EXE_NAME.exe &
+
+
+# ============================================================
+# COMMENTED REFERENCE
+# ============================================================
+
+# #!/bin/bash
+# Run this script using Bash.
+#
+# set -e
+# Stop the script immediately if a command fails.
+#
+# EXE_NAME="TingoBingo"
+# Set the name of the executable.
+#
+# cd "$(dirname "$0")/.."
+# Move from the scripts directory to the project root.
+#
+# echo "Building $EXE_NAME..."
+# Display a message showing that compilation is starting.
+#
+# mkdir -p build
+# Create the build directory if it does not already exist.
+#
+# g++ \
+# Start the C++ compiler.
+#
+#     -g \
+# Include debugging information for GDB.
+#
+#     -Wall \
+# Enable common compiler warnings.
+#
+#     -Wextra \
+# Enable additional compiler warnings.
+#
+#     -std=c++23 \
+# Compile using the C++23 standard.
+#
+#     -Iinclude \
+# Tell the compiler to search the include directory for headers.
+#
+#     src/*.cpp \
+# Compile all .cpp files directly inside src.
+#
+#     src/head/*.cpp \
+# Compile all .cpp files inside src/head.
+#
+#     -o build/$EXE_NAME.exe \
+# Create the executable inside the build directory.
+#
+#     -lraylib \
+# Link the Raylib library.
+#
+#     -lopengl32 \
+# Link the Windows OpenGL library.
+#
+#     -lgdi32 \
+# Link the Windows Graphics Device Interface library.
+#
+#     -lwinmm
+# Link the Windows multimedia library.
+#
+# echo "Build successful"
+# Display a message when compilation succeeds.
+#
+# echo "Running $EXE_NAME..."
+# Display a message before running the program.
+#
+# ./build/$EXE_NAME.exe &
+# Run the executable in the background.

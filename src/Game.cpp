@@ -32,9 +32,10 @@ void Game::Draw()
 
 void Game::Shutdown()
 {
-	CloseWindow();
 	robot.Shutdown();
 	object.Shutdown();
+
+	CloseWindow();
 }
 
 void Game::Run()

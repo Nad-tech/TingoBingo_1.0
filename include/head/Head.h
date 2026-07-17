@@ -1,18 +1,16 @@
 #pragma once
 
-#include "../SpritePart.h"
 #include "raylib.h"
-#include "Antenna.h"
-#include "Ears.h"
-#include "Eyebrows.h"
-#include "Mouth.h"
-#include "Eyes.h"
+#include "head/Antenna.h"
+#include "head/Ears.h"
+#include "head/Eyebrows.h"
+#include "head/Mouth.h"
+#include "head/Eyes.h"
+#include "head/Headbase.h"
 
 class Head
 {
     public:
-        Head();
-        
         void Initialise();
         void Shutdown();
 
@@ -22,9 +20,9 @@ class Head
         void SetPosition(Vector2 position);
 
     private:
-       Vector2 position;
+        Vector2 position;
     
-        SpritePart headBase;
+        Headbase headBase;
         Eyes eyes;
         Antenna antenna;
         Ears ears;

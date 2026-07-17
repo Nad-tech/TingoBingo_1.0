@@ -23,12 +23,12 @@ void Head::Shutdown()
 
 void Head::Update(float dt)
 {
-    headBase.Update();
-    antenna.Update();
-    ears.Update();
-    eyeBrows.Update();
-    eyes.Update();
-    mouth.Update();
+    headBase.Update(dt);
+    antenna.Update(dt);
+    ears.Update(dt);
+    eyeBrows.Update(dt);
+    eyes.Update(dt);
+    mouth.Update(dt);
 }
 
 void Head::Draw() const

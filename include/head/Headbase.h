@@ -2,7 +2,7 @@
 
 #include "SpritePart.h"
 
-class Mouth : public SpritePart
+class Headbase : public SpritePart 
 {
     public:
         void Initialise() override;

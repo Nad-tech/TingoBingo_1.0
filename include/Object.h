@@ -1,17 +1,11 @@
 #pragma once
 
-#include "raylib.h"
-class Object
+#include "SpritePart.h"
+
+class Object : public SpritePart 
 {
-public:
-
-    Object();
-
-    void Update(float dt);
-    void Draw() const;
-    void Initialise();
-    void Shutdown();
-
-private:
-    Vector2 position;
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
 };
