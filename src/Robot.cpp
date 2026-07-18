@@ -4,13 +4,29 @@
 
 Robot::Robot()
 {
-	position = {0,0};
+	position = ROBOT_INITIAL_POSITION;
     head.SetPosition(position);
 }
 
 void Robot::Update(float dt)
 {
     head.Update(dt);
+}
+
+void Robot::SetPosition(Vector2 position)
+{
+    this->position = position;
+    head.SetPosition(position);
+}
+
+Vector2 Robot::GetPosition() const
+{
+    return position;
+}
+
+Vector2 Robot::GetHeadPosition() const
+{
+    return head.GetPosition();
 }
 
 void Robot::Draw() const

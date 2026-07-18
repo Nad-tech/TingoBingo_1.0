@@ -18,6 +18,7 @@ class Head
         void Draw() const;
 
         void SetPosition(Vector2 position);
+        Vector2 GetPosition() const;
 
     private:
         Vector2 position;

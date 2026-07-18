@@ -16,6 +16,9 @@ public:
 	void Shutdown();
 
 	void SetPosition(Vector2 position);
+	
+	Vector2 GetPosition() const;
+	Vector2 GetHeadPosition() const;
 
 private:
 	Vector2 position;

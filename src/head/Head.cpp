@@ -43,10 +43,17 @@ void Head::Draw() const
 
 void Head::SetPosition(Vector2 position) 
 {
+    this->position = position;
+    
     headBase.SetPosition(position);
     antenna.SetPosition(position);
     ears.SetPosition(position);
     eyeBrows.SetPosition(position);
     eyes.SetPosition(position);
     mouth.SetPosition(position);
+}
+
+Vector2 Head::GetPosition() const
+{
+    return position;
 }

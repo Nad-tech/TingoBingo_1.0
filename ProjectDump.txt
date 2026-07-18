@@ -21,10 +21,13 @@
 
 #pragma once
 
+#include "raylib.h"
+
 constexpr int SCREEN_WIDTH = 700;
 constexpr int SCREEN_HEIGHT = 600;
 constexpr char WINDOW_TITLE[] = "TingoBingo";
 constexpr int TARGET_FPS = 60;
+constexpr Vector2 ROBOT_INITIAL_POSITION = {SCREEN_WIDTH/2, SCREEN_HEIGHT/2};
 
 
 =====================================
@@ -71,7 +74,6 @@ class Antenna : public SpritePart
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void Shutdown() override;
 };
 
 
@@ -89,7 +91,6 @@ class Ears : public SpritePart
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void Shutdown() override;
 };
 
 
@@ -107,7 +108,6 @@ class Eyebrows : public SpritePart
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void Shutdown() override;
 };
 
 
@@ -125,7 +125,6 @@ class Eyes : public SpritePart
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void Shutdown() override;
 
     private:
         float blinkTimer = 0;
@@ -145,6 +144,7 @@ class Eyes : public SpritePart
 #include "head/Eyebrows.h"
 #include "head/Mouth.h"
 #include "head/Eyes.h"
+#include "head/Headbase.h"
 
 class Head
 {
@@ -158,14 +158,31 @@ class Head
         void SetPosition(Vector2 position);
 
     private:
-       Vector2 position;
+        Vector2 position;
     
-        SpritePart headBase;
+        Headbase headBase;
         Eyes eyes;
         Antenna antenna;
         Ears ears;
         Eyebrows eyeBrows;
         Mouth mouth;
+};
+
+
+=====================================
+.\include\head\Headbase.h
+=====================================
+
+#pragma once
+
+#include "SpritePart.h"
+
+class Headbase : public SpritePart 
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
 };
 
 
@@ -183,7 +200,6 @@ class Mouth : public SpritePart
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void Shutdown() override;
 };
 
 
@@ -199,17 +215,14 @@ class Mouth : public SpritePart
 
 #pragma once
 
-#include "raylib.h"
-class Object
-{
-public:
-    void Update(float dt);
-    void Draw() const;
-    void Initialise();
-    void Shutdown();
+#include "SpritePart.h"
 
-private:
-    Vector2 position;
+class Object : public SpritePart 
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
 };
 
 
@@ -257,7 +270,7 @@ public:
     virtual ~SpritePart() = default;
 
     virtual void Initialise() {}
-    virtual void Update(float deltaTime) {}
+    virtual void Update(float dt) {(void)dt;}
     virtual void Draw() const {}
     virtual void Shutdown() {UnloadTexture(texture);}
 
@@ -323,9 +336,10 @@ void Game::Draw()
 
 void Game::Shutdown()
 {
-	CloseWindow();
 	robot.Shutdown();
 	object.Shutdown();
+
+	CloseWindow();
 }
 
 void Game::Run()
@@ -369,7 +383,7 @@ void Antenna::Initialise()
 
 void Antenna::Update(float dt)
 {
-
+    (void)dt;
 }
 
 void Antenna::Draw() const 
@@ -396,7 +410,7 @@ void Ears::Initialise()
 
 void Ears::Update(float dt)
 {
-
+    (void)dt;
 }
 
 void Ears::Draw() const 
@@ -423,7 +437,7 @@ void Eyebrows::Initialise()
 
 void Eyebrows::Update(float dt)
 {
-
+    (void)dt;
 }
 
 void Eyebrows::Draw() const 
@@ -449,12 +463,12 @@ void Eyes::Initialise()
 
 void Eyes::Update(float dt)
 {
-
+    (void)dt;
 }
 
 void Eyes::Draw() const 
 {
-
+    
 }
 
 
@@ -515,6 +529,64 @@ void Head::SetPosition(Vector2 position)
     mouth.SetPosition(position);
 }
 
+Vector2 GetPosition()
+{
+    return position;
+}
+
+
+=====================================
+.\src\head\Headbase.cpp
+=====================================
+
+#include "head/Headbase.h"
+
+void Headbase::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/headbase.png");
+
+    position = {0,0};
+    rotation = 0.0f;
+    scale = 1.0f;
+}
+
+void Headbase::Update(float dt)
+{
+    (void)dt;
+}
+
+void Headbase::Draw() const 
+{
+    Rectangle source = {
+    0.0f,   // x: start 32 pixels from left
+    0.0f,   // y: start 32 pixels from top
+    256.0f,  // width of frame
+    256.0f   // height of frame
+};
+
+Rectangle destination = {
+    position.x,
+    position.y,
+    source.width * scale,
+    source.height * scale
+};
+
+Vector2 origin = {
+    0.0f,
+    0.0f
+};
+
+DrawTexturePro(
+    texture,
+    source,
+    destination,
+    origin,
+    rotation,
+    WHITE
+);
+}
+
+
 
 =====================================
 .\src\head\Mouth.cpp
@@ -533,7 +605,7 @@ void Mouth::Initialise()
 
 void Mouth::Update(float dt)
 {
-
+    (void)dt;
 }
 
 void Mouth::Draw() const 
@@ -568,27 +640,26 @@ int main ()
 =====================================
 
 #include "Object.h"
-#include "raylib.h"
 
-void Object::Initialise()
+void Object::Initialise() 
 {
-    position = {20, 20};
+    texture = LoadTexture("assets/images/TingoBingo/head/antenna.png");
+
+    position = { 0.0f, 0.0f };
+    rotation = 0.0f;
+    scale = 1.0f;
 }
 
 void Object::Update(float dt)
 {
-    position.y += 100 * dt;
+    (void)dt;
 }
 
-void Object::Draw() const
+void Object::Draw() const 
 {
-    DrawCircle(position.x, position.y, 10,RED);
+    DrawCircle(10,10,10,RED);
 }
 
-void Object::Shutdown()
-{
-    
-}
 
 
 =====================================
@@ -601,13 +672,29 @@ void Object::Shutdown()
 
 Robot::Robot()
 {
-	position = {0,0};
+	position = ROBOT_INITIAL_POSITION;
     head.SetPosition(position);
 }
 
 void Robot::Update(float dt)
 {
     head.Update(dt);
+}
+
+void Robot::SetPosition(Vector2 position)
+{
+    this->position = position;
+    head.SetPosition(position);
+}
+
+Vector2 Robot::GetPosition()
+{
+    return position;
+}
+
+Vector2 Robot::GetHeadPosition()
+{
+    return head.GetPosition();
 }
 
 void Robot::Draw() const
