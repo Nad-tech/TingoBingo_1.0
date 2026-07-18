@@ -1,45 +1,63 @@
 #include "head/Headbase.h"
+#include "Constants.h"
 
 void Headbase::Initialise() 
 {
     texture = LoadTexture("assets/images/TingoBingo/head/headbase.png");
     rotation = 0.0f;
     scale = 1.0f;
+    frame = 0;
+    frameTimer = 0;
+}
+
+void Headbase::IncrementFrame() {
+    frame = (frame + 1) % 8;
 }
 
 void Headbase::Update(float dt)
 {
-    (void)dt;
+    frameTimer += dt;
+    if(frameTimer >= 0.4) 
+    {
+        IncrementFrame();
+        frameTimer = 0;
+    }
 }
 
 void Headbase::Draw() const 
 {
-    Rectangle source = {
-    0.0f,   // x: start 32 pixels from left
-    0.0f,   // y: start 32 pixels from top
-    256.0f,  // width of frame
-    256.0f   // height of frame
-};
+    int columns = 4;
 
-Rectangle destination = {
-    position.x,
-    position.y,
-    source.width * scale,
-    source.height * scale
-};
+    float column = frame % columns;
+    float row    = frame / columns;
 
-Vector2 origin = {
-    0.0f,
-    0.0f
-};
+    Rectangle source =
+    {
+        column * SPRITESHEET_FRAME_SIZE,
+        row * SPRITESHEET_FRAME_SIZE,
+        SPRITESHEET_FRAME_SIZE,
+        SPRITESHEET_FRAME_SIZE
+    };
 
-DrawTexturePro(
-    texture,
-    source,
-    destination,
-    origin,
-    rotation,
-    WHITE
-);
+    Rectangle destination = {
+        position.x,
+        position.y,
+        source.width * scale,
+        source.height * scale
+    };
+
+    Vector2 origin = {
+        0.0f,
+        0.0f
+    };
+
+    DrawTexturePro(
+        texture,
+        source,
+        destination,
+        origin,
+        rotation,
+        WHITE
+    );
 }
 

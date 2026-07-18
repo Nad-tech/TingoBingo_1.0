@@ -8,4 +8,9 @@ class Headbase : public SpritePart
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
+        void IncrementFrame();
+
+    private:
+        int frame;
+        float frameTimer = 0.0f;
 };

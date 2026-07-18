@@ -27,7 +27,12 @@ constexpr int SCREEN_WIDTH = 700;
 constexpr int SCREEN_HEIGHT = 600;
 constexpr char WINDOW_TITLE[] = "TingoBingo";
 constexpr int TARGET_FPS = 60;
-constexpr Vector2 ROBOT_INITIAL_POSITION = {SCREEN_WIDTH/2, SCREEN_HEIGHT/2};
+
+constexpr int SPRITESHEET_FRAME_SIZE = 256;
+constexpr Vector2 ROBOT_INITIAL_POSITION = {
+    SCREEN_WIDTH / 2.0f - SPRITESHEET_FRAME_SIZE/2,
+    SCREEN_HEIGHT / 2.0f - SPRITESHEET_FRAME_SIZE/2
+};
 
 
 =====================================
@@ -156,6 +161,7 @@ class Head
         void Draw() const;
 
         void SetPosition(Vector2 position);
+        Vector2 GetPosition() const;
 
     private:
         Vector2 position;
@@ -248,6 +254,9 @@ public:
 	void Shutdown();
 
 	void SetPosition(Vector2 position);
+	
+	Vector2 GetPosition() const;
+	Vector2 GetHeadPosition() const;
 
 private:
 	Vector2 position;
@@ -521,6 +530,8 @@ void Head::Draw() const
 
 void Head::SetPosition(Vector2 position) 
 {
+    this->position = position;
+    
     headBase.SetPosition(position);
     antenna.SetPosition(position);
     ears.SetPosition(position);
@@ -529,7 +540,7 @@ void Head::SetPosition(Vector2 position)
     mouth.SetPosition(position);
 }
 
-Vector2 GetPosition()
+Vector2 Head::GetPosition() const
 {
     return position;
 }
@@ -544,8 +555,6 @@ Vector2 GetPosition()
 void Headbase::Initialise() 
 {
     texture = LoadTexture("assets/images/TingoBingo/head/headbase.png");
-
-    position = {0,0};
     rotation = 0.0f;
     scale = 1.0f;
 }
@@ -687,12 +696,12 @@ void Robot::SetPosition(Vector2 position)
     head.SetPosition(position);
 }
 
-Vector2 Robot::GetPosition()
+Vector2 Robot::GetPosition() const
 {
     return position;
 }
 
-Vector2 Robot::GetHeadPosition()
+Vector2 Robot::GetHeadPosition() const
 {
     return head.GetPosition();
 }
