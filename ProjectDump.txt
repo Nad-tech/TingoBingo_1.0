@@ -129,6 +129,7 @@ class Antenna : public Sprite
     public:
         void Initialise() override;
         void Update(float dt) override;
+        void PlayWiggle();
     
     private:
         float blinkTimer = 0.0f;
@@ -227,6 +228,8 @@ class Head
         void RotateRight();
         void ReturnToCentre();
         bool IsFrontFacing() const;
+
+        void WiggleAntenna();
         
     private:
         Vector2 position;
@@ -301,6 +304,27 @@ class Nose : public Sprite
 
 
 =====================================
+.\include\IdleController.h
+=====================================
+
+#pragma once
+#include "head\Head.h"
+
+class IdleController 
+{
+    public:
+        IdleController(Head& h);
+        void Update(float dt);
+        void UpdateAntenna(float dt);
+    
+    private:
+	    float antennaWiggleTimer;
+	    float nextAntennaWiggle;
+        Head& head;
+};
+
+
+=====================================
 .\include\Input.h
 =====================================
 
@@ -322,6 +346,7 @@ public:
 
 #include "raylib.h"
 #include "head/Head.h"
+#include "IdleController.h"
 
 class Robot 
 {
@@ -348,6 +373,7 @@ private:
 	Vector2 position;
 	
 	Head head;
+	IdleController idle;
 };
 
 
@@ -685,18 +711,15 @@ void Antenna::Initialise()
 void Antenna::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
-
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
-    {
-        animation.Play(0, 7);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
-    }
 }
 
+void Antenna::PlayWiggle()
+{
+    if (!animation.IsPlaying())
+    {
+        animation.Play(0, 7);
+    }
+}
 
 
 =====================================
@@ -954,6 +977,10 @@ bool Head::IsFrontFacing() const
     return headBase.GetFrame() == 0;
 }
 
+void Head::WiggleAntenna() {
+    antenna.PlayWiggle();
+}
+
 
 =====================================
 .\src\head\Headbase.cpp
@@ -1129,6 +1156,36 @@ void Nose::Update(float dt)
 
 
 =====================================
+.\src\IdleController.cpp
+=====================================
+
+#include "IdleController.h"
+
+IdleController::IdleController(Head& h)
+    : head(h),
+      antennaWiggleTimer(0.0f),
+      nextAntennaWiggle(3.0f)
+{
+}
+
+void IdleController::Update(float dt)
+{
+    UpdateAntenna(dt);
+}
+
+void IdleController::UpdateAntenna(float dt)
+{
+    antennaWiggleTimer += dt;
+    if(antennaWiggleTimer > nextAntennaWiggle)
+    {
+        head.WiggleAntenna();
+        antennaWiggleTimer = 0.0f;
+        nextAntennaWiggle = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+
+=====================================
 .\src\Input.cpp
 =====================================
 
@@ -1169,7 +1226,8 @@ int main ()
 #include "raylib.h"
 #include "Constants.h"
 
-Robot::Robot()
+Robot::Robot() 
+    : idle(head)
 {
 	position = 
     {
@@ -1181,6 +1239,7 @@ Robot::Robot()
 void Robot::Update(float dt)
 {
     head.Update(dt);
+    idle.Update(dt);
 }
 
 void Robot::SetPosition(Vector2 position)

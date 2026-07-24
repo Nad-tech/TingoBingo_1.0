@@ -2,6 +2,7 @@
 
 #include "raylib.h"
 #include "head/Head.h"
+#include "IdleController.h"
 
 class Robot 
 {
@@ -28,4 +29,5 @@ private:
 	Vector2 position;
 	
 	Head head;
+	IdleController idle;
 };

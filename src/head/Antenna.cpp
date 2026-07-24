@@ -32,15 +32,12 @@ void Antenna::Initialise()
 void Antenna::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
-
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
-    {
-        animation.Play(0, 7);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
-    }
 }
 
+void Antenna::PlayWiggle()
+{
+    if (!animation.IsPlaying())
+    {
+        animation.Play(0, 7);
+    }
+}

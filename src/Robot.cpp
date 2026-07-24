@@ -2,7 +2,8 @@
 #include "raylib.h"
 #include "Constants.h"
 
-Robot::Robot()
+Robot::Robot() 
+    : idle(head)
 {
 	position = 
     {
@@ -14,6 +15,7 @@ Robot::Robot()
 void Robot::Update(float dt)
 {
     head.Update(dt);
+    idle.Update(dt);
 }
 
 void Robot::SetPosition(Vector2 position)

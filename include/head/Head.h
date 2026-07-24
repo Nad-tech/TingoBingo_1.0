@@ -25,6 +25,8 @@ class Head
         void RotateRight();
         void ReturnToCentre();
         bool IsFrontFacing() const;
+
+        void WiggleAntenna();
         
     private:
         Vector2 position;

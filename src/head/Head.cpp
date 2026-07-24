@@ -91,3 +91,7 @@ bool Head::IsFrontFacing() const
 {
     return headBase.GetFrame() == 0;
 }
+
+void Head::WiggleAntenna() {
+    antenna.PlayWiggle();
+}
