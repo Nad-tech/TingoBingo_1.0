@@ -171,5 +171,3 @@ The goal is to capture that same sense of imagination in software while learning
 This project is released under the MIT License.
 
 ---
-
-*"Every great project starts with one blinking eye."*

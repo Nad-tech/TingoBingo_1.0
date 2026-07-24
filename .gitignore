@@ -1,8 +1,16 @@
+# Archives
 *.zip
 
-assets/images/TingoBingo/head/Renders/
-assets/images/TingoBingo/head/RawFiles/
+# Blender backups
+*.blend1
 
+# Blender autosaves
+*.blend@
+
+# Build output
 build/
 *.exe
-*.blend1
+
+# Working assets
+assets/images/TingoBingo/head/RawFiles/
+assets/images/TingoBingo/head/Renders/
