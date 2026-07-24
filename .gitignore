@@ -1,0 +1,8 @@
+*.zip
+
+assets/images/TingoBingo/head/Renders/
+assets/images/TingoBingo/head/RawFiles/
+
+build/
+*.exe
+*.blend1

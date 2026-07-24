@@ -1,0 +1,1508 @@
+=====================================
+.\include\Animation.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+
+class Animation
+{
+    public:
+    Animation();
+
+    void Initialise
+    (
+        int frameWidth,
+        int frameHeight,
+        int totalFrames,
+        int columns,
+        float frameDuration
+    );
+
+    void Update(float dt);
+
+    Rectangle GetSourceRectangle() const;
+
+    int GetFrameWidth() const;
+    int GetFrameHeight() const;
+
+    void SetFrame(int newFrame);
+    int GetFrame() const;
+    int GetTotalFrames() const;
+    
+    void Reset();
+
+    void PreviousFrame();
+    void NextFrame();
+    
+    void Play(int startFrame, int endFrame);
+    bool IsPlaying() const;
+
+private:
+    int frame;
+
+    int frameWidth;
+    int frameHeight;
+
+    int totalFrames;
+    int columns;
+
+    float frameTimer;
+    float frameDuration;
+
+    bool playing;
+
+    int startFrame;
+    int endFrame;
+};
+
+
+=====================================
+.\include\Constants.h
+=====================================
+
+//==================================================
+//
+// Template Project
+//
+// Version 1.0
+//
+// Raylib
+// C++20
+//
+//==================================================
+
+#pragma once
+
+constexpr int SCREEN_WIDTH = 700;
+constexpr int SCREEN_HEIGHT = 700;
+constexpr char WINDOW_TITLE[] = "TingoBingo";
+constexpr int TARGET_FPS = 60;
+
+constexpr int ROBOT_WIDTH = 256;
+constexpr int ROBOT_HEIGHT = 256;
+constexpr float SCALE = 2.0f;
+
+
+
+=====================================
+.\include\Game.h
+=====================================
+
+#pragma once
+
+#include "Robot.h"
+#include "Input.h"
+class Game
+{
+public:
+	
+	void Run();
+	
+private:
+	
+	void Initialise();
+	void Shutdown();
+
+	void HandleInput();
+	void Update(const float dt);
+	void Draw();
+	
+	
+	Robot robot;
+	Input input;
+	Texture2D background;
+};
+
+
+=====================================
+.\include\head\Antenna.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Antenna : public Sprite 
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+    
+    private:
+        float blinkTimer = 0.0f;
+        float nextBlink = 3.0f;
+};
+
+
+=====================================
+.\include\head\Ears.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Ears : public Sprite
+{
+     public:
+        void Initialise() override;
+        void Update(float dt) override;
+    
+    private:
+        float blinkTimer = 0.0f;
+        float nextBlink = 3.0f;
+};
+
+
+=====================================
+.\include\head\Eyebrows.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Eyebrows : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+    
+    private:
+        float blinkTimer = 0.0f;
+        float nextBlink = 3.0f;
+};
+
+
+=====================================
+.\include\head\Eyes.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Eyes : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+    
+    private:
+        float blinkTimer = 0.0f;
+        float nextBlink = 3.0f;
+}; 
+
+
+=====================================
+.\include\head\Head.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "head/Antenna.h"
+#include "head/Ears.h"
+#include "head/Eyebrows.h"
+#include "head/Mouth.h"
+#include "head/Eyes.h"
+#include "head/Headbase.h"
+#include "Nose.h"
+
+class Head
+{
+    public:
+        void Initialise();
+        void Shutdown();
+
+        void Update(float dt);
+        void Draw() const;
+
+        void SetPosition(Vector2 position);
+        Vector2 GetPosition() const;
+
+        void RotateLeft();
+        void RotateRight();
+        void ReturnToCentre();
+        bool IsFrontFacing() const;
+        
+    private:
+        Vector2 position;
+    
+        Headbase headBase;
+        Eyes eyes;
+        Antenna antenna;
+        Ears ears;
+        Eyebrows eyeBrows;
+        Mouth mouth;
+        Nose nose;
+};
+
+
+=====================================
+.\include\head\Headbase.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Headbase : public Sprite 
+{
+    public:
+        void Initialise() override;
+        void RotateLeft();
+        void RotateRight();
+        void ReturnToCentre();
+        int GetFrame() const;
+};
+
+
+=====================================
+.\include\head\Mouth.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Mouth : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+    
+    private:
+       float blinkTimer = 0.0f;
+       float nextBlink = 3.0f;
+};
+
+
+=====================================
+.\include\head\Nose.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Nose : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+    
+    private:
+        float blinkTimer = 0.0f;
+        float nextBlink = 3.0f;
+}; 
+
+
+=====================================
+.\include\Input.h
+=====================================
+
+#pragma once
+
+class Input
+{
+public:
+    bool LeftPressed() const;
+    bool RightPressed() const;
+};
+
+
+=====================================
+.\include\Robot.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "head/Head.h"
+
+class Robot 
+{
+public:
+	
+	Robot();	
+
+	void Update(float dt);
+	void Draw() const;
+	
+	void Initialise();
+	void Shutdown();
+
+	void SetPosition(Vector2 position);
+	
+	void RotateHeadLeft();
+	void RotateHeadRight();
+	void ReturnHeadToCentre();
+
+	Vector2 GetPosition() const;
+	Vector2 GetHeadPosition() const;
+
+private:
+	Vector2 position;
+	
+	Head head;
+};
+
+
+=====================================
+.\include\Sprite.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "Animation.h"
+
+class Sprite
+{
+protected:
+    Texture2D texture;
+    Animation animation;
+
+    Vector2 position = {0,0};
+    float rotation = 0.0f;
+    float scale = 1.0f;
+
+public:
+    virtual void Initialise() = 0;
+
+    virtual void Update(float dt);
+    virtual void Draw() const;
+
+    void Shutdown();
+    void SetPosition(Vector2 position);
+    Vector2 GetPosition() const;
+
+    void MoveSpriteUp();
+    void MoveSpriteDown();
+
+    virtual ~Sprite() = default;
+};
+
+
+=====================================
+.\include\Utils.h
+=====================================
+
+
+
+=====================================
+.\src\Animation.cpp
+=====================================
+
+#include "Animation.h"
+
+Animation::Animation()
+{
+    // Default animation state
+    frame = 0;
+
+    frameWidth = 0;
+    frameHeight = 0;
+
+    totalFrames = 1;
+    columns = 1;
+
+    frameTimer = 0.0f;
+    frameDuration = 0.1f;
+
+    playing = false;
+
+    startFrame = 0;
+    endFrame = 0;
+}
+
+void Animation::Initialise(
+    int width,
+    int height,
+    int frames,
+    int cols,
+    float duration)
+{
+    // Store animation properties
+    frameWidth = width;
+    frameHeight = height;
+
+    totalFrames = frames;
+    columns = cols;
+
+    frameDuration = duration;
+
+    // Reset animation
+    frame = 0;
+    frameTimer = 0.0f;
+}
+
+void Animation::Update(float dt)
+{
+    // Do nothing if animation isn't playing
+    if (!playing)
+        return;
+
+    // Count elapsed time
+    frameTimer += dt;
+
+    // Wait until it's time for the next frame
+    if (frameTimer < frameDuration)
+        return;
+    /*
+    Remove one frame's worth of elapsed time
+    Keep any leftover time for the next update
+    Example: 0.18s - 0.10s = 0.08s carries into the next frame.
+    Remove one frame's worth of time so any extra carries over.
+    Example: 0.18s - 0.10s = 0.08s, keeping the animation accurate.
+    By "keeping the animation accurate," I mean making sure it plays 
+    at the correct speed over time, even if your game's frame rate isn't 
+    perfectly consistent.
+    frameTimer -= frameDuration;
+    */
+
+    frameTimer -= frameDuration;
+
+    // Advance to the next frame
+    frame++;
+
+    // Stop after the last frame
+    if (frame > endFrame)
+    {
+        frame = startFrame;
+        playing = false;
+    }
+}
+
+Rectangle Animation::GetSourceRectangle() const
+{
+    // Calculate sprite sheet position
+    int column = frame % columns;
+    int row = frame / columns;
+
+    return
+    {
+        (float)(column * frameWidth),
+        (float)(row * frameHeight),
+        (float)frameWidth,
+        (float)frameHeight
+    };
+}
+
+void Animation::Reset()
+{
+    // Return to the first frame
+    frame = 0;
+    frameTimer = 0.0f;
+}
+
+void Animation::SetFrame(int newFrame)
+{
+    // Set a specific frame
+    frame = newFrame % totalFrames;
+}
+
+void Animation::PreviousFrame()
+{
+    // Move back one frame
+    frame--;
+
+    if (frame < 0)
+        frame = totalFrames - 1;
+}
+
+void Animation::NextFrame()
+{
+    // Move forward one frame
+    frame = (frame + 1) % totalFrames;
+}
+
+int Animation::GetFrameWidth() const
+{
+    return frameWidth;
+}
+
+int Animation::GetFrameHeight() const
+{
+    return frameHeight;
+}
+
+int Animation::GetFrame() const
+{
+    return frame;
+}
+
+int Animation::GetTotalFrames() const
+{
+    return totalFrames;
+}
+
+void Animation::Play(int start, int end)
+{
+    // Ignore if already playing
+    if (playing)
+        return;
+
+    // Set playback range
+    startFrame = start;
+    endFrame = end;
+
+    // Start at the first frame
+    frame = startFrame;
+    frameTimer = 0.0f;
+
+    playing = true;
+}
+
+bool Animation::IsPlaying() const
+{
+    return playing;
+}
+
+
+=====================================
+.\src\Game.cpp
+=====================================
+
+#include "raylib.h"
+
+#include "Game.h"
+#include "Constants.h"
+
+
+void  Game::Initialise()
+{
+	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+	
+	robot.Initialise();
+
+	SetTargetFPS(TARGET_FPS);
+
+	background = LoadTexture("assets/images/background/space.jpg");
+}
+
+void Game::HandleInput()
+{
+	if (input.LeftPressed())
+	{
+		robot.RotateHeadLeft();
+	}
+	else if (input.RightPressed())
+	{
+		robot.RotateHeadRight();
+	}
+	else 
+	{
+		robot.ReturnHeadToCentre();
+	}
+}
+
+void Game::Update(const float dt)
+{	
+	robot.Update(dt);
+}
+
+void Game::Draw()
+{
+	ClearBackground(BLACK);
+	
+	DrawTexture(background, 0, 0, WHITE);
+
+	robot.Draw();
+}
+
+void Game::Shutdown()
+{
+	robot.Shutdown();
+
+	UnloadTexture(background);
+
+	CloseWindow();
+}
+
+void Game::Run()
+{
+	float dt = GetFrameTime();
+	
+	Initialise();
+	
+	while (!WindowShouldClose()) 
+	{
+		HandleInput();
+		
+		dt = GetFrameTime();
+		Update(dt);
+		
+		BeginDrawing();
+		
+		Draw();
+		
+		EndDrawing();
+	}
+	
+	Shutdown();
+}
+
+
+=====================================
+.\src\head\Antenna.cpp
+=====================================
+
+#include "head/Antenna.h"
+#include "Constants.h"
+
+void Antenna::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/antenna.png");
+    const int COLUMNS = 4;
+    const int ROWS = 2;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.06f;
+
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+void Antenna::Update(float dt)
+{
+    Sprite::Update(dt);//Update the timer
+
+    blinkTimer += dt;
+
+    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+    {
+        animation.Play(0, 7);
+        
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+
+
+=====================================
+.\src\head\Ears.cpp
+=====================================
+
+#include "head/Ears.h"
+#include "Constants.h"
+
+void Ears::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/ears.png");
+
+    const int COLUMNS = 5;
+    const int ROWS = 1;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.09f;
+
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+void Ears::Update(float dt)
+{
+    Sprite::Update(dt);//Update the timer
+
+    blinkTimer += dt;
+
+    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+    {
+        animation.Play(0, 3);
+        
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+
+
+=====================================
+.\src\head\Eyebrows.cpp
+=====================================
+
+#include "head/Eyebrows.h"
+#include "Constants.h"
+
+void Eyebrows::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
+    
+    const int COLUMNS = 2;
+    const int ROWS = 1;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.3f;
+
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+void Eyebrows::Update(float dt)
+{
+    Sprite::Update(dt);//Update the timer
+
+    blinkTimer += dt;
+
+    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+    {
+        animation.Play(0, 1);
+        
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+
+
+=====================================
+.\src\head\Eyes.cpp
+=====================================
+
+#include "head/Eyes.h"
+#include "Constants.h"
+
+void Eyes::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/eyes.png");
+    const int COLUMNS = 5;
+    const int ROWS = 1;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.02f;
+
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+void Eyes::Update(float dt)
+{
+    Sprite::Update(dt);//Update the timer
+
+    blinkTimer += dt;
+
+    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+    {
+        animation.Play(0, 3);
+        
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+
+=====================================
+.\src\head\Head.cpp
+=====================================
+
+#include "head/Head.h"
+
+void Head::Initialise()
+{
+    headBase.Initialise();
+    antenna.Initialise();
+    ears.Initialise();
+    eyeBrows.Initialise();
+    eyes.Initialise();
+    mouth.Initialise();
+    nose.Initialise();
+}
+
+void Head::Shutdown()
+{
+    headBase.Shutdown();
+    antenna.Shutdown();
+    ears.Shutdown();
+    eyeBrows.Shutdown();
+    eyes.Shutdown();
+    mouth.Shutdown();
+    nose.Shutdown();
+}
+
+void Head::Update(float dt)
+{
+    headBase.Update(dt);
+    antenna.Update(dt);
+    ears.Update(dt);
+    eyeBrows.Update(dt);
+    eyes.Update(dt);
+    mouth.Update(dt);
+    nose.Update(dt);
+}
+
+void Head::Draw() const
+{
+    
+    antenna.Draw();
+   
+    if (IsFrontFacing())
+    {
+        ears.Draw();
+        headBase.Draw();
+        eyes.Draw();
+        mouth.Draw();
+        nose.Draw();
+        eyeBrows.Draw();
+        antenna.Draw();
+    }
+    else {
+        headBase.Draw();
+    }
+    
+}
+
+void Head::SetPosition(Vector2 position) 
+{
+    this->position = position;
+    
+    headBase.SetPosition(position);
+    antenna.SetPosition(position);
+    ears.SetPosition(position);
+    eyeBrows.SetPosition(position);
+    eyes.SetPosition(position);
+    mouth.SetPosition(position);
+    nose.SetPosition(position);
+}
+
+Vector2 Head::GetPosition() const
+{
+    return position;
+}
+
+void Head::RotateLeft()
+{
+    headBase.RotateLeft();
+}
+
+void Head::RotateRight()
+{
+    headBase.RotateRight();
+}
+
+void Head::ReturnToCentre()
+{
+    headBase.ReturnToCentre();
+}
+
+bool Head::IsFrontFacing() const
+{
+    return headBase.GetFrame() == 0;
+}
+
+
+=====================================
+.\src\head\Headbase.cpp
+=====================================
+
+#include "head/Headbase.h"
+#include "Constants.h"
+
+void Headbase::Initialise()
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/HeadBase.png");
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.02f;
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+int Headbase::GetFrame() const
+{
+    return animation.GetFrame();
+}
+
+void Headbase::RotateLeft()
+{
+    animation.PreviousFrame();
+}
+
+void Headbase::RotateRight()
+{
+    animation.NextFrame();
+}
+
+void Headbase::ReturnToCentre()
+{
+    int frame = animation.GetFrame();
+    int halfTurn = animation.GetTotalFrames() / 2;
+
+    if (frame == 0)
+        return;
+
+    // Decide which way is shorter.
+    if (frame < halfTurn)
+    {
+        animation.PreviousFrame();
+    }
+    else
+    {
+        animation.NextFrame();
+    }
+}
+
+
+
+=====================================
+.\src\head\Mouth.cpp
+=====================================
+
+#include "head/Mouth.h"
+#include "Constants.h"
+
+void Mouth::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/mouth.png");
+
+    const int COLUMNS = 3;
+    const int ROWS = 1;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 1.0f;
+
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+void Mouth::Update(float dt)
+{
+    Sprite::Update(dt);//Update the timer
+
+    blinkTimer += dt;
+
+    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+    {
+        animation.Play(0, 2);
+        
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+    } 
+}
+
+
+=====================================
+.\src\head\Nose.cpp
+=====================================
+
+#include "head/Nose.h"
+#include "Constants.h"
+
+void Nose::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/nose.png");
+    const int COLUMNS = 4;
+    const int ROWS = 1;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.08f;
+
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+void Nose::Update(float dt)
+{
+    Sprite::Update(dt);//Update the timer
+
+    blinkTimer += dt;
+
+    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+    {
+        animation.Play(0, 3);
+        
+        blinkTimer = 0.0f;
+        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+
+=====================================
+.\src\Input.cpp
+=====================================
+
+#include "Input.h"
+#include "raylib.h"
+
+bool Input::LeftPressed() const
+{
+    return IsKeyDown(KEY_LEFT);
+}
+
+bool Input::RightPressed() const
+{
+    return IsKeyDown(KEY_RIGHT);
+}
+
+
+=====================================
+.\src\main.cpp
+=====================================
+
+#include "Game.h"
+
+int main ()
+{
+	Game app;
+	app.Run();
+	
+	return 0;
+}
+
+
+=====================================
+.\src\Robot.cpp
+=====================================
+
+#include "Robot.h"
+#include "raylib.h"
+#include "Constants.h"
+
+Robot::Robot()
+{
+	position = 
+    {
+        (SCREEN_WIDTH - ROBOT_WIDTH * SCALE) / 2, 
+        (SCREEN_HEIGHT - ROBOT_HEIGHT * SCALE) / 2
+    };
+}
+
+void Robot::Update(float dt)
+{
+    head.Update(dt);
+}
+
+void Robot::SetPosition(Vector2 position)
+{
+    this->position = position;
+    head.SetPosition(position);
+}
+
+Vector2 Robot::GetPosition() const
+{
+    return position;
+}
+
+Vector2 Robot::GetHeadPosition() const
+{
+    return head.GetPosition();
+}
+
+void Robot::Draw() const
+{
+	head.Draw();
+}
+
+void Robot::Initialise()
+{
+    head.Initialise();
+    head.SetPosition(position);
+}
+
+void Robot::Shutdown()
+{
+    head.Shutdown();
+}
+
+void Robot::RotateHeadLeft()
+{
+    head.RotateLeft();
+}
+
+void Robot::RotateHeadRight()
+{
+    head.RotateRight();
+}
+
+void Robot::ReturnHeadToCentre()
+{
+    head.ReturnToCentre();
+}
+
+
+=====================================
+.\src\Sprite.cpp
+=====================================
+
+#include "Sprite.h"
+
+void Sprite::Update(float dt)
+{
+    animation.Update(dt);
+}
+
+void Sprite::Draw() const
+{
+    Rectangle source = animation.GetSourceRectangle();
+
+    Rectangle destination =
+    {
+        position.x,
+        position.y,
+        animation.GetFrameWidth() * scale,
+        animation.GetFrameHeight() * scale
+    };
+
+    Vector2 origin = {0,0};
+
+    DrawTexturePro(
+        texture,
+        source,
+        destination,
+        origin,
+        rotation,
+        WHITE
+    );
+}
+
+void Sprite::Shutdown()
+{
+    UnloadTexture(texture);
+}
+
+void Sprite::SetPosition(Vector2 position)
+{
+    this->position = position;
+}
+
+Vector2 Sprite::GetPosition() const
+{
+    return position;
+}
+
+void Sprite::MoveSpriteUp()
+{
+    this->SetPosition({this->GetPosition().x, this->GetPosition().y - 1.0f});
+}
+
+void Sprite::MoveSpriteDown()
+{
+    this->SetPosition({this->GetPosition().x, this->GetPosition().y + 1.0f});
+}
+
+
+=====================================
+.\utilities\projectDump.cpp
+=====================================
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+namespace fs = std::filesystem;
+
+int main()
+{
+    std::ofstream out("ProjectDump.txt");
+
+    for (const auto& entry : fs::recursive_directory_iterator("."))
+    {
+        if (!entry.is_regular_file())
+            continue;
+
+        if (entry.path().filename() == "ProjectDump.txt")
+            continue;
+
+        if (entry.path().string().find("build") != std::string::npos)
+            continue;
+
+        std::string ext = entry.path().extension().string();
+
+        if (ext == ".cpp" || ext == ".h")
+        {
+            out << "=====================================\n";
+            out << entry.path().string() << "\n";
+            out << "=====================================\n\n";
+
+            std::ifstream in(entry.path());
+
+            std::string line;
+            while (std::getline(in, line))
+            {
+                out << line << '\n';
+            }
+
+            out << "\n\n";
+        }
+    }
+
+    std::cout << "Finished!\n";
+}
+
+
+=====================================
+.\utilities\projectTree.cpp
+=====================================
+
+// iostream gives us std::cout for printing to the console.
+#include <iostream>
+
+// fstream lets us create and write to files.
+#include <fstream>
+
+// filesystem provides tools for working with files and folders.
+#include <filesystem>
+
+// Create a shorter name.
+// Instead of writing std::filesystem everywhere,
+// we can just write fs.
+namespace fs = std::filesystem;
+
+//---------------------------------------------------------------
+// PrintTree
+//
+// Recursively prints the contents of a folder.
+//
+// Parameters:
+//
+// path  - The folder we are currently scanning.
+// out   - The output file we are writing to.
+// depth - How deep we are in the folder structure.
+//         Used only to indent the output nicely.
+//---------------------------------------------------------------
+void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
+{
+    // directory_iterator loops through every file and folder
+    // inside "path".
+    for (const auto& entry : fs::directory_iterator(path))
+    {
+        //-------------------------------------------------------
+        // Print indentation.
+        //
+        // If we're inside several folders, print
+        // "│   " once for each level.
+        //
+        // Example:
+        //
+        // Root
+        // │
+        // ├── Folder
+        // │   ├── File.txt
+        //-------------------------------------------------------
+        for (int i = 0; i < depth; i++)
+            out << "│   ";
+
+        //-------------------------------------------------------
+        // Print the file or folder name.
+        //
+        // entry.path()
+        //      Returns the complete path.
+        //
+        // filename()
+        //      Extracts just the name.
+        //
+        // string()
+        //      Converts it into a std::string.
+        //-------------------------------------------------------
+        out << "├── " << entry.path().filename().string();
+
+        //-------------------------------------------------------
+        // If this entry is a directory,
+        // add a "/" after its name.
+        //-------------------------------------------------------
+        if (entry.is_directory())
+            out << "/";
+
+        // Move to the next line.
+        out << '\n';
+
+        //-------------------------------------------------------
+        // If this entry is another folder,
+        // call PrintTree AGAIN.
+        //
+        // This is called RECURSION.
+        //
+        // Example:
+        //
+        // Root
+        // ├── Animals
+        //
+        // PrintTree("Root")
+        //     finds Animals
+        //
+        // PrintTree("Animals")
+        //     scans everything inside Animals
+        //-------------------------------------------------------
+        if (entry.is_directory())
+        {
+            // depth + 1 means the next level is indented
+            // one extra step.
+            PrintTree(entry.path(), out, depth + 1);
+        }
+    }
+}
+
+int main()
+{
+    //-----------------------------------------------------------
+    // "." means "the current folder".
+    //
+    // If you run the program from:
+    //
+    // C:\Projects\Boids
+    //
+    // then "." refers to:
+    //
+    // C:\Projects\Boids
+    //-----------------------------------------------------------
+    fs::path root = ".";
+
+    //-----------------------------------------------------------
+    // Create an output file.
+    //
+    // If it doesn't exist,
+    // it will be created.
+    //
+    // If it already exists,
+    // it will be overwritten.
+    //-----------------------------------------------------------
+    std::ofstream out("FileStructure.txt");
+
+    //-----------------------------------------------------------
+    // Check that the file opened successfully.
+    //
+    // "!out" means "opening failed".
+    //-----------------------------------------------------------
+    if (!out)
+    {
+        std::cout << "Couldn't create output file.\n";
+        return 1;      // Return an error code.
+    }
+
+    //-----------------------------------------------------------
+    // Write the root folder name.
+    //
+    // root.string() converts the filesystem path
+    // into ordinary text.
+    //-----------------------------------------------------------
+    out << root.string() << '\n';
+
+    //-----------------------------------------------------------
+    // Scan the directory tree.
+    //
+    // This one function call does all the work.
+    //-----------------------------------------------------------
+    PrintTree(root, out);
+
+    //-----------------------------------------------------------
+    // Tell the user we're finished.
+    //-----------------------------------------------------------
+    std::cout << "Done! Wrote FileStructure.txt\n";
+
+    // Returning 0 means the program completed successfully.
+    return 0;
+}
+
+
