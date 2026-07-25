@@ -8,7 +8,7 @@ class Mouth : public Sprite
         void Initialise() override;
         void Update(float dt) override;
     
+        void PlayIdleMouth();
+
     private:
-       float blinkTimer = 0.0f;
-       float nextBlink = 3.0f;
 };

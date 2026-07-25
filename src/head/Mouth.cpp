@@ -33,14 +33,12 @@ void Mouth::Initialise()
 void Mouth::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
+}
 
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+void Mouth::PlayIdleMouth()
+{
+    if (!animation.IsPlaying())
     {
         animation.Play(0, 2);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
     } 
 }

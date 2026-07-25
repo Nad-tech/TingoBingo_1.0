@@ -32,14 +32,12 @@ void Nose::Initialise()
 void Nose::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
+}
 
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+void Nose::PlayWiggle()
+{
+    if (!animation.IsPlaying())
     {
         animation.Play(0, 3);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
     }
 }

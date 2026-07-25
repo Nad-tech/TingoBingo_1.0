@@ -26,7 +26,12 @@ class Head
         void ReturnToCentre();
         bool IsFrontFacing() const;
 
-        void WiggleAntenna();
+        void PlayIdleAntennaAnimation();
+        void PlayIdleEarsAnimation();
+        void PlayIdleEyebrowsAnimation();
+        void PlayIdleEyesAnimation();
+        void PlayIdleMouthAnimation();
+        void PlayIdleNoseAnimation();
         
     private:
         Vector2 position;
@@ -35,7 +40,7 @@ class Head
         Eyes eyes;
         Antenna antenna;
         Ears ears;
-        Eyebrows eyeBrows;
+        Eyebrows eyebrows;
         Mouth mouth;
         Nose nose;
 };

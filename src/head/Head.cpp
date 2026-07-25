@@ -5,7 +5,7 @@ void Head::Initialise()
     headBase.Initialise();
     antenna.Initialise();
     ears.Initialise();
-    eyeBrows.Initialise();
+    eyebrows.Initialise();
     eyes.Initialise();
     mouth.Initialise();
     nose.Initialise();
@@ -16,7 +16,7 @@ void Head::Shutdown()
     headBase.Shutdown();
     antenna.Shutdown();
     ears.Shutdown();
-    eyeBrows.Shutdown();
+    eyebrows.Shutdown();
     eyes.Shutdown();
     mouth.Shutdown();
     nose.Shutdown();
@@ -27,17 +27,14 @@ void Head::Update(float dt)
     headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
-    eyeBrows.Update(dt);
+    eyebrows.Update(dt);
     eyes.Update(dt);
     mouth.Update(dt);
     nose.Update(dt);
 }
 
 void Head::Draw() const
-{
-    
-    antenna.Draw();
-   
+{   
     if (IsFrontFacing())
     {
         ears.Draw();
@@ -45,7 +42,7 @@ void Head::Draw() const
         eyes.Draw();
         mouth.Draw();
         nose.Draw();
-        eyeBrows.Draw();
+        eyebrows.Draw();
         antenna.Draw();
     }
     else {
@@ -61,7 +58,7 @@ void Head::SetPosition(Vector2 position)
     headBase.SetPosition(position);
     antenna.SetPosition(position);
     ears.SetPosition(position);
-    eyeBrows.SetPosition(position);
+    eyebrows.SetPosition(position);
     eyes.SetPosition(position);
     mouth.SetPosition(position);
     nose.SetPosition(position);
@@ -92,6 +89,32 @@ bool Head::IsFrontFacing() const
     return headBase.GetFrame() == 0;
 }
 
-void Head::WiggleAntenna() {
+void Head::PlayIdleAntennaAnimation() 
+{
     antenna.PlayWiggle();
+}
+
+void Head::PlayIdleEarsAnimation() 
+{
+    ears.PlayWiggle();
+}
+
+void Head::PlayIdleEyebrowsAnimation()
+{
+    eyebrows.PlayWiggle();
+}
+
+void Head::PlayIdleEyesAnimation()
+{
+    eyes.PlayBlink();
+}
+
+void Head::PlayIdleMouthAnimation()
+{
+    mouth.PlayIdleMouth();
+}
+
+void Head::PlayIdleNoseAnimation()
+{
+    nose.PlayWiggle();
 }

@@ -32,14 +32,12 @@ void Eyes::Initialise()
 void Eyes::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
+}
 
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+void Eyes::PlayBlink()
+{
+    if (!animation.IsPlaying())
     {
-        animation.Play(0, 3);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+        animation.Play(0, 4);
     }
 }
