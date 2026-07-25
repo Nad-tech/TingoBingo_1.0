@@ -32,6 +32,7 @@ void Head::Initialise()
     eyes.Initialise();
     mouth.Initialise();
     nose.Initialise();
+    pupils.Initialise();
 }
 
 void Head::Shutdown()
@@ -43,6 +44,7 @@ void Head::Shutdown()
     eyes.Shutdown();
     mouth.Shutdown();
     nose.Shutdown();
+    pupils.Shutdown();
 }
 
 void Head::Update(float dt)
@@ -54,6 +56,7 @@ void Head::Update(float dt)
     eyes.Update(dt);
     mouth.Update(dt);
     nose.Update(dt);
+    pupils.Update(dt);
 }
 
 void Head::Draw() const
@@ -67,6 +70,7 @@ void Head::Draw() const
         nose.Draw();
         eyebrows.Draw();
         antenna.Draw();
+        pupils.Draw();
     }
     else {
         headBase.Draw();
@@ -91,6 +95,7 @@ void Head::ApplyPosition(Vector2 position)
     eyes.SetPosition(position);
     mouth.SetPosition(position);
     nose.SetPosition(position);
+    pupils.SetPosition(position);
 }
 
 Vector2 Head::GetPosition() const
@@ -165,15 +170,16 @@ void Head::ApplyRotation(float rotation)
     eyes.SetRotation(rotation);
     mouth.SetRotation(rotation);
     nose.SetRotation(rotation);
+    pupils.SetRotation(rotation);
 }
 
 void Head::PlayIdleHeadTransform(float dt)
 {
-    PlayHeadWiggle(dt);
-    ApplyRotation(rotation);
-
     PlayHeadBob(dt);
     ApplyPosition(position);
+
+    PlayHeadWiggle(dt);
+    ApplyRotation(rotation);
 }
 
 void Head::PlayHeadWiggle(float dt)
@@ -227,3 +233,7 @@ void Head::PlayHeadBob(float dt)
     position.y = homePosition.y + headBobOffset.y; 
 }
 
+void Head::LookAt(Vector2 point)
+{
+    pupils.LookAt(point);
+}

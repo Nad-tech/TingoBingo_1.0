@@ -33,6 +33,7 @@ void Game::HandleInput()
 
 void Game::Update(const float dt)
 {	
+	robot.LookAt(input.MousePosition());
 	robot.Update(dt);
 }
 

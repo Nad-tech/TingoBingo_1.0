@@ -207,7 +207,8 @@ class Eyes : public Sprite
 #include "head/Mouth.h"
 #include "head/Eyes.h"
 #include "head/Headbase.h"
-#include "Nose.h"
+#include "head/Nose.h"
+#include "head/Pupils.h"
 
 class Head
 {
@@ -239,21 +240,31 @@ class Head
         void PlayIdleMouthAnimation();
         void PlayIdleNoseAnimation();
         void PlayIdleHeadTransform(float dt);
+        void PlayHeadWiggle(float dt);
+        void PlayHeadBob(float dt);
         
     private:
         Vector2 position;
     
         float rotation;
         float scale;
-        
-        Vector2 idleOffset;
-        float idleRotationOffset;
-        float idleScale;
-        float idleTimer;
-        Vector2 homePosition;
-        float idleRotationTimer;
+          
         float homeRotation;
+        float headWiggleTimer;
+        float headWiggleAmplitude;
+        bool headWiggling;
+        float nextHeadWiggle;
+        float headWiggleFrequency;
 
+          Vector2 headBobOffset;
+        float headBobScale;
+        float headBobAngle;
+        float headBobDirection;
+        float randomHeadBobSignTimer;
+        float headBobRadiusX;
+        float headBobRadiusY;
+        float headBobSpeed;
+        Vector2 homePosition;
 
         Headbase headBase;
         Eyes eyes;
@@ -262,6 +273,7 @@ class Head
         Eyebrows eyebrows;
         Mouth mouth;
         Nose nose;
+        Pupils pupils;
 };
 
 
@@ -323,6 +335,47 @@ class Nose : public Sprite
 
     private:
 }; 
+
+
+=====================================
+.\include\head\Pupil.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Pupil : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+};
+
+
+=====================================
+.\include\head\Pupils.h
+=====================================
+
+#pragma once
+
+#include "head/Pupil.h"
+#include "raylib.h"
+
+class Pupils
+{
+    public:
+        void Initialise();
+        void Shutdown();
+        void Update(float dt);
+        void Draw();
+        void SetPosition(Vector2 position);
+        void SetRotation(float rotation);
+
+    private:
+        Pupil leftPupil;
+        Pupil rightPupil;
+};
 
 
 =====================================
@@ -928,12 +981,22 @@ void Eyes::PlayBlink()
 Head::Head() :
     rotation(0.0f),
     scale(0.0f),
-    idleOffset({0.0f, 0.0f}),
-    idleRotationOffset(0.0f),
-    idleScale(10.0f),
-    idleTimer(0.0f),
-    idleRotationTimer(0.0f), 
-    homeRotation(rotation)
+
+    homeRotation(rotation),
+    headWiggleTimer(0.0f),
+    headWiggleAmplitude(0.0f),
+    headWiggling(false),
+    nextHeadWiggle((float)GetRandomValue(5, 7)),
+    headWiggleFrequency(0.0f),
+
+    headBobOffset({0.0f, 0.0f}),
+    headBobScale(7.0f),
+    headBobAngle(0.0f),
+    headBobDirection(1.0f),
+    randomHeadBobSignTimer((float)GetRandomValue(5, 10)),
+    headBobRadiusX(GetRandomValue(3, 8)),
+    headBobRadiusY(GetRandomValue(2, 6)),
+    headBobSpeed(GetRandomValue(6, 14) / 10.0f)
 {
 }
 
@@ -946,6 +1009,7 @@ void Head::Initialise()
     eyes.Initialise();
     mouth.Initialise();
     nose.Initialise();
+    pupils.Initialise();
 }
 
 void Head::Shutdown()
@@ -957,6 +1021,7 @@ void Head::Shutdown()
     eyes.Shutdown();
     mouth.Shutdown();
     nose.Shutdown();
+    pupils.Shutdown();
 }
 
 void Head::Update(float dt)
@@ -968,6 +1033,7 @@ void Head::Update(float dt)
     eyes.Update(dt);
     mouth.Update(dt);
     nose.Update(dt);
+    pupils.Update(dt);
 }
 
 void Head::Draw() const
@@ -981,6 +1047,7 @@ void Head::Draw() const
         nose.Draw();
         eyebrows.Draw();
         antenna.Draw();
+        pupils.Draw();
     }
     else {
         headBase.Draw();
@@ -1005,6 +1072,7 @@ void Head::ApplyPosition(Vector2 position)
     eyes.SetPosition(position);
     mouth.SetPosition(position);
     nose.SetPosition(position);
+    pupils.SetPosition(position);
 }
 
 Vector2 Head::GetPosition() const
@@ -1062,23 +1130,6 @@ void Head::PlayIdleNoseAnimation()
     nose.PlayWiggle();
 }
 
-void Head::PlayIdleHeadTransform(float dt)
-{
-    idleTimer += dt;
-    idleRotationTimer += dt;
-    
-    idleOffset.y = sin(idleTimer) * idleScale;
-    
-    position.x = homePosition.x;
-    position.y = homePosition.y + idleOffset.y; 
-    
-    idleRotationOffset += 1.0;
-    rotation = idleRotationOffset;
-
-    ApplyPosition(position);
-    ApplyRotation(rotation);
-}
-
 void Head::SetRotation(float rotation)
 {
     homeRotation = rotation;
@@ -1096,7 +1147,69 @@ void Head::ApplyRotation(float rotation)
     eyes.SetRotation(rotation);
     mouth.SetRotation(rotation);
     nose.SetRotation(rotation);
+    pupils.SetRotation(rotation);
 }
+
+void Head::PlayIdleHeadTransform(float dt)
+{
+    PlayHeadWiggle(dt);
+    ApplyRotation(rotation);
+
+    PlayHeadBob(dt);
+    ApplyPosition(position);
+}
+
+void Head::PlayHeadWiggle(float dt)
+{
+    nextHeadWiggle -= dt;
+
+    if (nextHeadWiggle <= 0.0f && !headWiggling)
+    {
+        headWiggling = true;
+        headWiggleTimer = 0.0f;
+        headWiggleAmplitude = (float)GetRandomValue(10, 20);
+        nextHeadWiggle = (float)GetRandomValue(5, 7);
+        headWiggleFrequency = (float)GetRandomValue(10, 40);
+    }
+
+    if (headWiggling)
+    {
+        headWiggleTimer += dt;
+
+        rotation = sin(headWiggleTimer * headWiggleFrequency) * headWiggleAmplitude;
+
+        headWiggleAmplitude -= 8.0f * dt;
+
+        if (headWiggleAmplitude <= 0.0f)
+        {
+            headWiggling = false;
+            rotation = homeRotation;
+        }
+    }
+}
+
+void Head::PlayHeadBob(float dt)
+{
+    headBobAngle += dt * headBobSpeed * headBobDirection;
+
+    randomHeadBobSignTimer -= dt;
+
+    if(randomHeadBobSignTimer <= 0)
+    {
+        headBobDirection *= -1;
+        randomHeadBobSignTimer = (float)GetRandomValue(5,10);
+        headBobRadiusX = GetRandomValue(3, 8);
+        headBobRadiusY = GetRandomValue(2, 6);
+        headBobSpeed = GetRandomValue(6, 14) / 10.0f;
+    }
+
+    headBobOffset.x = cos(headBobAngle) * headBobRadiusX;
+    headBobOffset.y = sin(headBobAngle) * headBobRadiusY;
+
+    position.x = homePosition.x + headBobOffset.x;
+    position.y = homePosition.y + headBobOffset.y; 
+}
+
 
 
 =====================================
@@ -1273,6 +1386,92 @@ void Nose::PlayWiggle()
 
 
 =====================================
+.\src\head\Pupil.cpp
+=====================================
+
+#include "head/Pupil.h"
+#include "raylib.h"
+#include "Constants.h"
+
+void Pupil::Initialise() 
+{
+    texture = LoadTexture("assets/images/TingoBingo/head/pupil.png");
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+    
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.08f;
+
+
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+void Pupil::Update(float dt)
+{
+    Sprite::Update(dt);//Update the timer
+}
+
+
+=====================================
+.\src\head\Pupils.cpp
+=====================================
+
+#include "head\Pupils.h"
+#include "raylib.h"
+
+void Pupils::Initialise()
+{
+    leftPupil.Initialise();
+    rightPupil.Initialise();
+}
+
+void Pupils::Shutdown()
+{
+    leftPupil.Shutdown();
+    rightPupil.Shutdown();
+}
+
+void Pupils::Update(float dt)
+{
+    leftPupil.Update(dt);
+    rightPupil.Update(dt);
+}
+
+void Pupils::Draw()
+{
+    leftPupil.Draw();
+    rightPupil.Draw();
+}
+
+void Pupils::SetPosition(Vector2 position)
+{
+    leftPupil.SetPosition(position);
+    rightPupil.SetPosition(position);
+}
+
+void Pupils::SetRotation(float rotation) 
+{
+    leftPupil.SetRotation(rotation);
+    rightPupil.SetRotation(rotation);
+}
+
+
+=====================================
 .\src\IdleController.cpp
 =====================================
 
@@ -1424,8 +1623,8 @@ Robot::Robot()
 {
 	position = 
     {
-        (SCREEN_WIDTH - ROBOT_WIDTH * SCALE) / 2, 
-        (SCREEN_HEIGHT - ROBOT_HEIGHT * SCALE) / 2
+        SCREEN_WIDTH / 2, 
+        SCREEN_HEIGHT / 2
     };
 }
 

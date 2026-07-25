@@ -64,3 +64,8 @@ void Robot::ReturnHeadToCentre()
 {
     head.ReturnToCentre();
 }
+
+void Robot::LookAt(Vector2 point)
+{
+    head.LookAt(point);
+}

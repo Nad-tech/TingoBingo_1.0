@@ -10,3 +10,8 @@ bool Input::RightPressed() const
 {
     return IsKeyDown(KEY_RIGHT);
 }
+
+Vector2 Input::MousePosition() const
+{
+    return GetMousePosition();
+}

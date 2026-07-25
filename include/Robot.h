@@ -22,6 +22,8 @@ public:
 	void RotateHeadRight();
 	void ReturnHeadToCentre();
 
+	void LookAt(Vector2 point);
+
 	Vector2 GetPosition() const;
 	Vector2 GetHeadPosition() const;
 

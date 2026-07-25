@@ -7,7 +7,8 @@
 #include "head/Mouth.h"
 #include "head/Eyes.h"
 #include "head/Headbase.h"
-#include "Nose.h"
+#include "head/Nose.h"
+#include "head/Pupils.h"
 
 class Head
 {
@@ -42,6 +43,8 @@ class Head
         void PlayHeadWiggle(float dt);
         void PlayHeadBob(float dt);
         
+        void LookAt(Vector2 point);
+
     private:
         Vector2 position;
     
@@ -72,4 +75,5 @@ class Head
         Eyebrows eyebrows;
         Mouth mouth;
         Nose nose;
+        Pupils pupils;
 };
