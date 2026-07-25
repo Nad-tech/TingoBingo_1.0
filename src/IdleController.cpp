@@ -25,6 +25,7 @@ void IdleController::Update(float dt)
     UpdateEyes(dt);
     UpdateMouth(dt);
     UpdateNose(dt);
+    UpdateHead(dt);
 }
 
 void IdleController::UpdateAntenna(float dt)
@@ -93,3 +94,7 @@ void IdleController::UpdateNose(float dt)
     }
 }
 
+void IdleController::UpdateHead(float dt)
+{
+    head.PlayIdleHeadTransform(dt);
+}

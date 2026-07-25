@@ -17,7 +17,11 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * scale
     };
 
-    Vector2 origin = {0,0};
+    Vector2 origin = 
+    {
+        destination.width / 2.0f,
+        destination.height / 2.0f
+    };
 
     DrawTexturePro(
         texture,
@@ -52,4 +56,9 @@ void Sprite::MoveSpriteUp()
 void Sprite::MoveSpriteDown()
 {
     this->SetPosition({this->GetPosition().x, this->GetPosition().y + 1.0f});
+}
+
+void Sprite::SetRotation(float rotation)
+{
+    this->rotation = rotation;
 }

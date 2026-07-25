@@ -1,4 +1,27 @@
 #include "head/Head.h"
+#include<cmath>
+
+Head::Head() :
+    rotation(0.0f),
+    scale(0.0f),
+
+    homeRotation(rotation),
+    headWiggleTimer(0.0f),
+    headWiggleAmplitude(0.0f),
+    headWiggling(false),
+    nextHeadWiggle((float)GetRandomValue(5, 7)),
+    headWiggleFrequency(0.0f),
+
+    headBobOffset({0.0f, 0.0f}),
+    headBobScale(7.0f),
+    headBobAngle(0.0f),
+    headBobDirection(1.0f),
+    randomHeadBobSignTimer((float)GetRandomValue(5, 10)),
+    headBobRadiusX(GetRandomValue(3, 8)),
+    headBobRadiusY(GetRandomValue(2, 6)),
+    headBobSpeed(GetRandomValue(6, 14) / 10.0f)
+{
+}
 
 void Head::Initialise()
 {
@@ -53,8 +76,14 @@ void Head::Draw() const
 
 void Head::SetPosition(Vector2 position) 
 {
+    this->homePosition = position;
+    ApplyPosition(position);
+}
+
+void Head::ApplyPosition(Vector2 position)
+{
     this->position = position;
-    
+
     headBase.SetPosition(position);
     antenna.SetPosition(position);
     ears.SetPosition(position);
@@ -118,3 +147,83 @@ void Head::PlayIdleNoseAnimation()
 {
     nose.PlayWiggle();
 }
+
+void Head::SetRotation(float rotation)
+{
+    homeRotation = rotation;
+    ApplyRotation(rotation); 
+}
+
+void Head::ApplyRotation(float rotation)
+{
+    this->rotation = rotation;
+
+    headBase.SetRotation(rotation);
+    antenna.SetRotation(rotation);
+    ears.SetRotation(rotation);
+    eyebrows.SetRotation(rotation);
+    eyes.SetRotation(rotation);
+    mouth.SetRotation(rotation);
+    nose.SetRotation(rotation);
+}
+
+void Head::PlayIdleHeadTransform(float dt)
+{
+    PlayHeadWiggle(dt);
+    ApplyRotation(rotation);
+
+    PlayHeadBob(dt);
+    ApplyPosition(position);
+}
+
+void Head::PlayHeadWiggle(float dt)
+{
+    nextHeadWiggle -= dt;
+
+    if (nextHeadWiggle <= 0.0f && !headWiggling)
+    {
+        headWiggling = true;
+        headWiggleTimer = 0.0f;
+        headWiggleAmplitude = (float)GetRandomValue(10, 20);
+        nextHeadWiggle = (float)GetRandomValue(5, 7);
+        headWiggleFrequency = (float)GetRandomValue(10, 40);
+    }
+
+    if (headWiggling)
+    {
+        headWiggleTimer += dt;
+
+        rotation = sin(headWiggleTimer * headWiggleFrequency) * headWiggleAmplitude;
+
+        headWiggleAmplitude -= 8.0f * dt;
+
+        if (headWiggleAmplitude <= 0.0f)
+        {
+            headWiggling = false;
+            rotation = homeRotation;
+        }
+    }
+}
+
+void Head::PlayHeadBob(float dt)
+{
+    headBobAngle += dt * headBobSpeed * headBobDirection;
+
+    randomHeadBobSignTimer -= dt;
+
+    if(randomHeadBobSignTimer <= 0)
+    {
+        headBobDirection *= -1;
+        randomHeadBobSignTimer = (float)GetRandomValue(5,10);
+        headBobRadiusX = GetRandomValue(3, 8);
+        headBobRadiusY = GetRandomValue(2, 6);
+        headBobSpeed = GetRandomValue(6, 14) / 10.0f;
+    }
+
+    headBobOffset.x = cos(headBobAngle) * headBobRadiusX;
+    headBobOffset.y = sin(headBobAngle) * headBobRadiusY;
+
+    position.x = homePosition.x + headBobOffset.x;
+    position.y = homePosition.y + headBobOffset.y; 
+}
+

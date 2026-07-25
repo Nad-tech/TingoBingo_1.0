@@ -23,6 +23,8 @@ public:
     void SetPosition(Vector2 position);
     Vector2 GetPosition() const;
 
+    void SetRotation(float rotation);
+
     void MoveSpriteUp();
     void MoveSpriteDown();
 

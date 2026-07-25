@@ -62,3 +62,7 @@ void Headbase::ReturnToCentre()
     }
 }
 
+void Headbase::SetRotation(float rotation)
+{
+    Sprite::SetRotation(rotation);
+}

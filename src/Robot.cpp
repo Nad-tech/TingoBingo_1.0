@@ -7,8 +7,8 @@ Robot::Robot()
 {
 	position = 
     {
-        (SCREEN_WIDTH - ROBOT_WIDTH * SCALE) / 2, 
-        (SCREEN_HEIGHT - ROBOT_HEIGHT * SCALE) / 2
+        SCREEN_WIDTH / 2, 
+        SCREEN_HEIGHT / 2
     };
 }
 

@@ -13,6 +13,7 @@ class IdleController
         void UpdateEyes(float dt);
         void UpdateMouth(float dt);
         void UpdateNose(float dt);
+        void UpdateHead(float dt);
     
     private:
 	    Head& head;

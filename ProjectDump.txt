@@ -132,8 +132,6 @@ class Antenna : public Sprite
         void PlayWiggle();
     
     private:
-        float blinkTimer = 0.0f;
-        float nextBlink = 3.0f;
 };
 
 
@@ -151,9 +149,8 @@ class Ears : public Sprite
         void Initialise() override;
         void Update(float dt) override;
     
+        void PlayWiggle();
     private:
-        float blinkTimer = 0.0f;
-        float nextBlink = 3.0f;
 };
 
 
@@ -171,9 +168,9 @@ class Eyebrows : public Sprite
         void Initialise() override;
         void Update(float dt) override;
     
+        void PlayWiggle();
+
     private:
-        float blinkTimer = 0.0f;
-        float nextBlink = 3.0f;
 };
 
 
@@ -191,9 +188,9 @@ class Eyes : public Sprite
         void Initialise() override;
         void Update(float dt) override;
     
+        void PlayBlink();
+
     private:
-        float blinkTimer = 0.0f;
-        float nextBlink = 3.0f;
 }; 
 
 
@@ -215,6 +212,7 @@ class Eyes : public Sprite
 class Head
 {
     public:
+        Head();
         void Initialise();
         void Shutdown();
 
@@ -222,23 +220,46 @@ class Head
         void Draw() const;
 
         void SetPosition(Vector2 position);
+        void ApplyPosition(Vector2 position);
         Vector2 GetPosition() const;
+        
+        void SetRotation(float rotation);
+        void ApplyRotation(float rotation);
+        float GetRotation();
 
         void RotateLeft();
         void RotateRight();
         void ReturnToCentre();
         bool IsFrontFacing() const;
 
-        void WiggleAntenna();
+        void PlayIdleAntennaAnimation();
+        void PlayIdleEarsAnimation();
+        void PlayIdleEyebrowsAnimation();
+        void PlayIdleEyesAnimation();
+        void PlayIdleMouthAnimation();
+        void PlayIdleNoseAnimation();
+        void PlayIdleHeadTransform(float dt);
         
     private:
         Vector2 position;
     
+        float rotation;
+        float scale;
+        
+        Vector2 idleOffset;
+        float idleRotationOffset;
+        float idleScale;
+        float idleTimer;
+        Vector2 homePosition;
+        float idleRotationTimer;
+        float homeRotation;
+
+
         Headbase headBase;
         Eyes eyes;
         Antenna antenna;
         Ears ears;
-        Eyebrows eyeBrows;
+        Eyebrows eyebrows;
         Mouth mouth;
         Nose nose;
 };
@@ -260,6 +281,7 @@ class Headbase : public Sprite
         void RotateRight();
         void ReturnToCentre();
         int GetFrame() const;
+        void SetRotation(float rotation);
 };
 
 
@@ -277,9 +299,9 @@ class Mouth : public Sprite
         void Initialise() override;
         void Update(float dt) override;
     
+        void PlayIdleMouth();
+
     private:
-       float blinkTimer = 0.0f;
-       float nextBlink = 3.0f;
 };
 
 
@@ -296,10 +318,10 @@ class Nose : public Sprite
     public:
         void Initialise() override;
         void Update(float dt) override;
-    
+
+        void PlayWiggle();
+
     private:
-        float blinkTimer = 0.0f;
-        float nextBlink = 3.0f;
 }; 
 
 
@@ -314,13 +336,36 @@ class IdleController
 {
     public:
         IdleController(Head& h);
+        
         void Update(float dt);
         void UpdateAntenna(float dt);
+        void UpdateEars(float dt);
+        void UpdateEyebrows(float dt);
+        void UpdateEyes(float dt);
+        void UpdateMouth(float dt);
+        void UpdateNose(float dt);
+        void UpdateHead(float dt);
     
     private:
-	    float antennaWiggleTimer;
-	    float nextAntennaWiggle;
-        Head& head;
+	    Head& head;
+
+        float antennaIdleAnimationTimer;
+	    float nextAntennaIdleAnimation;
+
+        float earsIdleAnimationTimer;
+        float nextEarsIdleAnimation;
+
+        float eyebrowsIdleAnimationTimer;
+        float nextEyebrowsIdleAnimation;
+
+        float eyesIdleAnimationTimer;
+        float nextEyesIdleAnimation;
+
+        float mouthIdleAnimationTimer;
+        float nextMouthIdleAnimation;
+
+        float noseIdleAnimationTimer;
+        float nextNoseIdleAnimation;
 };
 
 
@@ -405,6 +450,8 @@ public:
     void Shutdown();
     void SetPosition(Vector2 position);
     Vector2 GetPosition() const;
+
+    void SetRotation(float rotation);
 
     void MoveSpriteUp();
     void MoveSpriteDown();
@@ -761,18 +808,15 @@ void Ears::Initialise()
 void Ears::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
-
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
-    {
-        animation.Play(0, 3);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
-    }
 }
 
+void Ears::PlayWiggle()
+{
+    if (!animation.IsPlaying())
+    {
+        animation.Play(0, 4);
+    }
+}
 
 
 =====================================
@@ -814,18 +858,15 @@ void Eyebrows::Initialise()
 void Eyebrows::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
-
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
-    {
-        animation.Play(0, 1);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
-    }
 }
 
+void Eyebrows::PlayWiggle()
+{
+    if (!animation.IsPlaying())
+    {
+        animation.Play(0, 1);
+    }
+}
 
 
 =====================================
@@ -866,15 +907,13 @@ void Eyes::Initialise()
 void Eyes::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
+}
 
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+void Eyes::PlayBlink()
+{
+    if (!animation.IsPlaying())
     {
-        animation.Play(0, 3);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
+        animation.Play(0, 4);
     }
 }
 
@@ -884,13 +923,26 @@ void Eyes::Update(float dt)
 =====================================
 
 #include "head/Head.h"
+#include<cmath>
+
+Head::Head() :
+    rotation(0.0f),
+    scale(0.0f),
+    idleOffset({0.0f, 0.0f}),
+    idleRotationOffset(0.0f),
+    idleScale(10.0f),
+    idleTimer(0.0f),
+    idleRotationTimer(0.0f), 
+    homeRotation(rotation)
+{
+}
 
 void Head::Initialise()
 {
     headBase.Initialise();
     antenna.Initialise();
     ears.Initialise();
-    eyeBrows.Initialise();
+    eyebrows.Initialise();
     eyes.Initialise();
     mouth.Initialise();
     nose.Initialise();
@@ -901,7 +953,7 @@ void Head::Shutdown()
     headBase.Shutdown();
     antenna.Shutdown();
     ears.Shutdown();
-    eyeBrows.Shutdown();
+    eyebrows.Shutdown();
     eyes.Shutdown();
     mouth.Shutdown();
     nose.Shutdown();
@@ -912,17 +964,14 @@ void Head::Update(float dt)
     headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
-    eyeBrows.Update(dt);
+    eyebrows.Update(dt);
     eyes.Update(dt);
     mouth.Update(dt);
     nose.Update(dt);
 }
 
 void Head::Draw() const
-{
-    
-    antenna.Draw();
-   
+{   
     if (IsFrontFacing())
     {
         ears.Draw();
@@ -930,7 +979,7 @@ void Head::Draw() const
         eyes.Draw();
         mouth.Draw();
         nose.Draw();
-        eyeBrows.Draw();
+        eyebrows.Draw();
         antenna.Draw();
     }
     else {
@@ -941,12 +990,18 @@ void Head::Draw() const
 
 void Head::SetPosition(Vector2 position) 
 {
+    this->homePosition = position;
+    ApplyPosition(position);
+}
+
+void Head::ApplyPosition(Vector2 position)
+{
     this->position = position;
-    
+
     headBase.SetPosition(position);
     antenna.SetPosition(position);
     ears.SetPosition(position);
-    eyeBrows.SetPosition(position);
+    eyebrows.SetPosition(position);
     eyes.SetPosition(position);
     mouth.SetPosition(position);
     nose.SetPosition(position);
@@ -977,8 +1032,70 @@ bool Head::IsFrontFacing() const
     return headBase.GetFrame() == 0;
 }
 
-void Head::WiggleAntenna() {
+void Head::PlayIdleAntennaAnimation() 
+{
     antenna.PlayWiggle();
+}
+
+void Head::PlayIdleEarsAnimation() 
+{
+    ears.PlayWiggle();
+}
+
+void Head::PlayIdleEyebrowsAnimation()
+{
+    eyebrows.PlayWiggle();
+}
+
+void Head::PlayIdleEyesAnimation()
+{
+    eyes.PlayBlink();
+}
+
+void Head::PlayIdleMouthAnimation()
+{
+    mouth.PlayIdleMouth();
+}
+
+void Head::PlayIdleNoseAnimation()
+{
+    nose.PlayWiggle();
+}
+
+void Head::PlayIdleHeadTransform(float dt)
+{
+    idleTimer += dt;
+    idleRotationTimer += dt;
+    
+    idleOffset.y = sin(idleTimer) * idleScale;
+    
+    position.x = homePosition.x;
+    position.y = homePosition.y + idleOffset.y; 
+    
+    idleRotationOffset += 1.0;
+    rotation = idleRotationOffset;
+
+    ApplyPosition(position);
+    ApplyRotation(rotation);
+}
+
+void Head::SetRotation(float rotation)
+{
+    homeRotation = rotation;
+    ApplyRotation(rotation); 
+}
+
+void Head::ApplyRotation(float rotation)
+{
+    this->rotation = rotation;
+
+    headBase.SetRotation(rotation);
+    antenna.SetRotation(rotation);
+    ears.SetRotation(rotation);
+    eyebrows.SetRotation(rotation);
+    eyes.SetRotation(rotation);
+    mouth.SetRotation(rotation);
+    nose.SetRotation(rotation);
 }
 
 
@@ -1050,6 +1167,10 @@ void Headbase::ReturnToCentre()
     }
 }
 
+void Headbase::SetRotation(float rotation)
+{
+    Sprite::SetRotation(rotation);
+}
 
 
 =====================================
@@ -1091,15 +1212,13 @@ void Mouth::Initialise()
 void Mouth::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
+}
 
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+void Mouth::PlayIdleMouth()
+{
+    if (!animation.IsPlaying())
     {
         animation.Play(0, 2);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
     } 
 }
 
@@ -1142,15 +1261,13 @@ void Nose::Initialise()
 void Nose::Update(float dt)
 {
     Sprite::Update(dt);//Update the timer
+}
 
-    blinkTimer += dt;
-
-    if (blinkTimer >= nextBlink && !animation.IsPlaying())
+void Nose::PlayWiggle()
+{
+    if (!animation.IsPlaying())
     {
         animation.Play(0, 3);
-        
-        blinkTimer = 0.0f;
-        nextBlink = GetRandomValue(1000,5000) / 1000.0f;
     }
 }
 
@@ -1163,25 +1280,101 @@ void Nose::Update(float dt)
 
 IdleController::IdleController(Head& h)
     : head(h),
-      antennaWiggleTimer(0.0f),
-      nextAntennaWiggle(3.0f)
+      antennaIdleAnimationTimer(0.0f),
+      nextAntennaIdleAnimation(3.0f),
+      earsIdleAnimationTimer(0.0f),
+      nextEarsIdleAnimation(3.0f),
+      eyebrowsIdleAnimationTimer(0.0f),
+      nextEyebrowsIdleAnimation(3.0f),
+      eyesIdleAnimationTimer(0.0f),
+      nextEyesIdleAnimation(3.0f),
+      mouthIdleAnimationTimer(0.0f),
+      nextMouthIdleAnimation(3.0f),
+      noseIdleAnimationTimer(0.0f),
+      nextNoseIdleAnimation(3.0f)
 {
 }
 
 void IdleController::Update(float dt)
 {
     UpdateAntenna(dt);
+    UpdateEars(dt);
+    UpdateEyebrows(dt);
+    UpdateEyes(dt);
+    UpdateMouth(dt);
+    UpdateNose(dt);
+    UpdateHead(dt);
 }
 
 void IdleController::UpdateAntenna(float dt)
 {
-    antennaWiggleTimer += dt;
-    if(antennaWiggleTimer > nextAntennaWiggle)
+    antennaIdleAnimationTimer += dt;
+    if(antennaIdleAnimationTimer > nextAntennaIdleAnimation)
     {
-        head.WiggleAntenna();
-        antennaWiggleTimer = 0.0f;
-        nextAntennaWiggle = GetRandomValue(1000,5000) / 1000.0f;
+        head.PlayIdleAntennaAnimation();
+        antennaIdleAnimationTimer = 0.0f;
+        nextAntennaIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
     }
+}
+
+void IdleController::UpdateEars(float dt)
+{
+    earsIdleAnimationTimer += dt;
+    if(earsIdleAnimationTimer > nextEarsIdleAnimation)
+    {
+        head.PlayIdleEarsAnimation();
+        earsIdleAnimationTimer = 0.0f;
+        nextEarsIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+void IdleController::UpdateEyebrows(float dt)
+{
+    eyebrowsIdleAnimationTimer += dt;
+    if(eyebrowsIdleAnimationTimer > nextEyebrowsIdleAnimation)
+    {
+        head.PlayIdleEyebrowsAnimation();
+        eyebrowsIdleAnimationTimer = 0.0f;
+        nextEyebrowsIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+void IdleController::UpdateEyes(float dt)
+{
+    eyesIdleAnimationTimer += dt;
+    if(eyesIdleAnimationTimer > nextEyesIdleAnimation)
+    {
+        head.PlayIdleEyesAnimation();
+        eyesIdleAnimationTimer = 0.0f;
+        nextEyesIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+void IdleController::UpdateMouth(float dt)
+{
+    mouthIdleAnimationTimer += dt;
+    if(mouthIdleAnimationTimer > nextMouthIdleAnimation)
+    {
+        head.PlayIdleMouthAnimation();
+        mouthIdleAnimationTimer = 0.0f;
+        nextMouthIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+void IdleController::UpdateNose(float dt)
+{
+    noseIdleAnimationTimer += dt;
+    if(noseIdleAnimationTimer > nextNoseIdleAnimation)
+    {
+        head.PlayIdleNoseAnimation();
+        noseIdleAnimationTimer = 0.0f;
+        nextNoseIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+    }
+}
+
+void IdleController::UpdateHead(float dt)
+{
+    head.PlayIdleHeadTransform(dt);
 }
 
 
@@ -1313,7 +1506,11 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * scale
     };
 
-    Vector2 origin = {0,0};
+    Vector2 origin = 
+    {
+        destination.width / 2.0f,
+        destination.height / 2.0f
+    };
 
     DrawTexturePro(
         texture,
@@ -1348,6 +1545,11 @@ void Sprite::MoveSpriteUp()
 void Sprite::MoveSpriteDown()
 {
     this->SetPosition({this->GetPosition().x, this->GetPosition().y + 1.0f});
+}
+
+void Sprite::SetRotation(float rotation)
+{
+    this->rotation = rotation;
 }
 
 

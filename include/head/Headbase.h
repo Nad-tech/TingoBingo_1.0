@@ -10,4 +10,5 @@ class Headbase : public Sprite
         void RotateRight();
         void ReturnToCentre();
         int GetFrame() const;
+        void SetRotation(float rotation);
 };

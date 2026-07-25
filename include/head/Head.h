@@ -12,6 +12,7 @@
 class Head
 {
     public:
+        Head();
         void Initialise();
         void Shutdown();
 
@@ -19,7 +20,12 @@ class Head
         void Draw() const;
 
         void SetPosition(Vector2 position);
+        void ApplyPosition(Vector2 position);
         Vector2 GetPosition() const;
+        
+        void SetRotation(float rotation);
+        void ApplyRotation(float rotation);
+        float GetRotation();
 
         void RotateLeft();
         void RotateRight();
@@ -32,10 +38,33 @@ class Head
         void PlayIdleEyesAnimation();
         void PlayIdleMouthAnimation();
         void PlayIdleNoseAnimation();
+        void PlayIdleHeadTransform(float dt);
+        void PlayHeadWiggle(float dt);
+        void PlayHeadBob(float dt);
         
     private:
         Vector2 position;
     
+        float rotation;
+        float scale;
+          
+        float homeRotation;
+        float headWiggleTimer;
+        float headWiggleAmplitude;
+        bool headWiggling;
+        float nextHeadWiggle;
+        float headWiggleFrequency;
+
+          Vector2 headBobOffset;
+        float headBobScale;
+        float headBobAngle;
+        float headBobDirection;
+        float randomHeadBobSignTimer;
+        float headBobRadiusX;
+        float headBobRadiusY;
+        float headBobSpeed;
+        Vector2 homePosition;
+
         Headbase headBase;
         Eyes eyes;
         Antenna antenna;
