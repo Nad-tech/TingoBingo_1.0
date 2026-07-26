@@ -1,216 +1,84 @@
 .
-├── .git/
-│   ├── COMMIT_EDITMSG
-│   ├── config
-│   ├── description
-│   ├── gk/
-│   │   ├── config
-│   ├── HEAD
-│   ├── hooks/
-│   │   ├── applypatch-msg.sample
-│   │   ├── commit-msg.sample
-│   │   ├── fsmonitor-watchman.sample
-│   │   ├── post-update.sample
-│   │   ├── pre-applypatch.sample
-│   │   ├── pre-commit.sample
-│   │   ├── pre-merge-commit.sample
-│   │   ├── pre-push.sample
-│   │   ├── pre-rebase.sample
-│   │   ├── pre-receive.sample
-│   │   ├── prepare-commit-msg.sample
-│   │   ├── push-to-checkout.sample
-│   │   ├── sendemail-validate.sample
-│   │   ├── update.sample
-│   ├── index
-│   ├── info/
-│   │   ├── exclude
-│   ├── logs/
-│   │   ├── HEAD
-│   │   ├── refs/
-│   │   │   ├── heads/
-│   │   │   │   ├── main
-│   │   │   ├── remotes/
-│   │   │   │   ├── origin/
-│   │   │   │   │   ├── HEAD
-│   │   │   │   │   ├── main
-│   ├── objects/
-│   │   ├── 02/
-│   │   │   ├── 498e6c497cf865100759e0556a9bc87ced7302
-│   │   ├── 05/
-│   │   │   ├── 7292f6da4b2d99dc68b5f4276d34bd806f7fbe
-│   │   ├── 09/
-│   │   │   ├── 2a85d2083a1607dcd190704e115657665fd3ff
-│   │   ├── 0a/
-│   │   │   ├── 6ea6297cd031f11885b1fe093687a1ad024bb1
-│   │   ├── 0f/
-│   │   │   ├── bf287d989a4f6ebf0dd5f6d9d74248433dfb3b
-│   │   │   ├── e681599ba271a91be95c3171a3a8b4a1e7c96d
-│   │   ├── 11/
-│   │   │   ├── 7fca5cbb1ab307f23e80bbb61a1f526666d202
-│   │   ├── 15/
-│   │   │   ├── 2fb79e6a46cdbbdca5a24cbf4c3dfb54db9fe7
-│   │   ├── 16/
-│   │   │   ├── 004f7efa5f3ac0633bada206adb4d88addab96
-│   │   ├── 17/
-│   │   │   ├── 1142b475cb21941986414e162cb087f8947576
-│   │   ├── 1c/
-│   │   │   ├── 141de122578b76881c4409a7d1f5bbf705ea63
-│   │   ├── 25/
-│   │   │   ├── 508b92fbfe615aa8798dfd62a142be617bb6be
-│   │   ├── 27/
-│   │   │   ├── 2f1cbfb6a1962cd829eb87d4452fb4fb76a288
-│   │   │   ├── fb86eb76166e3702988c6ef88d490c5782bd6c
-│   │   ├── 30/
-│   │   │   ├── abe478d639cb65c284e5725a3d88cc91d6bbe3
-│   │   ├── 3b/
-│   │   │   ├── cd1272878a0a4d92f7a7bff1c3a72ded5ebf45
-│   │   ├── 3d/
-│   │   │   ├── 4940c95faecc80a864b7ff7047033d6b749d44
-│   │   ├── 3f/
-│   │   │   ├── 8e949b6d1eab3f4f70f1bda16fd0d517da2700
-│   │   ├── 40/
-│   │   │   ├── 248d9f3ccda3e4dacd53ac3a78851f29f11a08
-│   │   ├── 42/
-│   │   │   ├── b7c0fc9b58ffa6eb8cf03271922fd20738e011
-│   │   ├── 45/
-│   │   │   ├── 820863ffdf718dd4b59c7d5f92726570687f32
-│   │   ├── 49/
-│   │   │   ├── ecc887f5456adfbea51a29af8fbcffc0c2acc4
-│   │   ├── 4a/
-│   │   │   ├── 8403bd9441bf83692b23f2cd88c85ba9cb9946
-│   │   ├── 4e/
-│   │   │   ├── 9a38f3ff8a22046b0f7344528136b2568ffa90
-│   │   ├── 53/
-│   │   │   ├── 922887615d371c8b101b06487b8becf7d4be5e
-│   │   ├── 56/
-│   │   │   ├── 395ffd23e6add6005090d276983c55f70296df
-│   │   ├── 57/
-│   │   │   ├── e9aa108c2b402166d72d684b042f47ffeac15f
-│   │   ├── 65/
-│   │   │   ├── ec2c3c6399ff7cdc1eaa942282874558ce7a46
-│   │   ├── 6d/
-│   │   │   ├── 30eb32c703c286c942736994e2c924461542e0
-│   │   ├── 6f/
-│   │   │   ├── 55e12dac8253665b98d6d91f984ee4949b53dd
-│   │   ├── 72/
-│   │   │   ├── c79cea84d3842efdd39092904171d2b2aa055a
-│   │   ├── 73/
-│   │   │   ├── dda91a8c65a231e5f4f9e8e59d9cd68a746a6e
-│   │   ├── 75/
-│   │   │   ├── d8c3bd27795dce15cd4a8b9fbf1e4d9a454c86
-│   │   ├── 78/
-│   │   │   ├── 4608d195854a91227a2e4fb0207de964622d3d
-│   │   ├── 7c/
-│   │   │   ├── 41ac1910f408b02410594d64d2961165340241
-│   │   ├── 82/
-│   │   │   ├── f35673dbbd17033c691480dd90989266985bda
-│   │   ├── 88/
-│   │   │   ├── c546c463b568ce6e8438ce4520d13fda774e76
-│   │   ├── 89/
-│   │   │   ├── e83ee5f1eae660f11d045b29036e8e242ae712
-│   │   ├── 8f/
-│   │   │   ├── 347ca45b3b57dca87847133bf4a7a99ba231ae
-│   │   ├── 95/
-│   │   │   ├── c51aefe56e8f96c5ed4b6003004b622cf98c72
-│   │   │   ├── eca7ddb6b07ea01f03b02b856667eb2719cd99
-│   │   ├── 99/
-│   │   │   ├── 6b996865e8c99256fe4c9bfb7a8f85dabc3a94
-│   │   ├── 9b/
-│   │   │   ├── 8547541397a6606aa67776dffb3a728937dc99
-│   │   ├── 9c/
-│   │   │   ├── c78547d6c850ed5ecbf2154867109cb5f9312d
-│   │   ├── 9f/
-│   │   │   ├── 94977b9567b84a08bc0ba2d1fc9b842f829ba6
-│   │   ├── a3/
-│   │   │   ├── de6ea847bfe3d3f03610868beb753af3bfaf1b
-│   │   ├── a4/
-│   │   │   ├── 406a06bfd22231493d2ee3df7907e25bbadc7d
-│   │   ├── a5/
-│   │   │   ├── 19bf9b2748602b2d97b7d550fef9b5c25ee72d
-│   │   ├── aa/
-│   │   │   ├── 842374706fb2ee90e54378055cce14ca8babf6
-│   │   ├── ae/
-│   │   │   ├── 2ec5e658b5f4e1f44f3b51be8707811c68684e
-│   │   ├── b7/
-│   │   │   ├── bdf7afdd730d525eb688dba1a54c24695ad406
-│   │   ├── b9/
-│   │   │   ├── 6327033f98f7df498f366a9e212b1460ec490a
-│   │   ├── c1/
-│   │   │   ├── 038b5251705e1335bc806d1a6aba72a98b3704
-│   │   ├── c4/
-│   │   │   ├── b3dc43c43318fca73ad9dddacb93d8d783faa0
-│   │   │   ├── f6172c3b15a0416693d0a96fd18a1c2b8b5ac2
-│   │   ├── c9/
-│   │   │   ├── 83c0e83697ca13f33865edbdf2f401c8562fee
-│   │   │   ├── 9fb2ffe2c8f61ccab3ad9ea08ada2229ef0bff
-│   │   ├── ca/
-│   │   │   ├── 0022d8cf9ed8097d6631ad5aa312e4c2f68d98
-│   │   ├── cf/
-│   │   │   ├── 72e45d9af137bea5a052d7e45b1e92029b8c31
-│   │   ├── d2/
-│   │   │   ├── df95e2e6c4cef0f0676ef4a6548218ed49c61c
-│   │   ├── d7/
-│   │   │   ├── 390355839594c0b70c6ade1d9fbe2826f48d25
-│   │   ├── d9/
-│   │   │   ├── 5a329df8cff8d90717ef9aff5df91e3ffc353f
-│   │   ├── da/
-│   │   │   ├── bf762fbc588ad8d84e5cb83526b3320365c246
-│   │   ├── dc/
-│   │   │   ├── a66ac156c289b5743734a228f116d05ab55ae5
-│   │   ├── e0/
-│   │   │   ├── 0700218398ebcd285839ac39e453618be7c4de
-│   │   ├── e2/
-│   │   │   ├── 926a799b573012f36739e147688e080975e9d5
-│   │   ├── ed/
-│   │   │   ├── d95936e702c6660b27852003379141824b2b01
-│   │   ├── f0/
-│   │   │   ├── 283cdaac03b63f2a7053f082be2a3f70757c42
-│   │   ├── f4/
-│   │   │   ├── 05a11d60fa5ed1d689ba106450945ebf650fa9
-│   │   ├── f7/
-│   │   │   ├── ae08f47fd55abf62c814ab593e603c827e01f6
-│   │   ├── f8/
-│   │   │   ├── de99e00c840e286825eeeacceed5333a872f7a
-│   │   ├── fa/
-│   │   │   ├── b65bacff2eabee17e5614135634cb416d218ed
-│   │   ├── fd/
-│   │   │   ├── 7ac550e7a476bacc41648af0304469fe7173fe
-│   │   ├── fe/
-│   │   │   ├── 8875733578a95bb510a76368d6f42378fd3f03
-│   │   ├── info/
-│   │   ├── pack/
-│   │   │   ├── pack-594bef603037c45b527f96d3fa63a50faf80bb68.idx
-│   │   │   ├── pack-594bef603037c45b527f96d3fa63a50faf80bb68.pack
-│   │   │   ├── pack-594bef603037c45b527f96d3fa63a50faf80bb68.rev
-│   ├── packed-refs
-│   ├── refs/
-│   │   ├── heads/
-│   │   │   ├── main
-│   │   ├── remotes/
-│   │   │   ├── origin/
-│   │   │   │   ├── HEAD
-│   │   │   │   ├── main
-│   │   ├── tags/
 ├── .gitignore
-├── .vscode/
-│   ├── launch.json
-│   ├── settings.json
-│   ├── tasks.json
 ├── assets/
 │   ├── fonts/
 │   │   ├── .gitkeep
 │   ├── images/
+│   │   ├── background/
+│   │   │   ├── space.jpg
 │   │   ├── TingoBingo/
 │   │   │   ├── head/
 │   │   │   │   ├── antenna.png
 │   │   │   │   ├── ears.png
 │   │   │   │   ├── eyebrows.png
+│   │   │   │   ├── eyebrows2.png
 │   │   │   │   ├── eyes.png
 │   │   │   │   ├── headBase.png
 │   │   │   │   ├── mouth.png
+│   │   │   │   ├── nose.png
+│   │   │   │   ├── pupil.png
+│   │   │   │   ├── RawFiles/
+│   │   │   │   │   ├── 360_F_540738646_e4edvIenC9U1dNhP0s8pHZxbMqejvMOX.jpg
+│   │   │   │   │   ├── antannna.xcf
+│   │   │   │   │   ├── antenna1.png
+│   │   │   │   │   ├── antenna2.png
+│   │   │   │   │   ├── antenna3.png
+│   │   │   │   │   ├── antenna4.png
+│   │   │   │   │   ├── antenna5.png
+│   │   │   │   │   ├── antenna6.png
+│   │   │   │   │   ├── antenna7.png
+│   │   │   │   │   ├── antenna8.png
+│   │   │   │   │   ├── cardboard_texture.jpg
+│   │   │   │   │   ├── close-up-of-stacked-corrugated-cardboard-cross-sections-showing-wavy-inner-structure-photo.jpg
+│   │   │   │   │   ├── corrugated-edge-of-pristine-cardboard-box-showing-intricate-patterns-photo.jpeg
+│   │   │   │   │   ├── Ears.png
+│   │   │   │   │   ├── ears.xcf
+│   │   │   │   │   ├── eyebrows.xcf
+│   │   │   │   │   ├── eyes.xcf
+│   │   │   │   │   ├── headBase.xcf
+│   │   │   │   │   ├── mouth display.png
+│   │   │   │   │   ├── mouth display.xcf
+│   │   │   │   │   ├── mouth neutral open.png
+│   │   │   │   │   ├── mouth neutral.png
+│   │   │   │   │   ├── mouth smirk.png
+│   │   │   │   │   ├── Mouth sprite sheet.xcf
+│   │   │   │   │   ├── Mouth.png
+│   │   │   │   │   ├── Mouth.xcf
+│   │   │   │   │   ├── nose.xcf
+│   │   │   │   │   ├── nose1.png
+│   │   │   │   │   ├── nose2.png
+│   │   │   │   │   ├── nose3.png
+│   │   │   │   │   ├── nose4.png
+│   │   │   │   │   ├── pupil.xcf
+│   │   │   │   │   ├── Texture_Atlas_cardboard.png
+│   │   │   │   │   ├── Texture_Atlas_cardboard.xcf
+│   │   │   │   │   ├── Tingo Bingo antenna.blend
+│   │   │   │   │   ├── Tingo Bingo antenna.blend1
+│   │   │   │   │   ├── Tingo Bingo ears.blend
+│   │   │   │   │   ├── Tingo Bingo ears.blend1
+│   │   │   │   │   ├── Tingo Bingo eye brows.blend
+│   │   │   │   │   ├── Tingo Bingo eye brows.blend1
+│   │   │   │   │   ├── Tingo Bingo head.bbmodel
+│   │   │   │   │   ├── Tingo Bingo head.blend1
+│   │   │   │   │   ├── Tingo Bingo head_blink.blend1
+│   │   │   │   │   ├── Tingo Bingo head_eyes_blink.blend
+│   │   │   │   │   ├── Tingo Bingo head_eyes_blink.blend1
+│   │   │   │   │   ├── Tingo Bingo head_mouth_move.blend
+│   │   │   │   │   ├── Tingo Bingo head_mouth_move.blend1
+│   │   │   │   │   ├── Tingo Bingo head_turn.blend
+│   │   │   │   │   ├── Tingo Bingo head_turn.blend1
+│   │   │   │   │   ├── Tingo Bingo nose.blend
+│   │   │   │   │   ├── Tingo Bingo nose.blend1
+│   │   │   │   ├── Renders/
+│   │   │   │   │   ├── 0001.png
+│   │   │   │   │   ├── 0002.png
+│   │   │   │   │   ├── 0003.png
+│   │   │   │   │   ├── 0004.png
+│   │   │   │   │   ├── 0005.png
 │   ├── sounds/
 │   │   ├── .gitkeep
 ├── build/
+│   ├── TingoBingo.exe
 ├── FileStructure.txt
 ├── include/
 │   ├── Animation.h
@@ -222,11 +90,15 @@
 │   │   ├── Eyebrows.h
 │   │   ├── Eyes.h
 │   │   ├── Head.h
+│   │   ├── Headbase.h
 │   │   ├── Mouth.h
+│   │   ├── Nose.h
+│   │   ├── Pupil.h
+│   │   ├── Pupils.h
+│   ├── IdleController.h
 │   ├── Input.h
-│   ├── Object.h
 │   ├── Robot.h
-│   ├── SpritePart.h
+│   ├── Sprite.h
 │   ├── Utils.h
 ├── ProjectDump.txt
 ├── README.md
@@ -243,11 +115,16 @@
 │   │   ├── Eyebrows.cpp
 │   │   ├── Eyes.cpp
 │   │   ├── Head.cpp
+│   │   ├── Headbase.cpp
 │   │   ├── Mouth.cpp
+│   │   ├── Nose.cpp
+│   │   ├── Pupil.cpp
+│   │   ├── Pupils.cpp
+│   ├── IdleController.cpp
 │   ├── Input.cpp
 │   ├── main.cpp
-│   ├── Object.cpp
 │   ├── Robot.cpp
+│   ├── Sprite.cpp
 ├── utilities/
 │   ├── projectDump.cpp
 │   ├── projectDump.exe

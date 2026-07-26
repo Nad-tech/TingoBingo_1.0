@@ -243,6 +243,8 @@ class Head
         void PlayHeadWiggle(float dt);
         void PlayHeadBob(float dt);
         
+        void LookAt(Vector2 point);
+
     private:
         Vector2 position;
     
@@ -368,9 +370,12 @@ class Pupils
         void Initialise();
         void Shutdown();
         void Update(float dt);
-        void Draw();
+        void Draw() const;
         void SetPosition(Vector2 position);
         void SetRotation(float rotation);
+        Vector2 RotateVector(Vector2 v, float rotation);
+
+        void LookAt(Vector2 point);
 
     private:
         Pupil leftPupil;
@@ -428,11 +433,13 @@ class IdleController
 
 #pragma once
 
+#include "raylib.h"
 class Input
 {
 public:
     bool LeftPressed() const;
     bool RightPressed() const;
+    Vector2 MousePosition() const;
 };
 
 
@@ -463,6 +470,8 @@ public:
 	void RotateHeadLeft();
 	void RotateHeadRight();
 	void ReturnHeadToCentre();
+
+	void LookAt(Vector2 point);
 
 	Vector2 GetPosition() const;
 	Vector2 GetHeadPosition() const;
@@ -728,6 +737,7 @@ void Game::HandleInput()
 
 void Game::Update(const float dt)
 {	
+	robot.LookAt(input.MousePosition());
 	robot.Update(dt);
 }
 
@@ -1152,11 +1162,11 @@ void Head::ApplyRotation(float rotation)
 
 void Head::PlayIdleHeadTransform(float dt)
 {
-    PlayHeadWiggle(dt);
-    ApplyRotation(rotation);
-
     PlayHeadBob(dt);
     ApplyPosition(position);
+
+    PlayHeadWiggle(dt);
+    ApplyRotation(rotation);
 }
 
 void Head::PlayHeadWiggle(float dt)
@@ -1210,6 +1220,10 @@ void Head::PlayHeadBob(float dt)
     position.y = homePosition.y + headBobOffset.y; 
 }
 
+void Head::LookAt(Vector2 point)
+{
+    pupils.LookAt(point);
+}
 
 
 =====================================
@@ -1433,6 +1447,16 @@ void Pupil::Update(float dt)
 
 #include "head\Pupils.h"
 #include "raylib.h"
+#include "cmath"
+#include "raymath.h"
+
+Vector2 leftEyeOffset  = {-67.0f, 21.0f};
+Vector2 rightEyeOffset = { 81.0f, 21.0f};
+Vector2 headPosition = {0,0};
+
+Vector2 leftLookOffset  = {0.0f, 0.0f};
+Vector2 rightLookOffset = {0.0f, 0.0f};
+const float LOOK_DISTANCE = 15.0f;
 
 void Pupils::Initialise()
 {
@@ -1452,7 +1476,7 @@ void Pupils::Update(float dt)
     rightPupil.Update(dt);
 }
 
-void Pupils::Draw()
+void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
@@ -1460,14 +1484,91 @@ void Pupils::Draw()
 
 void Pupils::SetPosition(Vector2 position)
 {
-    leftPupil.SetPosition(position);
-    rightPupil.SetPosition(position);
+    headPosition = position;
+
+    leftPupil.SetPosition(
+        {
+            position.x + leftEyeOffset.x, position.y + leftEyeOffset.y
+        });
+
+    rightPupil.SetPosition(
+        {
+            position.x + rightEyeOffset.x, position.y + rightEyeOffset.y
+        });
 }
 
-void Pupils::SetRotation(float rotation) 
+Vector2 Pupils::RotateVector(Vector2 v, float rotation)
 {
+    float r = rotation * DEG2RAD;
+
+    return
+    {
+        v.x * cosf(r) - v.y * sinf(r),
+        v.x * sinf(r) + v.y * cosf(r)
+    };
+}
+
+void Pupils::SetRotation(float rotation)
+{
+    Vector2 rotatedLeft  = RotateVector(Vector2Add(leftEyeOffset, leftLookOffset), rotation);
+    Vector2 rotatedRight = RotateVector(Vector2Add(rightEyeOffset, rightLookOffset), rotation);
+
+    leftPupil.SetPosition(
+    {
+        headPosition.x + rotatedLeft.x,
+        headPosition.y + rotatedLeft.y
+    });
+
+    rightPupil.SetPosition(
+    {
+        headPosition.x + rotatedRight.x,
+        headPosition.y + rotatedRight.y
+    });
+
     leftPupil.SetRotation(rotation);
     rightPupil.SetRotation(rotation);
+}
+
+void Pupils::LookAt(Vector2 point)
+{
+    Vector2 leftEyeCentre =
+    {
+        headPosition.x + leftEyeOffset.x,
+        headPosition.y + leftEyeOffset.y
+    };
+
+    Vector2 rightEyeCentre =
+    {
+        headPosition.x + rightEyeOffset.x,
+        headPosition.y + rightEyeOffset.y
+    };
+
+    Vector2 leftDirection =
+    {
+        point.x - leftEyeCentre.x,
+        point.y - leftEyeCentre.y
+    };
+
+    Vector2 rightDirection =
+    {
+        point.x - rightEyeCentre.x,
+        point.y - rightEyeCentre.y
+    };
+
+    leftDirection = Vector2Normalize(leftDirection);
+    rightDirection = Vector2Normalize(rightDirection);
+
+    leftLookOffset =
+    {
+        leftDirection.x * LOOK_DISTANCE,
+        leftDirection.y * LOOK_DISTANCE
+    };
+
+    rightLookOffset =
+    {
+        rightDirection.x * LOOK_DISTANCE,
+        rightDirection.y * LOOK_DISTANCE
+    };
 }
 
 
@@ -1594,6 +1695,11 @@ bool Input::RightPressed() const
     return IsKeyDown(KEY_RIGHT);
 }
 
+Vector2 Input::MousePosition() const
+{
+    return GetMousePosition();
+}
+
 
 =====================================
 .\src\main.cpp
@@ -1679,6 +1785,11 @@ void Robot::RotateHeadRight()
 void Robot::ReturnHeadToCentre()
 {
     head.ReturnToCentre();
+}
+
+void Robot::LookAt(Vector2 point)
+{
+    head.LookAt(point);
 }
 
 
@@ -1834,71 +1945,36 @@ namespace fs = std::filesystem;
 //---------------------------------------------------------------
 void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
 {
-    // directory_iterator loops through every file and folder
-    // inside "path".
     for (const auto& entry : fs::directory_iterator(path))
     {
+        // Skip the .git directory completely.
+        if (entry.is_directory() && entry.path().filename() == ".git")
+            continue;
+
         //-------------------------------------------------------
         // Print indentation.
-        //
-        // If we're inside several folders, print
-        // "│   " once for each level.
-        //
-        // Example:
-        //
-        // Root
-        // │
-        // ├── Folder
-        // │   ├── File.txt
         //-------------------------------------------------------
         for (int i = 0; i < depth; i++)
             out << "│   ";
 
         //-------------------------------------------------------
         // Print the file or folder name.
-        //
-        // entry.path()
-        //      Returns the complete path.
-        //
-        // filename()
-        //      Extracts just the name.
-        //
-        // string()
-        //      Converts it into a std::string.
         //-------------------------------------------------------
         out << "├── " << entry.path().filename().string();
 
         //-------------------------------------------------------
-        // If this entry is a directory,
-        // add a "/" after its name.
+        // Add "/" after directories.
         //-------------------------------------------------------
         if (entry.is_directory())
             out << "/";
 
-        // Move to the next line.
         out << '\n';
 
         //-------------------------------------------------------
-        // If this entry is another folder,
-        // call PrintTree AGAIN.
-        //
-        // This is called RECURSION.
-        //
-        // Example:
-        //
-        // Root
-        // ├── Animals
-        //
-        // PrintTree("Root")
-        //     finds Animals
-        //
-        // PrintTree("Animals")
-        //     scans everything inside Animals
+        // Recurse into subdirectories.
         //-------------------------------------------------------
         if (entry.is_directory())
         {
-            // depth + 1 means the next level is indented
-            // one extra step.
             PrintTree(entry.path(), out, depth + 1);
         }
     }
@@ -1908,51 +1984,30 @@ int main()
 {
     //-----------------------------------------------------------
     // "." means "the current folder".
-    //
-    // If you run the program from:
-    //
-    // C:\Projects\Boids
-    //
-    // then "." refers to:
-    //
-    // C:\Projects\Boids
     //-----------------------------------------------------------
     fs::path root = ".";
 
     //-----------------------------------------------------------
     // Create an output file.
-    //
-    // If it doesn't exist,
-    // it will be created.
-    //
-    // If it already exists,
-    // it will be overwritten.
     //-----------------------------------------------------------
     std::ofstream out("FileStructure.txt");
 
     //-----------------------------------------------------------
     // Check that the file opened successfully.
-    //
-    // "!out" means "opening failed".
     //-----------------------------------------------------------
     if (!out)
     {
         std::cout << "Couldn't create output file.\n";
-        return 1;      // Return an error code.
+        return 1;
     }
 
     //-----------------------------------------------------------
     // Write the root folder name.
-    //
-    // root.string() converts the filesystem path
-    // into ordinary text.
     //-----------------------------------------------------------
     out << root.string() << '\n';
 
     //-----------------------------------------------------------
     // Scan the directory tree.
-    //
-    // This one function call does all the work.
     //-----------------------------------------------------------
     PrintTree(root, out);
 
@@ -1961,7 +2016,6 @@ int main()
     //-----------------------------------------------------------
     std::cout << "Done! Wrote FileStructure.txt\n";
 
-    // Returning 0 means the program completed successfully.
     return 0;
 }
 

@@ -26,71 +26,36 @@ namespace fs = std::filesystem;
 //---------------------------------------------------------------
 void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
 {
-    // directory_iterator loops through every file and folder
-    // inside "path".
     for (const auto& entry : fs::directory_iterator(path))
     {
+        // Skip the .git directory completely.
+        if (entry.is_directory() && entry.path().filename() == ".git")
+            continue;
+
         //-------------------------------------------------------
         // Print indentation.
-        //
-        // If we're inside several folders, print
-        // "│   " once for each level.
-        //
-        // Example:
-        //
-        // Root
-        // │
-        // ├── Folder
-        // │   ├── File.txt
         //-------------------------------------------------------
         for (int i = 0; i < depth; i++)
             out << "│   ";
 
         //-------------------------------------------------------
         // Print the file or folder name.
-        //
-        // entry.path()
-        //      Returns the complete path.
-        //
-        // filename()
-        //      Extracts just the name.
-        //
-        // string()
-        //      Converts it into a std::string.
         //-------------------------------------------------------
         out << "├── " << entry.path().filename().string();
 
         //-------------------------------------------------------
-        // If this entry is a directory,
-        // add a "/" after its name.
+        // Add "/" after directories.
         //-------------------------------------------------------
         if (entry.is_directory())
             out << "/";
 
-        // Move to the next line.
         out << '\n';
 
         //-------------------------------------------------------
-        // If this entry is another folder,
-        // call PrintTree AGAIN.
-        //
-        // This is called RECURSION.
-        //
-        // Example:
-        //
-        // Root
-        // ├── Animals
-        //
-        // PrintTree("Root")
-        //     finds Animals
-        //
-        // PrintTree("Animals")
-        //     scans everything inside Animals
+        // Recurse into subdirectories.
         //-------------------------------------------------------
         if (entry.is_directory())
         {
-            // depth + 1 means the next level is indented
-            // one extra step.
             PrintTree(entry.path(), out, depth + 1);
         }
     }
@@ -100,51 +65,30 @@ int main()
 {
     //-----------------------------------------------------------
     // "." means "the current folder".
-    //
-    // If you run the program from:
-    //
-    // C:\Projects\Boids
-    //
-    // then "." refers to:
-    //
-    // C:\Projects\Boids
     //-----------------------------------------------------------
     fs::path root = ".";
 
     //-----------------------------------------------------------
     // Create an output file.
-    //
-    // If it doesn't exist,
-    // it will be created.
-    //
-    // If it already exists,
-    // it will be overwritten.
     //-----------------------------------------------------------
     std::ofstream out("FileStructure.txt");
 
     //-----------------------------------------------------------
     // Check that the file opened successfully.
-    //
-    // "!out" means "opening failed".
     //-----------------------------------------------------------
     if (!out)
     {
         std::cout << "Couldn't create output file.\n";
-        return 1;      // Return an error code.
+        return 1;
     }
 
     //-----------------------------------------------------------
     // Write the root folder name.
-    //
-    // root.string() converts the filesystem path
-    // into ordinary text.
     //-----------------------------------------------------------
     out << root.string() << '\n';
 
     //-----------------------------------------------------------
     // Scan the directory tree.
-    //
-    // This one function call does all the work.
     //-----------------------------------------------------------
     PrintTree(root, out);
 
@@ -153,6 +97,5 @@ int main()
     //-----------------------------------------------------------
     std::cout << "Done! Wrote FileStructure.txt\n";
 
-    // Returning 0 means the program completed successfully.
     return 0;
 }
