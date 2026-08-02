@@ -1,0 +1,133 @@
+//====================================================
+// launch.json
+//
+// VS Code debugger configuration for the TingoBingo project.
+//
+// This file tells VS Code:
+// - which executable to run
+// - which debugger to use (GDB)
+// - where the program starts
+// - which build task to run before debugging
+//
+// Note: Standard JSON does not support comments, so this
+// explanation is kept outside the file.
+//====================================================
+What each setting does
+Setting	Purpose
+"version": "0.2.0"	Version of the VS Code launch configuration format.
+"configurations"	List of available debugging configurations.
+"name": "Debug Template"	Name shown in VS Code's Run and Debug menu.
+"type": "cppdbg"	Uses the Microsoft C/C++ debugger extension.
+"request": "launch"	Launch a new program rather than attaching to one that's already running.
+"program"	The executable that will be started (build/TingoBingo.exe).
+"args"	Command-line arguments passed to the program. Empty means none.
+"stopAtEntry": false	Begin execution immediately instead of stopping at main().
+"cwd"	Current working directory when the program starts.
+"environment"	Environment variables supplied to the program.
+"externalConsole": true	Opens a separate console window for the program.
+"MIMode": "gdb"	Specifies that GDB is the debugger.
+"miDebuggerPath"	Location of the GDB executable installed with MSYS2.
+"preLaunchTask": "Build"	Runs the VS Code Build task before starting the debugger.
+===========================================================================================
+
+//====================================================
+// settings.json
+//
+// Workspace settings for the TingoBingo project.
+//
+// These settings tell the C/C++ extension:
+// - which compiler is being used
+// - where project header files are located
+//
+// Note: JSON does not support comments, so this
+// explanation is kept outside the file.
+//====================================================
+What each setting does
+Setting	Purpose
+"C_Cpp.default.compilerPath"	Tells the C/C++ extension which compiler to use for IntelliSense 
+and code analysis. Here it points to the MSYS2 MinGW-w64 g++ compiler.
+
+"C_Cpp.default.includePath"	Lists folders that contain header (.h) files so IntelliSense 
+can find them.
+
+"${workspaceFolder}/include"	Includes the project's main include directory.
+
+"${workspaceFolder}/include/**"	Includes all subfolders within include, allowing headers 
+to be organized into folders without additional configuration.
+Why this file matters
+
+Without these settings, VS Code may:
+
+Show false "Cannot open source file" errors.
+Fail to autocomplete your classes and functions.
+Be unable to jump to definitions or provide accurate IntelliSense.
+
+This file doesn't affect how your program is compiled by g++; it mainly
+ helps the VS Code C/C++ extension understand your project structure while you're editing.
+
+=========================================================================
+
+//====================================================
+// tasks.json
+//
+// Defines build tasks that can be run from VS Code.
+//
+// This project uses an MSYS2 shell to execute the
+// build script, which compiles the TingoBingo source
+// code into an executable.
+//
+// Note: JSON does not support comments, so this
+// explanation is kept outside the file.
+//====================================================
+What each setting does
+Setting	Purpose
+"version": "2.0.0"	Version of the VS Code Tasks configuration format.
+"tasks"	List of tasks available in the project.
+"label": "Build"	The name of the task. This is the task that launch.json runs before 
+debugging.
+"type": "process"	Runs an external program rather than a shell command directly.
+"command"	Starts the MSYS2 shell (msys2_shell.cmd).
+"args"	Arguments passed to the MSYS2 shell to control how it starts.
+MSYS2 arguments
+Argument	Purpose
+-defterm	Uses the default terminal.
+-no-start	Runs in the current terminal instead of opening a new MSYS2 window.
+-mingw64	Starts the MinGW 64-bit environment so g++ and Raylib are available.
+-here	Starts MSYS2 in the project folder.
+-c	Executes the following command and then exits.
+Build command
+cd "${workspaceFolder}" && ./scripts/build.sh
+
+This command:
+
+Changes into the project folder.
+Runs your build.sh script.
+The script compiles all of TingoBingo.
+Produces build/TingoBingo.exe.
+Remaining settings
+Setting	Purpose
+"group"	Marks this as the project's default build task. Pressing Ctrl+Shift+B runs it
+ automatically.
+"problemMatcher": "$gcc"	Parses g++ compiler output so errors and warnings appear 
+in VS Code's Problems panel and can be clicked to jump directly to the relevant line of code.
+
+I really like this setup because it keeps everything simple:
+
+Ctrl + Shift + B
+        │
+        ▼
+VS Code Task
+        │
+        ▼
+MSYS2 Shell
+        │
+        ▼
+build.sh
+        │
+        ▼
+g++
+        │
+        ▼
+TingoBingo.exe
+
+That flow is exactly how your project gets built every time.

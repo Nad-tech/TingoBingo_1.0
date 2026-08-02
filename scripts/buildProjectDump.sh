@@ -1,3 +1,13 @@
+#====================================================
+# projectDump.sh
+#
+# Builds and runs the ProjectDump utility.
+# This script also demonstrates several common Bash
+# concepts such as the shebang, changing directories,
+# and command substitution.
+#====================================================
+
+
 #!/bin/bash
 # ^^^^^^^^^^
 # This is called the "shebang".

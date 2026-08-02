@@ -1,8 +1,18 @@
+//====================================================
+// Animation.cpp
+//
+// Manages sprite sheet animations.
+//
+// The Animation class tracks the current frame,
+// advances animations over time and calculates the
+// correct source rectangle for rendering.
+//====================================================
+
 #include "Animation.h"
 
+// Initialise the animation with default values.
 Animation::Animation()
 {
-    // Default animation state
     frame = 0;
 
     frameWidth = 0;
@@ -20,6 +30,8 @@ Animation::Animation()
     endFrame = 0;
 }
 
+// Configure the animation using information from
+// the sprite sheet.
 void Animation::Initialise(
     int width,
     int height,
@@ -27,7 +39,6 @@ void Animation::Initialise(
     int cols,
     float duration)
 {
-    // Store animation properties
     frameWidth = width;
     frameHeight = height;
 
@@ -36,41 +47,34 @@ void Animation::Initialise(
 
     frameDuration = duration;
 
-    // Reset animation
+    // Reset the animation.
     frame = 0;
     frameTimer = 0.0f;
 }
 
+// Advance the animation based on elapsed time.
 void Animation::Update(float dt)
 {
-    // Do nothing if animation isn't playing
+    // Do nothing if the animation isn't currently playing.
     if (!playing)
         return;
 
-    // Count elapsed time
+    // Count the elapsed time since the last frame.
     frameTimer += dt;
 
-    // Wait until it's time for the next frame
+    // Wait until enough time has passed.
     if (frameTimer < frameDuration)
         return;
-    /*
-    Remove one frame's worth of elapsed time
-    Keep any leftover time for the next update
-    Example: 0.18s - 0.10s = 0.08s carries into the next frame.
-    Remove one frame's worth of time so any extra carries over.
-    Example: 0.18s - 0.10s = 0.08s, keeping the animation accurate.
-    By "keeping the animation accurate," I mean making sure it plays 
-    at the correct speed over time, even if your game's frame rate isn't 
-    perfectly consistent.
-    frameTimer -= frameDuration;
-    */
 
+    // Remove one frame's worth of elapsed time.
+    // Keeping any leftover time prevents the animation
+    // from slowing down if frame times vary.
     frameTimer -= frameDuration;
 
-    // Advance to the next frame
+    // Advance to the next frame.
     frame++;
 
-    // Stop after the last frame
+    // Stop once the animation reaches the end frame.
     if (frame > endFrame)
     {
         frame = startFrame;
@@ -78,9 +82,10 @@ void Animation::Update(float dt)
     }
 }
 
+// Return the source rectangle for the current frame
+// within the sprite sheet.
 Rectangle Animation::GetSourceRectangle() const
 {
-    // Calculate sprite sheet position
     int column = frame % columns;
     int row = frame / columns;
 
@@ -93,31 +98,33 @@ Rectangle Animation::GetSourceRectangle() const
     };
 }
 
+// Reset the animation to the first frame.
 void Animation::Reset()
 {
-    // Return to the first frame
     frame = 0;
     frameTimer = 0.0f;
 }
 
+// Set the current animation frame.
 void Animation::SetFrame(int newFrame)
 {
-    // Set a specific frame
     frame = newFrame % totalFrames;
 }
 
+// Move to the previous frame.
 void Animation::PreviousFrame()
 {
-    // Move back one frame
     frame--;
 
+    // Wrap around to the last frame.
     if (frame < 0)
         frame = totalFrames - 1;
 }
 
+// Move to the next frame.
 void Animation::NextFrame()
 {
-    // Move forward one frame
+    // Wrap around to the first frame.
     frame = (frame + 1) % totalFrames;
 }
 
@@ -141,23 +148,24 @@ int Animation::GetTotalFrames() const
     return totalFrames;
 }
 
+// Play a section of the sprite sheet once.
 void Animation::Play(int start, int end)
 {
-    // Ignore if already playing
+    // Ignore the request if an animation is already playing.
     if (playing)
         return;
 
-    // Set playback range
     startFrame = start;
     endFrame = end;
 
-    // Start at the first frame
+    // Start playback from the first frame.
     frame = startFrame;
     frameTimer = 0.0f;
 
     playing = true;
 }
 
+// Returns true while an animation is playing.
 bool Animation::IsPlaying() const
 {
     return playing;

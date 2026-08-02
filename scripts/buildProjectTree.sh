@@ -1,3 +1,11 @@
+#====================================================
+# projectTree.sh
+#
+# Builds and runs the ProjectTree utility.
+# Used to generate a tree view of the TingoBingo
+# project structure.
+#====================================================
+
 #!/bin/bash
 
 set -e
@@ -127,7 +135,10 @@ pwd
 
 echo "Building ProjectTree..."
 
+# Compile the ProjectTree utility.
 g++ -std=c++23 utilities/projectTree.cpp -o utilities/projectTree.exe
 
 echo "Executing ProjectTree..."
+
+# Run the utility.
 ./utilities/projectTree.exe

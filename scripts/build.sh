@@ -1,19 +1,33 @@
 #!/bin/bash
 
+#====================================================
+# build.sh
+#
+# Builds the TingoBingo project using g++ and Raylib,
+# then launches the executable.
+#====================================================
+
+# Exit immediately if any command fails.
 set -e
 
 EXE_NAME="TingoBingo"
 
+# Move to the project root regardless of where the
+# script was launched from.
 cd "$(dirname "$0")/.."
 
 echo "Building $EXE_NAME..."
 
+# Create the build folder if it doesn't already exist.
 mkdir -p build
 
+# Remove any previous executable to ensure a clean build.
 rm -f build/TingoBingo.exe
 
 echo src/*.cpp
 
+# Compile all project source files and link the
+# required Raylib and Windows libraries.
 g++ \
     -g \
     -Wall \
@@ -31,75 +45,5 @@ g++ \
 echo "Build successful"
 echo "Running $EXE_NAME..."
 
+# Launch the application in the background.
 ./build/$EXE_NAME.exe &
-
-
-# ============================================================
-# COMMENTED REFERENCE
-# ============================================================
-
-# #!/bin/bash
-# Run this script using Bash.
-#
-# set -e
-# Stop the script immediately if a command fails.
-#
-# EXE_NAME="TingoBingo"
-# Set the name of the executable.
-#
-# cd "$(dirname "$0")/.."
-# Move from the scripts directory to the project root.
-#
-# echo "Building $EXE_NAME..."
-# Display a message showing that compilation is starting.
-#
-# mkdir -p build
-# Create the build directory if it does not already exist.
-#
-# g++ \
-# Start the C++ compiler.
-#
-#     -g \
-# Include debugging information for GDB.
-#
-#     -Wall \
-# Enable common compiler warnings.
-#
-#     -Wextra \
-# Enable additional compiler warnings.
-#
-#     -std=c++23 \
-# Compile using the C++23 standard.
-#
-#     -Iinclude \
-# Tell the compiler to search the include directory for headers.
-#
-#     src/*.cpp \
-# Compile all .cpp files directly inside src.
-#
-#     src/head/*.cpp \
-# Compile all .cpp files inside src/head.
-#
-#     -o build/$EXE_NAME.exe \
-# Create the executable inside the build directory.
-#
-#     -lraylib \
-# Link the Raylib library.
-#
-#     -lopengl32 \
-# Link the Windows OpenGL library.
-#
-#     -lgdi32 \
-# Link the Windows Graphics Device Interface library.
-#
-#     -lwinmm
-# Link the Windows multimedia library.
-#
-# echo "Build successful"
-# Display a message when compilation succeeds.
-#
-# echo "Running $EXE_NAME..."
-# Display a message before running the program.
-#
-# ./build/$EXE_NAME.exe &
-# Run the executable in the background.

@@ -1,59 +1,63 @@
-// iostream gives us std::cout for printing to the console.
+//====================================================
+// ProjectTree.cpp
+//
+// Generates a text file showing the folder structure
+// of the current project.
+//
+// This utility demonstrates how to use
+// std::filesystem to recursively traverse directories
+// and produce a simple tree view.
+//====================================================
+
+// iostream provides std::cout for writing to the console.
 #include <iostream>
 
-// fstream lets us create and write to files.
+// fstream provides file input and output.
 #include <fstream>
 
-// filesystem provides tools for working with files and folders.
+// filesystem provides classes and functions for working
+// with files and directories.
 #include <filesystem>
 
-// Create a shorter name.
-// Instead of writing std::filesystem everywhere,
-// we can just write fs.
+// Create a shorter alias so we can write "fs::"
+// instead of "std::filesystem::".
 namespace fs = std::filesystem;
 
-//---------------------------------------------------------------
+//===============================================================
 // PrintTree
 //
-// Recursively prints the contents of a folder.
+// Recursively writes the contents of a directory to the
+// output file as a tree structure.
 //
 // Parameters:
-//
-// path  - The folder we are currently scanning.
-// out   - The output file we are writing to.
-// depth - How deep we are in the folder structure.
-//         Used only to indent the output nicely.
-//---------------------------------------------------------------
+//   path  - The directory currently being scanned.
+//   out   - The output file.
+//   depth - The current directory depth, used to indent
+//           child files and folders.
+//===============================================================
 void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
 {
+    // Visit every file and folder in the current directory.
     for (const auto& entry : fs::directory_iterator(path))
     {
-        // Skip the .git directory completely.
+        // Skip the Git repository metadata.
         if (entry.is_directory() && entry.path().filename() == ".git")
             continue;
 
-        //-------------------------------------------------------
-        // Print indentation.
-        //-------------------------------------------------------
+        // Indent according to the current folder depth.
         for (int i = 0; i < depth; i++)
             out << "│   ";
 
-        //-------------------------------------------------------
-        // Print the file or folder name.
-        //-------------------------------------------------------
+        // Write the file or directory name.
         out << "├── " << entry.path().filename().string();
 
-        //-------------------------------------------------------
-        // Add "/" after directories.
-        //-------------------------------------------------------
+        // Add a trailing '/' to make directories easy to identify.
         if (entry.is_directory())
             out << "/";
 
         out << '\n';
 
-        //-------------------------------------------------------
-        // Recurse into subdirectories.
-        //-------------------------------------------------------
+        // Recursively process child directories.
         if (entry.is_directory())
         {
             PrintTree(entry.path(), out, depth + 1);
@@ -63,38 +67,26 @@ void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
 
 int main()
 {
-    //-----------------------------------------------------------
-    // "." means "the current folder".
-    //-----------------------------------------------------------
+    // "." represents the current working directory.
     fs::path root = ".";
 
-    //-----------------------------------------------------------
-    // Create an output file.
-    //-----------------------------------------------------------
+    // Create the output file.
     std::ofstream out("FileStructure.txt");
 
-    //-----------------------------------------------------------
-    // Check that the file opened successfully.
-    //-----------------------------------------------------------
+    // Stop if the file couldn't be created.
     if (!out)
     {
         std::cout << "Couldn't create output file.\n";
         return 1;
     }
 
-    //-----------------------------------------------------------
     // Write the root folder name.
-    //-----------------------------------------------------------
     out << root.string() << '\n';
 
-    //-----------------------------------------------------------
-    // Scan the directory tree.
-    //-----------------------------------------------------------
+    // Generate the directory tree.
     PrintTree(root, out);
 
-    //-----------------------------------------------------------
-    // Tell the user we're finished.
-    //-----------------------------------------------------------
+    // Inform the user that the operation completed.
     std::cout << "Done! Wrote FileStructure.txt\n";
 
     return 0;
