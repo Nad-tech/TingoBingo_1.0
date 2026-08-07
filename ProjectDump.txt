@@ -59,6 +59,12 @@ private:
 
 
 =====================================
+.\include\AudioManager.h
+=====================================
+
+
+
+=====================================
 .\include\Constants.h
 =====================================
 
@@ -439,6 +445,7 @@ class Input
 public:
     bool LeftPressed() const;
     bool RightPressed() const;
+    bool SpacePressed() const;
     Vector2 MousePosition() const;
 };
 
@@ -452,7 +459,9 @@ public:
 #include "raylib.h"
 #include "head/Head.h"
 #include "IdleController.h"
-
+#include "RobotBrain.h"
+#include "SpeechController.h"
+#include <string>
 class Robot 
 {
 public:
@@ -476,11 +485,90 @@ public:
 	Vector2 GetPosition() const;
 	Vector2 GetHeadPosition() const;
 
+	void UpdateIdle(float dt);
+	void Speak(const std::string& text);
+
 private:
 	Vector2 position;
 	
 	Head head;
-	IdleController idle;
+	IdleController idleController;
+	RobotBrain robotBrain;
+};
+
+
+=====================================
+.\include\RobotBrain.h
+=====================================
+
+#pragma once
+
+#include "SpeechController.h"
+#include <string>
+
+class Robot;
+
+class RobotBrain
+{
+    public:
+        enum class State
+        {
+            Idle,
+            Speaking
+        };
+
+        RobotBrain(Robot& robot);
+
+        void Update(float dt);
+        void SetState(State newState);
+        void Speak(const std::string& command);
+
+    private:
+        Robot& robot;
+        State state;
+        SpeechController speechController;
+};
+
+
+=====================================
+.\include\Speech.h
+=====================================
+
+#pragma once
+
+#include <string>
+
+class Speech
+{
+public:
+    static void Speak(const std::string& text);
+};
+
+
+=====================================
+.\include\SpeechController.h
+=====================================
+
+#pragma once
+
+#include <string>
+#include <thread>
+#include <atomic>
+#include "raylib.h"
+
+class SpeechController
+{
+    public:
+        void Update();
+        void Speak(const std::string& text);
+        bool IsSpeaking() const;
+
+    private:
+        std::atomic<bool> speaking = false;
+        std::thread speechThread;
+        std::atomic<bool> wavReady = false;
+        Sound speech{};
+        bool soundLoaded = false;
 };
 
 
@@ -532,11 +620,21 @@ public:
 .\src\Animation.cpp
 =====================================
 
+//====================================================
+// Animation.cpp
+//
+// Manages sprite sheet animations.
+//
+// The Animation class tracks the current frame,
+// advances animations over time and calculates the
+// correct source rectangle for rendering.
+//====================================================
+
 #include "Animation.h"
 
+// Initialise the animation with default values.
 Animation::Animation()
 {
-    // Default animation state
     frame = 0;
 
     frameWidth = 0;
@@ -554,6 +652,8 @@ Animation::Animation()
     endFrame = 0;
 }
 
+// Configure the animation using information from
+// the sprite sheet.
 void Animation::Initialise(
     int width,
     int height,
@@ -561,7 +661,6 @@ void Animation::Initialise(
     int cols,
     float duration)
 {
-    // Store animation properties
     frameWidth = width;
     frameHeight = height;
 
@@ -570,41 +669,34 @@ void Animation::Initialise(
 
     frameDuration = duration;
 
-    // Reset animation
+    // Reset the animation.
     frame = 0;
     frameTimer = 0.0f;
 }
 
+// Advance the animation based on elapsed time.
 void Animation::Update(float dt)
 {
-    // Do nothing if animation isn't playing
+    // Do nothing if the animation isn't currently playing.
     if (!playing)
         return;
 
-    // Count elapsed time
+    // Count the elapsed time since the last frame.
     frameTimer += dt;
 
-    // Wait until it's time for the next frame
+    // Wait until enough time has passed.
     if (frameTimer < frameDuration)
         return;
-    /*
-    Remove one frame's worth of elapsed time
-    Keep any leftover time for the next update
-    Example: 0.18s - 0.10s = 0.08s carries into the next frame.
-    Remove one frame's worth of time so any extra carries over.
-    Example: 0.18s - 0.10s = 0.08s, keeping the animation accurate.
-    By "keeping the animation accurate," I mean making sure it plays 
-    at the correct speed over time, even if your game's frame rate isn't 
-    perfectly consistent.
-    frameTimer -= frameDuration;
-    */
 
+    // Remove one frame's worth of elapsed time.
+    // Keeping any leftover time prevents the animation
+    // from slowing down if frame times vary.
     frameTimer -= frameDuration;
 
-    // Advance to the next frame
+    // Advance to the next frame.
     frame++;
 
-    // Stop after the last frame
+    // Stop once the animation reaches the end frame.
     if (frame > endFrame)
     {
         frame = startFrame;
@@ -612,9 +704,10 @@ void Animation::Update(float dt)
     }
 }
 
+// Return the source rectangle for the current frame
+// within the sprite sheet.
 Rectangle Animation::GetSourceRectangle() const
 {
-    // Calculate sprite sheet position
     int column = frame % columns;
     int row = frame / columns;
 
@@ -627,31 +720,33 @@ Rectangle Animation::GetSourceRectangle() const
     };
 }
 
+// Reset the animation to the first frame.
 void Animation::Reset()
 {
-    // Return to the first frame
     frame = 0;
     frameTimer = 0.0f;
 }
 
+// Set the current animation frame.
 void Animation::SetFrame(int newFrame)
 {
-    // Set a specific frame
     frame = newFrame % totalFrames;
 }
 
+// Move to the previous frame.
 void Animation::PreviousFrame()
 {
-    // Move back one frame
     frame--;
 
+    // Wrap around to the last frame.
     if (frame < 0)
         frame = totalFrames - 1;
 }
 
+// Move to the next frame.
 void Animation::NextFrame()
 {
-    // Move forward one frame
+    // Wrap around to the first frame.
     frame = (frame + 1) % totalFrames;
 }
 
@@ -675,23 +770,24 @@ int Animation::GetTotalFrames() const
     return totalFrames;
 }
 
+// Play a section of the sprite sheet once.
 void Animation::Play(int start, int end)
 {
-    // Ignore if already playing
+    // Ignore the request if an animation is already playing.
     if (playing)
         return;
 
-    // Set playback range
     startFrame = start;
     endFrame = end;
 
-    // Start at the first frame
+    // Start playback from the first frame.
     frame = startFrame;
     frameTimer = 0.0f;
 
     playing = true;
 }
 
+// Returns true while an animation is playing.
 bool Animation::IsPlaying() const
 {
     return playing;
@@ -699,8 +795,43 @@ bool Animation::IsPlaying() const
 
 
 =====================================
+.\src\AudioManager.cpp
+=====================================
+
+
+
+=====================================
 .\src\Game.cpp
 =====================================
+
+//====================================================
+// Game.cpp
+//
+// Controls the main game loop.
+//
+// The Game class is responsible for initialising the
+// application, processing input, updating the game
+// state, drawing each frame and shutting everything
+// down when the program exits.
+//====================================================
+
+// Main game loop.
+//
+// Initialise()
+//       │
+//       ▼
+// ┌─────────────────────┐
+// │ HandleInput()       │
+// │ Update()            │
+// │ BeginDrawing()      │
+// │ Draw()              │
+// │ EndDrawing()        │
+// └─────────────────────┘
+//          ▲
+//          │
+// WindowShouldClose()
+//          │
+// Shutdown()
 
 #include "raylib.h"
 
@@ -708,10 +839,13 @@ bool Animation::IsPlaying() const
 #include "Constants.h"
 
 
-void  Game::Initialise()
+// Initialise the game and load required resources.
+void Game::Initialise()
 {
 	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
-	
+
+	InitAudioDevice();
+
 	robot.Initialise();
 
 	SetTargetFPS(TARGET_FPS);
@@ -719,6 +853,7 @@ void  Game::Initialise()
 	background = LoadTexture("assets/images/background/space.jpg");
 }
 
+// Process keyboard input.
 void Game::HandleInput()
 {
 	if (input.LeftPressed())
@@ -729,56 +864,70 @@ void Game::HandleInput()
 	{
 		robot.RotateHeadRight();
 	}
-	else 
+	else
 	{
 		robot.ReturnHeadToCentre();
 	}
+
+	if (input.SpacePressed())
+	{
+		robot.Speak("Hello");
+	}
 }
 
+// Update the game state.
 void Game::Update(const float dt)
-{	
+{
+	// Make the robot follow the mouse with its eyes.
 	robot.LookAt(input.MousePosition());
+
+	// Update the robot and its animations.
 	robot.Update(dt);
 }
 
+// Draw the current frame.
 void Game::Draw()
 {
 	ClearBackground(BLACK);
-	
+
 	DrawTexture(background, 0, 0, WHITE);
 
 	robot.Draw();
 }
 
+// Release resources before exiting.
 void Game::Shutdown()
 {
 	robot.Shutdown();
 
 	UnloadTexture(background);
 
+	CloseAudioDevice();
+
 	CloseWindow();
 }
 
+// Run the main game loop.
 void Game::Run()
 {
 	float dt = GetFrameTime();
-	
+
 	Initialise();
-	
-	while (!WindowShouldClose()) 
+
+	while (!WindowShouldClose())
 	{
 		HandleInput();
-		
+
 		dt = GetFrameTime();
 		Update(dt);
-		
+
 		BeginDrawing();
-		
+
 		Draw();
-		
+
 		EndDrawing();
 	}
-	
+
 	Shutdown();
 }
 
@@ -787,24 +936,37 @@ void Game::Run()
 .\src\head\Antenna.cpp
 =====================================
 
+//====================================================
+// Antenna.cpp
+//
+// Handles the robot's antenna sprite and animation.
+// The antenna can play a short wiggle animation when
+// triggered.
+//====================================================
+
 #include "head/Antenna.h"
 #include "Constants.h"
 
-void Antenna::Initialise() 
+void Antenna::Initialise()
 {
+    // Load the antenna sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/antenna.png");
+
+    // Sprite sheet layout.
     const int COLUMNS = 4;
     const int ROWS = 2;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.06f;
 
-
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -820,11 +982,13 @@ void Antenna::Initialise()
 
 void Antenna::Update(float dt)
 {
-    Sprite::Update(dt);//Update the timer
+    // Advance the antenna animation.
+    Sprite::Update(dt);
 }
 
 void Antenna::PlayWiggle()
 {
+    // Start the wiggle animation if it isn't already playing.
     if (!animation.IsPlaying())
     {
         animation.Play(0, 7);
@@ -836,25 +1000,37 @@ void Antenna::PlayWiggle()
 .\src\head\Ears.cpp
 =====================================
 
+//====================================================
+// Ears.cpp
+//
+// Handles the robot's ear sprites and animation.
+// The ears can play a short wiggle animation when
+// triggered.
+//====================================================
+
 #include "head/Ears.h"
 #include "Constants.h"
 
-void Ears::Initialise() 
+void Ears::Initialise()
 {
+    // Load the ear sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/ears.png");
 
+    // Sprite sheet layout.
     const int COLUMNS = 5;
     const int ROWS = 1;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.09f;
 
-
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -870,11 +1046,13 @@ void Ears::Initialise()
 
 void Ears::Update(float dt)
 {
-    Sprite::Update(dt);//Update the timer
+    // Advance the ear animation.
+    Sprite::Update(dt);
 }
 
 void Ears::PlayWiggle()
 {
+    // Start the wiggle animation if it isn't already playing.
     if (!animation.IsPlaying())
     {
         animation.Play(0, 4);
@@ -886,25 +1064,37 @@ void Ears::PlayWiggle()
 .\src\head\Eyebrows.cpp
 =====================================
 
+//====================================================
+// Eyebrows.cpp
+//
+// Handles the robot's eyebrow sprites and animation.
+// The eyebrows can play a simple two-frame wiggle
+// animation when triggered.
+//====================================================
+
 #include "head/Eyebrows.h"
 #include "Constants.h"
 
-void Eyebrows::Initialise() 
+void Eyebrows::Initialise()
 {
+    // Load the eyebrow sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
-    
+
+    // Sprite sheet layout.
     const int COLUMNS = 2;
     const int ROWS = 1;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.3f;
 
-
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -920,11 +1110,13 @@ void Eyebrows::Initialise()
 
 void Eyebrows::Update(float dt)
 {
-    Sprite::Update(dt);//Update the timer
+    // Advance the eyebrow animation.
+    Sprite::Update(dt);
 }
 
 void Eyebrows::PlayWiggle()
 {
+    // Start the wiggle animation if it isn't already playing.
     if (!animation.IsPlaying())
     {
         animation.Play(0, 1);
@@ -936,24 +1128,38 @@ void Eyebrows::PlayWiggle()
 .\src\head\Eyes.cpp
 =====================================
 
+//====================================================
+// Eyes.cpp
+//
+// Handles the robot's eye sprites and blink animation.
+// The eyes are animated independently from the head,
+// allowing facial expressions without changing the
+// head rotation sprite.
+//====================================================
+
 #include "head/Eyes.h"
 #include "Constants.h"
 
-void Eyes::Initialise() 
+void Eyes::Initialise()
 {
+    // Load the eye sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/eyes.png");
+
+    // Sprite sheet layout.
     const int COLUMNS = 5;
     const int ROWS = 1;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.02f;
 
-
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -969,11 +1175,13 @@ void Eyes::Initialise()
 
 void Eyes::Update(float dt)
 {
-    Sprite::Update(dt);//Update the timer
+    // Advance the eye animation.
+    Sprite::Update(dt);
 }
 
 void Eyes::PlayBlink()
 {
+    // Start the blink animation if it isn't already playing.
     if (!animation.IsPlaying())
     {
         animation.Play(0, 4);
@@ -985,9 +1193,25 @@ void Eyes::PlayBlink()
 .\src\head\Head.cpp
 =====================================
 
-#include "head/Head.h"
-#include<cmath>
+//====================================================
+// Head.cpp
+//
+// Coordinates all of the robot's head components.
+//
+// The Head class owns the individual facial features
+// (head base, eyes, mouth, ears, antenna, nose,
+// eyebrows and pupils) and keeps them synchronised by
+// updating, drawing, positioning and rotating them as
+// a single unit.
+//
+// It also controls the head's idle animations,
+// including bobbing and wiggling.
+//====================================================
 
+#include "head/Head.h"
+#include <cmath>
+
+// Initialise the head's transform and idle animation state.
 Head::Head() :
     rotation(0.0f),
     scale(0.0f),
@@ -1010,6 +1234,7 @@ Head::Head() :
 {
 }
 
+// Initialise every component that makes up the robot's head.
 void Head::Initialise()
 {
     headBase.Initialise();
@@ -1022,6 +1247,7 @@ void Head::Initialise()
     pupils.Initialise();
 }
 
+// Release resources used by each head component.
 void Head::Shutdown()
 {
     headBase.Shutdown();
@@ -1034,6 +1260,7 @@ void Head::Shutdown()
     pupils.Shutdown();
 }
 
+// Update every animated head component.
 void Head::Update(float dt)
 {
     headBase.Update(dt);
@@ -1047,7 +1274,10 @@ void Head::Update(float dt)
 }
 
 void Head::Draw() const
-{   
+{
+    // Draw the full face only when the head is facing forward.
+    // During head rotation the facial features are already
+    // baked into the head sprite.
     if (IsFrontFacing())
     {
         ears.Draw();
@@ -1059,18 +1289,20 @@ void Head::Draw() const
         antenna.Draw();
         pupils.Draw();
     }
-    else {
+    else
+    {
         headBase.Draw();
     }
-    
 }
 
-void Head::SetPosition(Vector2 position) 
+// Set the head's home position and apply it to every component.
+void Head::SetPosition(Vector2 position)
 {
     this->homePosition = position;
     ApplyPosition(position);
 }
 
+// Move every head component to the same world position.
 void Head::ApplyPosition(Vector2 position)
 {
     this->position = position;
@@ -1090,32 +1322,36 @@ Vector2 Head::GetPosition() const
     return position;
 }
 
+// Rotate the head one frame to the left.
 void Head::RotateLeft()
 {
     headBase.RotateLeft();
 }
 
+// Rotate the head one frame to the right.
 void Head::RotateRight()
 {
     headBase.RotateRight();
 }
 
+// Return the head to its forward-facing position.
 void Head::ReturnToCentre()
 {
     headBase.ReturnToCentre();
 }
 
+// Returns true when the front-facing head sprite is active.
 bool Head::IsFrontFacing() const
 {
     return headBase.GetFrame() == 0;
 }
 
-void Head::PlayIdleAntennaAnimation() 
+void Head::PlayIdleAntennaAnimation()
 {
     antenna.PlayWiggle();
 }
 
-void Head::PlayIdleEarsAnimation() 
+void Head::PlayIdleEarsAnimation()
 {
     ears.PlayWiggle();
 }
@@ -1140,12 +1376,14 @@ void Head::PlayIdleNoseAnimation()
     nose.PlayWiggle();
 }
 
+// Set the head's home rotation.
 void Head::SetRotation(float rotation)
 {
     homeRotation = rotation;
-    ApplyRotation(rotation); 
+    ApplyRotation(rotation);
 }
 
+// Apply the current rotation to every head component.
 void Head::ApplyRotation(float rotation)
 {
     this->rotation = rotation;
@@ -1160,6 +1398,8 @@ void Head::ApplyRotation(float rotation)
     pupils.SetRotation(rotation);
 }
 
+// Play the head's idle movement by combining
+// bobbing and rotation animations.
 void Head::PlayIdleHeadTransform(float dt)
 {
     PlayHeadBob(dt);
@@ -1169,6 +1409,7 @@ void Head::PlayIdleHeadTransform(float dt)
     ApplyRotation(rotation);
 }
 
+// Randomly play a damped side-to-side wiggle.
 void Head::PlayHeadWiggle(float dt)
 {
     nextHeadWiggle -= dt;
@@ -1188,6 +1429,7 @@ void Head::PlayHeadWiggle(float dt)
 
         rotation = sin(headWiggleTimer * headWiggleFrequency) * headWiggleAmplitude;
 
+        // Gradually reduce the wiggle until the head settles.
         headWiggleAmplitude -= 8.0f * dt;
 
         if (headWiggleAmplitude <= 0.0f)
@@ -1198,16 +1440,18 @@ void Head::PlayHeadWiggle(float dt)
     }
 }
 
+// Move the head in a slow, organic elliptical motion.
 void Head::PlayHeadBob(float dt)
 {
     headBobAngle += dt * headBobSpeed * headBobDirection;
 
     randomHeadBobSignTimer -= dt;
 
-    if(randomHeadBobSignTimer <= 0)
+    // Periodically randomise the bobbing direction and movement.
+    if (randomHeadBobSignTimer <= 0)
     {
         headBobDirection *= -1;
-        randomHeadBobSignTimer = (float)GetRandomValue(5,10);
+        randomHeadBobSignTimer = (float)GetRandomValue(5, 10);
         headBobRadiusX = GetRandomValue(3, 8);
         headBobRadiusY = GetRandomValue(2, 6);
         headBobSpeed = GetRandomValue(6, 14) / 10.0f;
@@ -1217,9 +1461,10 @@ void Head::PlayHeadBob(float dt)
     headBobOffset.y = sin(headBobAngle) * headBobRadiusY;
 
     position.x = homePosition.x + headBobOffset.x;
-    position.y = homePosition.y + headBobOffset.y; 
+    position.y = homePosition.y + headBobOffset.y;
 }
 
+// Rotate the pupils to look towards the given point.
 void Head::LookAt(Vector2 point)
 {
     pupils.LookAt(point);
@@ -1230,23 +1475,39 @@ void Head::LookAt(Vector2 point)
 .\src\head\Headbase.cpp
 =====================================
 
+//====================================================
+// HeadBase.cpp
+//
+// Handles the robot's main head sprite.
+//
+// The HeadBase is responsible for displaying the
+// current head orientation and managing rotation
+// between head frames.
+//====================================================
+
 #include "head/Headbase.h"
 #include "Constants.h"
 
+// Load the head sprite and initialise its animation.
 void Headbase::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/head/HeadBase.png");
+
+    // Sprite sheet layout.
     const int COLUMNS = 1;
     const int ROWS = 1;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.02f;
 
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -1260,21 +1521,26 @@ void Headbase::Initialise()
     scale = SCALE;
 }
 
+// Return the current head animation frame.
 int Headbase::GetFrame() const
 {
     return animation.GetFrame();
 }
 
+// Rotate the head one frame to the left.
 void Headbase::RotateLeft()
 {
     animation.PreviousFrame();
 }
 
+// Rotate the head one frame to the right.
 void Headbase::RotateRight()
 {
     animation.NextFrame();
 }
 
+// Gradually return the head to its forward-facing position
+// using the shortest rotation direction.
 void Headbase::ReturnToCentre()
 {
     int frame = animation.GetFrame();
@@ -1283,7 +1549,7 @@ void Headbase::ReturnToCentre()
     if (frame == 0)
         return;
 
-    // Decide which way is shorter.
+    // Decide which direction requires the fewest frames.
     if (frame < halfTurn)
     {
         animation.PreviousFrame();
@@ -1294,6 +1560,7 @@ void Headbase::ReturnToCentre()
     }
 }
 
+// Apply a rotation transform to the head sprite.
 void Headbase::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
@@ -1304,25 +1571,39 @@ void Headbase::SetRotation(float rotation)
 .\src\head\Mouth.cpp
 =====================================
 
+//====================================================
+// Mouth.cpp
+//
+// Handles the robot's mouth sprite and idle animation.
+// The mouth can play a simple animation to give the
+// robot a more lifelike appearance.
+//====================================================
+
 #include "head/Mouth.h"
 #include "Constants.h"
 
-void Mouth::Initialise() 
+// Load the mouth sprite sheet and initialise its animation.
+void Mouth::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/head/mouth.png");
 
+    // Sprite sheet layout.
     const int COLUMNS = 3;
     const int ROWS = 1;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
+    
+    // Hold each mouth frame for one second.
     const float FRAME_DURATION = 1.0f;
 
-
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -1336,17 +1617,19 @@ void Mouth::Initialise()
     scale = SCALE;
 }
 
+// Advance the mouth animation.
 void Mouth::Update(float dt)
 {
-    Sprite::Update(dt);//Update the timer
+    Sprite::Update(dt);
 }
 
+// Start the idle mouth animation if it isn't already playing.
 void Mouth::PlayIdleMouth()
 {
     if (!animation.IsPlaying())
     {
         animation.Play(0, 2);
-    } 
+    }
 }
 
 
@@ -1354,24 +1637,37 @@ void Mouth::PlayIdleMouth()
 .\src\head\Nose.cpp
 =====================================
 
+//====================================================
+// Nose.cpp
+//
+// Handles the robot's nose sprite and animation.
+// The nose can play a short wiggle animation to add
+// subtle life to the robot's idle behaviour.
+//====================================================
+
 #include "head/Nose.h"
 #include "Constants.h"
 
-void Nose::Initialise() 
+// Load the nose sprite sheet and initialise its animation.
+void Nose::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/head/nose.png");
+
+    // Sprite sheet layout.
     const int COLUMNS = 4;
     const int ROWS = 1;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.08f;
 
-
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -1385,11 +1681,13 @@ void Nose::Initialise()
     scale = SCALE;
 }
 
+// Advance the nose animation.
 void Nose::Update(float dt)
 {
-    Sprite::Update(dt);//Update the timer
+    Sprite::Update(dt);
 }
 
+// Start the wiggle animation if it isn't already playing.
 void Nose::PlayWiggle()
 {
     if (!animation.IsPlaying())
@@ -1403,25 +1701,38 @@ void Nose::PlayWiggle()
 .\src\head\Pupil.cpp
 =====================================
 
+//====================================================
+// Pupil.cpp
+//
+// Handles the robot's pupil sprite.
+//
+// The pupil is drawn separately from the eyes so it
+// can move independently when the robot looks around.
+//====================================================
+
 #include "head/Pupil.h"
-#include "raylib.h"
 #include "Constants.h"
 
-void Pupil::Initialise() 
+// Load the pupil sprite and initialise its animation.
+void Pupil::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/head/pupil.png");
+
+    // Sprite sheet layout.
     const int COLUMNS = 1;
     const int ROWS = 1;
 
+    // Calculate the size of a single animation frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-    
+
+    // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.08f;
 
-
+    // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -1435,9 +1746,10 @@ void Pupil::Initialise()
     scale = SCALE;
 }
 
+// Advance the pupil animation.
 void Pupil::Update(float dt)
 {
-    Sprite::Update(dt);//Update the timer
+    Sprite::Update(dt);
 }
 
 
@@ -1445,58 +1757,86 @@ void Pupil::Update(float dt)
 .\src\head\Pupils.cpp
 =====================================
 
-#include "head\Pupils.h"
+//====================================================
+// Pupils.cpp
+//
+// Controls both of the robot's pupils.
+//
+// This class keeps the pupils positioned inside the
+// eyes and moves them towards a target point to give
+// the illusion that the robot is looking around.
+//====================================================
+
+#include "head/Pupils.h"
 #include "raylib.h"
 #include "cmath"
 #include "raymath.h"
 
+
+//These globals should be memeber variables in pupils.h
+//especially if im going to have more than one tingo 
+//keeping them here means they wont have their own eye positions they will share
+// Default pupil positions relative to the centre of the head.
 Vector2 leftEyeOffset  = {-67.0f, 21.0f};
 Vector2 rightEyeOffset = { 81.0f, 21.0f};
-Vector2 headPosition = {0,0};
 
+// Current position of the head in world space.
+Vector2 headPosition = {0, 0};
+
+// Current look offsets applied to each pupil.
 Vector2 leftLookOffset  = {0.0f, 0.0f};
 Vector2 rightLookOffset = {0.0f, 0.0f};
+
+// Maximum distance a pupil can move from the centre of the eye.
 const float LOOK_DISTANCE = 15.0f;
 
+// Initialise both pupil sprites.
 void Pupils::Initialise()
 {
     leftPupil.Initialise();
     rightPupil.Initialise();
 }
 
+// Release resources used by both pupils.
 void Pupils::Shutdown()
 {
     leftPupil.Shutdown();
     rightPupil.Shutdown();
 }
 
+// Update both pupil animations.
 void Pupils::Update(float dt)
 {
     leftPupil.Update(dt);
     rightPupil.Update(dt);
 }
 
+// Draw both pupils.
 void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
 }
 
+// Position both pupils relative to the head.
 void Pupils::SetPosition(Vector2 position)
 {
     headPosition = position;
 
     leftPupil.SetPosition(
-        {
-            position.x + leftEyeOffset.x, position.y + leftEyeOffset.y
-        });
+    {
+        position.x + leftEyeOffset.x,
+        position.y + leftEyeOffset.y
+    });
 
     rightPupil.SetPosition(
-        {
-            position.x + rightEyeOffset.x, position.y + rightEyeOffset.y
-        });
+    {
+        position.x + rightEyeOffset.x,
+        position.y + rightEyeOffset.y
+    });
 }
 
+// Rotate a vector around the origin.
 Vector2 Pupils::RotateVector(Vector2 v, float rotation)
 {
     float r = rotation * DEG2RAD;
@@ -1508,10 +1848,14 @@ Vector2 Pupils::RotateVector(Vector2 v, float rotation)
     };
 }
 
+// Rotate the pupils so they remain aligned with the head.
 void Pupils::SetRotation(float rotation)
 {
-    Vector2 rotatedLeft  = RotateVector(Vector2Add(leftEyeOffset, leftLookOffset), rotation);
-    Vector2 rotatedRight = RotateVector(Vector2Add(rightEyeOffset, rightLookOffset), rotation);
+    Vector2 rotatedLeft =
+        RotateVector(Vector2Add(leftEyeOffset, leftLookOffset), rotation);
+
+    Vector2 rotatedRight =
+        RotateVector(Vector2Add(rightEyeOffset, rightLookOffset), rotation);
 
     leftPupil.SetPosition(
     {
@@ -1529,6 +1873,8 @@ void Pupils::SetRotation(float rotation)
     rightPupil.SetRotation(rotation);
 }
 
+// Move the pupils towards a target point while limiting
+// how far they can travel within the eye.
 void Pupils::LookAt(Vector2 point)
 {
     Vector2 leftEyeCentre =
@@ -1543,6 +1889,7 @@ void Pupils::LookAt(Vector2 point)
         headPosition.y + rightEyeOffset.y
     };
 
+    // Calculate the direction from each eye to the target.
     Vector2 leftDirection =
     {
         point.x - leftEyeCentre.x,
@@ -1558,6 +1905,7 @@ void Pupils::LookAt(Vector2 point)
     leftDirection = Vector2Normalize(leftDirection);
     rightDirection = Vector2Normalize(rightDirection);
 
+    // Convert the direction into a small movement offset.
     leftLookOffset =
     {
         leftDirection.x * LOOK_DISTANCE,
@@ -1576,8 +1924,20 @@ void Pupils::LookAt(Vector2 point)
 .\src\IdleController.cpp
 =====================================
 
+//====================================================
+// IdleController.cpp
+//
+// Controls the robot's idle behaviour.
+//
+// Each facial feature has its own independent timer,
+// allowing idle animations such as blinking, ear
+// wiggles and nose wiggles to occur at random
+// intervals, making the robot appear more lifelike.
+//====================================================
+
 #include "IdleController.h"
 
+// Initialise the idle timers for each head component.
 IdleController::IdleController(Head& h)
     : head(h),
       antennaIdleAnimationTimer(0.0f),
@@ -1595,6 +1955,7 @@ IdleController::IdleController(Head& h)
 {
 }
 
+// Update every idle animation controller.
 void IdleController::Update(float dt)
 {
     UpdateAntenna(dt);
@@ -1606,72 +1967,91 @@ void IdleController::Update(float dt)
     UpdateHead(dt);
 }
 
+// Trigger the antenna idle animation at random intervals.
 void IdleController::UpdateAntenna(float dt)
 {
     antennaIdleAnimationTimer += dt;
-    if(antennaIdleAnimationTimer > nextAntennaIdleAnimation)
+
+    if (antennaIdleAnimationTimer > nextAntennaIdleAnimation)
     {
         head.PlayIdleAntennaAnimation();
+
         antennaIdleAnimationTimer = 0.0f;
-        nextAntennaIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+        nextAntennaIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
+// Trigger the ear idle animation at random intervals.
 void IdleController::UpdateEars(float dt)
 {
     earsIdleAnimationTimer += dt;
-    if(earsIdleAnimationTimer > nextEarsIdleAnimation)
+
+    if (earsIdleAnimationTimer > nextEarsIdleAnimation)
     {
         head.PlayIdleEarsAnimation();
+
         earsIdleAnimationTimer = 0.0f;
-        nextEarsIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+        nextEarsIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
+// Trigger the eyebrow idle animation at random intervals.
 void IdleController::UpdateEyebrows(float dt)
 {
     eyebrowsIdleAnimationTimer += dt;
-    if(eyebrowsIdleAnimationTimer > nextEyebrowsIdleAnimation)
+
+    if (eyebrowsIdleAnimationTimer > nextEyebrowsIdleAnimation)
     {
         head.PlayIdleEyebrowsAnimation();
+
         eyebrowsIdleAnimationTimer = 0.0f;
-        nextEyebrowsIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+        nextEyebrowsIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
+// Trigger the eye blink animation at random intervals.
 void IdleController::UpdateEyes(float dt)
 {
     eyesIdleAnimationTimer += dt;
-    if(eyesIdleAnimationTimer > nextEyesIdleAnimation)
+
+    if (eyesIdleAnimationTimer > nextEyesIdleAnimation)
     {
         head.PlayIdleEyesAnimation();
+
         eyesIdleAnimationTimer = 0.0f;
-        nextEyesIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+        nextEyesIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
+// Trigger the mouth idle animation at random intervals.
 void IdleController::UpdateMouth(float dt)
 {
     mouthIdleAnimationTimer += dt;
-    if(mouthIdleAnimationTimer > nextMouthIdleAnimation)
+
+    if (mouthIdleAnimationTimer > nextMouthIdleAnimation)
     {
         head.PlayIdleMouthAnimation();
+
         mouthIdleAnimationTimer = 0.0f;
-        nextMouthIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+        nextMouthIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
+// Trigger the nose idle animation at random intervals.
 void IdleController::UpdateNose(float dt)
 {
     noseIdleAnimationTimer += dt;
-    if(noseIdleAnimationTimer > nextNoseIdleAnimation)
+
+    if (noseIdleAnimationTimer > nextNoseIdleAnimation)
     {
         head.PlayIdleNoseAnimation();
+
         noseIdleAnimationTimer = 0.0f;
-        nextNoseIdleAnimation = GetRandomValue(1000,5000) / 1000.0f;
+        nextNoseIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
+// Update the head's idle movement.
 void IdleController::UpdateHead(float dt)
 {
     head.PlayIdleHeadTransform(dt);
@@ -1682,22 +2062,39 @@ void IdleController::UpdateHead(float dt)
 .\src\Input.cpp
 =====================================
 
+//====================================================
+// Input.cpp
+//
+// Provides a simple interface for reading player input.
+//
+// Wrapping Raylib input functions keeps the rest of the
+// project independent of the underlying input library.
+//====================================================
+
 #include "Input.h"
 #include "raylib.h"
 
+// Returns true while the left arrow key is held down.
 bool Input::LeftPressed() const
 {
     return IsKeyDown(KEY_LEFT);
 }
 
+// Returns true while the right arrow key is held down.
 bool Input::RightPressed() const
 {
     return IsKeyDown(KEY_RIGHT);
 }
 
+// Return the current mouse position.
 Vector2 Input::MousePosition() const
 {
     return GetMousePosition();
+}
+
+bool Input::SpacePressed() const
+{
+    return IsKeyDown(KEY_SPACE);
 }
 
 
@@ -1723,9 +2120,12 @@ int main ()
 #include "Robot.h"
 #include "raylib.h"
 #include "Constants.h"
+#include "RobotBrain.h"
+#include <string>
 
-Robot::Robot() 
-    : idle(head)
+Robot::Robot()
+    : idleController(head),
+      robotBrain(*this)
 {
 	position = 
     {
@@ -1737,7 +2137,17 @@ Robot::Robot()
 void Robot::Update(float dt)
 {
     head.Update(dt);
-    idle.Update(dt);
+    robotBrain.Update(dt);
+}
+
+void Robot::UpdateIdle(float dt)
+{
+    idleController.Update(dt);
+}
+
+void Robot::Speak(const std::string& text)
+{
+    robotBrain.Speak(text);
 }
 
 void Robot::SetPosition(Vector2 position)
@@ -1794,16 +2204,162 @@ void Robot::LookAt(Vector2 point)
 
 
 =====================================
+.\src\RobotBrain.cpp
+=====================================
+
+#include "RobotBrain.h"
+#include "Robot.h"
+#include "Input.h"
+#include "SpeechController.h"
+#include <string>
+
+class Robot; //Forward declaration
+
+RobotBrain::RobotBrain(Robot& robot)
+    : robot(robot),
+      state(State::Idle)
+{}
+
+void RobotBrain::SetState(State state)
+{
+    this->state = state;
+}
+
+void RobotBrain::Update(float dt)
+{
+        robot.UpdateIdle(dt);
+
+        speechController.Update();
+
+        if(state == State::Speaking &&
+           !speechController.IsSpeaking())
+        {
+            SetState(State::Idle);
+        }
+}
+
+void RobotBrain::Speak(const std::string& text)
+{
+    SetState(State::Speaking);
+    speechController.Speak(text);
+}
+
+
+=====================================
+.\src\Speech.cpp
+=====================================
+
+//====================================================
+// Speech.cpp
+//
+// Generates speech audio using Piper.
+//
+// Text is passed to the Piper command-line tool,
+// which creates a WAV file that can later be played
+// by the game.
+//====================================================
+
+#include "Speech.h"
+
+#include <cstdlib>
+
+// Convert text into a spoken WAV file using Piper.
+void Speech::Speak(const std::string& text)
+{
+    // Build the command used to launch Piper.
+    std::string command =
+        "echo \"" + text + "\" | "
+        "\"tools\\piper\\piper.exe\" "
+        "--model \"tools\\piper\\en_GB-semaine-medium.onnx\" "
+        "--length_scale 1.5 "
+        "--noise_scale 1.3 "
+        "--noise_w 0.9 "
+        "--sentence_silence 0.03 "
+        "--output_file \"assets\\audio\\voice\\speech.wav\"";
+
+    // Execute the command and generate the speech file.
+    system(command.c_str());
+}
+
+
+=====================================
+.\src\SpeechController.cpp
+=====================================
+
+#include "SpeechController.h"
+#include "Speech.h"
+#include "Input.h"
+
+void SpeechController::Update()
+{
+    if(wavReady)
+	{
+		speech = LoadSound("assets/audio/voice/speech.wav");
+
+		SetSoundPitch(speech, 0.82f);
+		SetSoundVolume(speech, 0.85f);
+
+		PlaySound(speech);
+		wavReady = false;
+		soundLoaded = true;
+	}
+
+	if (soundLoaded && !IsSoundPlaying(speech))
+	{
+		UnloadSound(speech);
+		speaking = false;
+		soundLoaded = false;
+	}
+}
+
+bool SpeechController::IsSpeaking () const
+{
+	return speaking;
+}
+
+void SpeechController::Speak(const std::string& text)
+{
+	if(speaking)
+	{
+		return;
+	}
+
+	speechThread = std::thread([this, text]()
+	{
+		speaking = true;
+
+		Speech::Speak(text);
+
+		wavReady = true;
+	});
+	
+	speechThread.detach();
+}
+
+
+=====================================
 .\src\Sprite.cpp
 =====================================
 
+//====================================================
+// Sprite.cpp
+//
+// Provides a base class for drawable sprites.
+//
+// A Sprite stores its texture, position, rotation,
+// scale and animation. Derived classes only need to
+// load their textures and configure their animations.
+//====================================================
+
 #include "Sprite.h"
 
+// Update the sprite's animation.
 void Sprite::Update(float dt)
 {
     animation.Update(dt);
 }
 
+// Draw the sprite using its current animation frame.
 void Sprite::Draw() const
 {
     Rectangle source = animation.GetSourceRectangle();
@@ -1816,7 +2372,8 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * scale
     };
 
-    Vector2 origin = 
+    // Rotate around the centre of the sprite.
+    Vector2 origin =
     {
         destination.width / 2.0f,
         destination.height / 2.0f
@@ -1832,31 +2389,45 @@ void Sprite::Draw() const
     );
 }
 
+// Release the sprite's texture.
 void Sprite::Shutdown()
 {
     UnloadTexture(texture);
 }
 
+// Set the sprite's world position.
 void Sprite::SetPosition(Vector2 position)
 {
     this->position = position;
 }
 
+// Return the sprite's current position.
 Vector2 Sprite::GetPosition() const
 {
     return position;
 }
 
+// Move the sprite up by one pixel.
 void Sprite::MoveSpriteUp()
 {
-    this->SetPosition({this->GetPosition().x, this->GetPosition().y - 1.0f});
+    this->SetPosition(
+    {
+        this->GetPosition().x,
+        this->GetPosition().y - 1.0f
+    });
 }
 
+// Move the sprite down by one pixel.
 void Sprite::MoveSpriteDown()
 {
-    this->SetPosition({this->GetPosition().x, this->GetPosition().y + 1.0f});
+    this->SetPosition(
+    {
+        this->GetPosition().x,
+        this->GetPosition().y + 1.0f
+    });
 }
 
+// Set the sprite's rotation in degrees.
 void Sprite::SetRotation(float rotation)
 {
     this->rotation = rotation;
@@ -1867,6 +2438,17 @@ void Sprite::SetRotation(float rotation)
 .\utilities\projectDump.cpp
 =====================================
 
+//====================================================
+// ProjectDump.cpp
+//
+// Creates a text file containing the contents of all
+// C++ source and header files in the project.
+//
+// This utility is useful for creating a single file
+// that can be shared for code reviews or archived as
+// a snapshot of the project.
+//====================================================
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -1876,23 +2458,30 @@ namespace fs = std::filesystem;
 
 int main()
 {
+    // Create the output file.
     std::ofstream out("ProjectDump.txt");
 
+    // Visit every file in the project directory.
     for (const auto& entry : fs::recursive_directory_iterator("."))
     {
+        // Ignore directories.
         if (!entry.is_regular_file())
             continue;
 
+        // Don't include the output file itself.
         if (entry.path().filename() == "ProjectDump.txt")
             continue;
 
+        // Skip generated build files.
         if (entry.path().string().find("build") != std::string::npos)
             continue;
 
         std::string ext = entry.path().extension().string();
 
+        // Only include C++ source and header files.
         if (ext == ".cpp" || ext == ".h")
         {
+            // Write a heading for each file.
             out << "=====================================\n";
             out << entry.path().string() << "\n";
             out << "=====================================\n\n";
@@ -1900,6 +2489,8 @@ int main()
             std::ifstream in(entry.path());
 
             std::string line;
+
+            // Copy the file into the output.
             while (std::getline(in, line))
             {
                 out << line << '\n';
@@ -1910,6 +2501,8 @@ int main()
     }
 
     std::cout << "Finished!\n";
+
+    return 0;
 }
 
 
@@ -1917,62 +2510,66 @@ int main()
 .\utilities\projectTree.cpp
 =====================================
 
-// iostream gives us std::cout for printing to the console.
+//====================================================
+// ProjectTree.cpp
+//
+// Generates a text file showing the folder structure
+// of the current project.
+//
+// This utility demonstrates how to use
+// std::filesystem to recursively traverse directories
+// and produce a simple tree view.
+//====================================================
+
+// iostream provides std::cout for writing to the console.
 #include <iostream>
 
-// fstream lets us create and write to files.
+// fstream provides file input and output.
 #include <fstream>
 
-// filesystem provides tools for working with files and folders.
+// filesystem provides classes and functions for working
+// with files and directories.
 #include <filesystem>
 
-// Create a shorter name.
-// Instead of writing std::filesystem everywhere,
-// we can just write fs.
+// Create a shorter alias so we can write "fs::"
+// instead of "std::filesystem::".
 namespace fs = std::filesystem;
 
-//---------------------------------------------------------------
+//===============================================================
 // PrintTree
 //
-// Recursively prints the contents of a folder.
+// Recursively writes the contents of a directory to the
+// output file as a tree structure.
 //
 // Parameters:
-//
-// path  - The folder we are currently scanning.
-// out   - The output file we are writing to.
-// depth - How deep we are in the folder structure.
-//         Used only to indent the output nicely.
-//---------------------------------------------------------------
+//   path  - The directory currently being scanned.
+//   out   - The output file.
+//   depth - The current directory depth, used to indent
+//           child files and folders.
+//===============================================================
 void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
 {
+    // Visit every file and folder in the current directory.
     for (const auto& entry : fs::directory_iterator(path))
     {
-        // Skip the .git directory completely.
+        // Skip the Git repository metadata.
         if (entry.is_directory() && entry.path().filename() == ".git")
             continue;
 
-        //-------------------------------------------------------
-        // Print indentation.
-        //-------------------------------------------------------
+        // Indent according to the current folder depth.
         for (int i = 0; i < depth; i++)
             out << "│   ";
 
-        //-------------------------------------------------------
-        // Print the file or folder name.
-        //-------------------------------------------------------
+        // Write the file or directory name.
         out << "├── " << entry.path().filename().string();
 
-        //-------------------------------------------------------
-        // Add "/" after directories.
-        //-------------------------------------------------------
+        // Add a trailing '/' to make directories easy to identify.
         if (entry.is_directory())
             out << "/";
 
         out << '\n';
 
-        //-------------------------------------------------------
-        // Recurse into subdirectories.
-        //-------------------------------------------------------
+        // Recursively process child directories.
         if (entry.is_directory())
         {
             PrintTree(entry.path(), out, depth + 1);
@@ -1982,38 +2579,26 @@ void PrintTree(const fs::path& path, std::ofstream& out, int depth = 0)
 
 int main()
 {
-    //-----------------------------------------------------------
-    // "." means "the current folder".
-    //-----------------------------------------------------------
+    // "." represents the current working directory.
     fs::path root = ".";
 
-    //-----------------------------------------------------------
-    // Create an output file.
-    //-----------------------------------------------------------
+    // Create the output file.
     std::ofstream out("FileStructure.txt");
 
-    //-----------------------------------------------------------
-    // Check that the file opened successfully.
-    //-----------------------------------------------------------
+    // Stop if the file couldn't be created.
     if (!out)
     {
         std::cout << "Couldn't create output file.\n";
         return 1;
     }
 
-    //-----------------------------------------------------------
     // Write the root folder name.
-    //-----------------------------------------------------------
     out << root.string() << '\n';
 
-    //-----------------------------------------------------------
-    // Scan the directory tree.
-    //-----------------------------------------------------------
+    // Generate the directory tree.
     PrintTree(root, out);
 
-    //-----------------------------------------------------------
-    // Tell the user we're finished.
-    //-----------------------------------------------------------
+    // Inform the user that the operation completed.
     std::cout << "Done! Wrote FileStructure.txt\n";
 
     return 0;

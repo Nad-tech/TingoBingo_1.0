@@ -32,7 +32,6 @@
 #include "Game.h"
 #include "Constants.h"
 
-#include "Speech.h"
 
 // Initialise the game and load required resources.
 void Game::Initialise()
@@ -63,6 +62,11 @@ void Game::HandleInput()
 	{
 		robot.ReturnHeadToCentre();
 	}
+
+	if (input.SpacePressed())
+	{
+		robot.Speak("Hello");
+	}
 }
 
 // Update the game state.
@@ -73,60 +77,6 @@ void Game::Update(const float dt)
 
 	// Update the robot and its animations.
 	robot.Update(dt);
-
-	// Temporary speech test.
-	if (IsKeyPressed(KEY_SPACE))
-	{
-		Speech::Speak("Hello there. My name is Tingo Bingo. whats your name?");
-
-		Sound speech = LoadSound("assets/audio/voice/speech.wav");
-
-		SetSoundPitch(speech, 0.82f);
-		SetSoundVolume(speech, 0.85f);
-
-		// TODO: Apply voice effects here.
-		// bitcrusher(jsdhkjs)
-
-		PlaySound(speech);
-
-		//UnloadSound(speech);
-	}
-
-	// Temporary speech test.
-	if (IsKeyPressed(KEY_T))
-	{
-		Speech::Speak("Hello Alby. Nice to meet you. We are going to have lots of fun");
-
-		Sound speech = LoadSound("assets/audio/voice/speech.wav");
-
-		SetSoundPitch(speech, 0.82f);
-		SetSoundVolume(speech, 0.85f);
-
-		// TODO: Apply voice effects here.
-		// bitcrusher(jsdhkjs)
-
-		PlaySound(speech);
-
-		//UnloadSound(speech);
-	}
-
-	// Temporary speech test.
-	if (IsKeyPressed(KEY_P))
-	{
-		Speech::Speak("Hello Alby. Virtual tingo bingo has a problem. Can you help?");
-
-		Sound speech = LoadSound("assets/audio/voice/speech.wav");
-
-		SetSoundPitch(speech, 0.82f);
-		SetSoundVolume(speech, 0.85f);
-
-		// TODO: Apply voice effects here.
-		// bitcrusher(jsdhkjs)
-
-		PlaySound(speech);
-
-		//UnloadSound(speech);
-	}
 }
 
 // Draw the current frame.

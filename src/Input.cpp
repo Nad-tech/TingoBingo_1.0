@@ -27,3 +27,8 @@ Vector2 Input::MousePosition() const
 {
     return GetMousePosition();
 }
+
+bool Input::SpacePressed() const
+{
+    return IsKeyDown(KEY_SPACE);
+}

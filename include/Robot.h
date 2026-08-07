@@ -3,7 +3,9 @@
 #include "raylib.h"
 #include "head/Head.h"
 #include "IdleController.h"
-
+#include "RobotBrain.h"
+#include "SpeechController.h"
+#include <string>
 class Robot 
 {
 public:
@@ -27,9 +29,13 @@ public:
 	Vector2 GetPosition() const;
 	Vector2 GetHeadPosition() const;
 
+	void UpdateIdle(float dt);
+	void Speak(const std::string& text);
+
 private:
 	Vector2 position;
 	
 	Head head;
-	IdleController idle;
+	IdleController idleController;
+	RobotBrain robotBrain;
 };
