@@ -558,17 +558,27 @@ public:
 
 class SpeechController
 {
-    public:
-        void Update();
-        void Speak(const std::string& text);
-        bool IsSpeaking() const;
+public:
+    void Update();
+    void Speak(const std::string& text);
+    bool IsSpeaking() const;
 
-    private:
-        std::atomic<bool> speaking = false;
-        std::thread speechThread;
-        std::atomic<bool> wavReady = false;
-        Sound speech{};
-        bool soundLoaded = false;
+private:
+
+    // True while speech is being generated or played.
+    std::atomic<bool> speaking = false;
+
+    // Background thread used to generate speech with Piper.
+    std::thread speechThread;
+
+    // Set by the worker thread when the WAV file is ready to play.
+    std::atomic<bool> wavReady = false;
+
+    // The currently loaded speech audio.
+    Sound speech{};
+
+    // True while the speech sound is loaded into memory.
+    bool soundLoaded = false;
 };
 
 
@@ -2286,54 +2296,79 @@ void Speech::Speak(const std::string& text)
 .\src\SpeechController.cpp
 =====================================
 
+//====================================================
+// SpeechController.cpp
+//
+// Controls asynchronous speech generation and playback.
+//
+// Speech is generated on a background thread so the
+// main game loop can continue updating and drawing.
+// Once the WAV file is ready, it is loaded and played
+// from the main thread.
+//====================================================
+
 #include "SpeechController.h"
 #include "Speech.h"
 #include "Input.h"
 
+// Update speech generation and playback.
 void SpeechController::Update()
 {
-    if(wavReady)
-	{
-		speech = LoadSound("assets/audio/voice/speech.wav");
+    // Load and play the generated speech once the
+    // worker thread has finished creating the WAV file.
+    if (wavReady)
+    {
+        speech = LoadSound("assets/audio/voice/speech.wav");
 
-		SetSoundPitch(speech, 0.82f);
-		SetSoundVolume(speech, 0.85f);
+        SetSoundPitch(speech, 0.82f);
+        SetSoundVolume(speech, 0.85f);
 
-		PlaySound(speech);
-		wavReady = false;
-		soundLoaded = true;
-	}
+        PlaySound(speech);
 
-	if (soundLoaded && !IsSoundPlaying(speech))
-	{
-		UnloadSound(speech);
-		speaking = false;
-		soundLoaded = false;
-	}
+        wavReady = false;
+        soundLoaded = true;
+    }
+
+    // Release the sound once playback has finished.
+    if (soundLoaded && !IsSoundPlaying(speech))
+    {
+        UnloadSound(speech);
+
+        speaking = false;
+        soundLoaded = false;
+    }
 }
 
-bool SpeechController::IsSpeaking () const
+// Returns true while speech is being generated
+// or played.
+bool SpeechController::IsSpeaking() const
 {
-	return speaking;
+    return speaking;
 }
 
+// Begin generating speech on a background thread.
 void SpeechController::Speak(const std::string& text)
 {
-	if(speaking)
-	{
-		return;
-	}
+    // Ignore new speech requests while already speaking.
+    if (speaking)
+    {
+        return;
+    }
 
-	speechThread = std::thread([this, text]()
-	{
-		speaking = true;
+    speechThread = std::thread([this, text]()
+    {
+        speaking = true;
 
-		Speech::Speak(text);
+        // Generate the speech WAV file using Piper.
+        Speech::Speak(text);
 
-		wavReady = true;
-	});
-	
-	speechThread.detach();
+        // Notify the main thread that the WAV file
+        // is ready to be loaded and played.
+        wavReady = true;
+    });
+
+    // Allow the worker thread to continue independently.
+    speechThread.detach();
 }
 
 

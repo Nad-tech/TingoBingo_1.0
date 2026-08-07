@@ -1,173 +1,133 @@
-# 🤖 TingoBingo 1.0
+# 🤖 TingoBingo
 
-A fun C++/Raylib project about bringing a friendly cardboard robot to life.
-
-TingoBingo began as a real cardboard robot built with my son. This project is the digital version—an interactive robot that will gradually become more expressive, animated, intelligent, and fun to play with.
-
-This repository represents the beginning of that journey.
+> **A modular C++ robot built with Raylib.**
+>
+> TingoBingo is an interactive cardboard robot designed to explore animation, game architecture and AI features through a clean, object-oriented codebase.
 
 ---
 
-## 📸 Current Progress
+## 📷 Current Status
 
-Current version includes:
-
-- ✅ Raylib project framework
-- ✅ MSYS2 build environment
-- ✅ Modular C++ project structure
-- ✅ TingoBingo head sprite
-- ✅ Keyboard movement
-- ✅ Smooth movement using delta time
-- ✅ Git version control
-
-Current focus is bringing TingoBingo to life through animation.
+🟢 Active Development
 
 ---
 
-## 🚀 Planned Features
+## 🛠 Built With
 
-### Phase 1 — Bring TingoBingo to Life
-
-- Blinking eyes
-- Eye tracking
-- Mouth animation
-- Idle movements
-- Facial expressions
-- Speech bubbles
-- Head movement
-
-### Phase 2 — Interaction
-
-- Mouse interaction
-- Click reactions
-- Drag-and-drop objects
-- Toys and props
-- Sound effects
-
-### Phase 3 — Voice
-
-- Speech synthesis
-- Voice recognition
-- Simple conversations
-- Personality system
-
-### Phase 4 — Fun
-
-- Dancing
-- Guitar playing
-- Music
-- Mini-games
-- Jokes
-- Random animations
-
-### Phase 5 — Creativity
-
-- Change colours
-- Hats
-- Accessories
-- Stickers
-- Character customization
-
-### Phase 6 — Learning
-
-- Educational games
-- Counting
-- Shapes
-- Reading activities
-- Memory games
+| Technology | Purpose |
+|------------|---------|
+| C++20 | Core application |
+| Raylib | Rendering, input and audio |
+| Piper TTS | Offline text-to-speech generation |
+| MSYS2 / MinGW64 | Build environment |
+| Visual Studio Code | Development |
 
 ---
 
-# 🛠 Built With
+# Current Features
+
+### Robot
+
+- Modular robot architecture
+- Layered head components
+- Sprite-based rendering
+- Object-oriented design
+
+### Animation
+
+- Independent animation system
+- Sprite sheet support
+- Random idle animations
+- Eye blinking
+- Ear movement
+- Eyebrow movement
+- Nose movement
+- Mouth idle animation
+- Head bobbing
+- Head wiggle animation
+
+### Interaction
+
+- Mouse tracking pupils
+- Keyboard controlled head rotation
+- Automatic return to centre
+
+### Speech
+
+- Offline speech generation using Piper
+- Background thread speech generation
+- Non-blocking speech system
+- Automatic speech playback
+- RobotBrain state management
+- Automatic return to idle after speaking
+
+---
+
+# Project Architecture
+
+```
+Game
+│
+├── Robot
+│   ├── Head
+│   ├── IdleController
+│   └── RobotBrain
+│        └── SpeechController
+│              ├── Piper
+│              └── Raylib Audio
+│
+└── Animation System
+```
+
+---
+
+# Project Goals
+
+The project focuses on learning and experimenting with:
 
 - C++
-- Raylib
-- MSYS2 (MinGW64)
-- Visual Studio Code
-- Git
-
----
-
-# 📁 Project Structure
-
-```
-TingoBingo_1.0/
-│
-├── assets/
-│   ├── fonts/
-│   ├── images/
-│   └── sounds/
-│
-├── include/
-│
-├── src/
-│
-├── build/
-│
-└── scripts/
-```
-
----
-
-# ▶ Building
-
-Compile using the supplied build script.
-
-```bash
-./scripts/build.sh
-```
-
-Run the executable from the `build` folder.
-
----
-
-# 🎯 Project Goals
-
-This project is also a learning exercise.
-
-Along the way I'll be exploring:
-
-- Modern C++
-- Object-Oriented Programming
-- Game programming
+- Object-oriented programming
+- Game architecture
 - Animation systems
-- Sprite sheets
-- Audio
-- AI behaviours
-- UI programming
-- Clean project architecture
-
-Rather than rushing to finish the game, the goal is to steadily build reusable systems while improving as a programmer.
+- State machines
+- Threading
+- Artificial intelligence
+- Robot behaviour
 
 ---
 
-# 📚 Future Ideas
+# Planned Features
 
-Some long-term ideas include:
-
-- Modular body animation
-- Inventory system
-- Save games
-- Weather
-- Time of day
-- Emotions
-- Procedural animations
-- Physics interactions
-- Multiple characters
-- Mobile/Web builds
-
----
-
-# ❤️ Inspiration
-
-TingoBingo was inspired by a cardboard robot made with my son.
-
-The goal is to capture that same sense of imagination in software while learning game development one feature at a time.
+- Facial expressions
+- Talking mouth animation
+- Speech queue
+- Conversation system
+- Emotion system
+- Object interaction
+- Memory system
+- Voice recognition
+- Behaviour trees
+- Mini games
+- Music and dancing
+- Customisation
 
 ---
 
-# 📄 License
+# Current Project Structure
 
-This project is released under the MIT License.
+```
+include/
+src/
+assets/
+tools/
+scripts/
+build/
+```
 
 ---
+
+# Author
+
+**Dan3rdeye**
+
+Learning modern C++ by building an interactive robot from the ground up.
