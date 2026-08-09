@@ -11,6 +11,7 @@ public:
     void Update();
     void Speak(const std::string& text);
     bool IsSpeaking() const;
+    bool SoundLoaded();
 
 private:
 

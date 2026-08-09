@@ -18,21 +18,28 @@ void RobotBrain::SetState(State state)
 
 void RobotBrain::Update(float dt)
 {
-        robot.UpdateIdle(dt);
+    robot.UpdateIdle(dt);
 
-        speechController.Update();
+    speechController.Update();
 
-        if(state == State::Speaking &&
-           !speechController.IsSpeaking())
-        {
-            SetState(State::Idle);
-            robot.SetSpeaking(false);
-        }
+    // Speech audio has started playing.
+    if (state == State::Speaking &&
+        speechController.SoundLoaded())
+    {
+        robot.SetSpeaking(true);
+    }
+
+    // Speech has completely finished.
+    if (state == State::Speaking &&
+        !speechController.IsSpeaking())
+    {
+        SetState(State::Idle);
+        robot.SetSpeaking(false);
+    }
 }
 
 void RobotBrain::Speak(const std::string& text)
 {
     SetState(State::Speaking);
     speechController.Speak(text);
-    robot.SetSpeaking(true);
 }

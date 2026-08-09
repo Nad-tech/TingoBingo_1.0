@@ -65,7 +65,7 @@ void Game::HandleInput()
 
 	if (input.SpacePressed())
 	{
-		robot.Speak("Hello");
+		robot.Speak("Hello Alby, my name is tingo bingo");
 	}
 }
 

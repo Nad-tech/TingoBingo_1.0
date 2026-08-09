@@ -6,7 +6,7 @@ class Mouth : public Sprite
 {
     public:
         void Initialise() override;
-        void Update(float dt, bool speaking);
+        void UpdateMouth(float dt, bool speaking);
     
         void PlayIdleMouth();
 

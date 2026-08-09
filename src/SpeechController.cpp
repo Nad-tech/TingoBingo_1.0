@@ -41,6 +41,11 @@ void SpeechController::Update()
     }
 }
 
+bool SpeechController::SoundLoaded()
+{
+    return soundLoaded;
+}
+
 // Returns true while speech is being generated
 // or played.
 bool SpeechController::IsSpeaking() const

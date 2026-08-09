@@ -42,7 +42,7 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::Update(float dt, bool speaking)
+void Mouth::UpdateMouth(float dt, bool speaking)
 {
     Sprite::Update(dt);
 

@@ -17,8 +17,8 @@ Robot::Robot()
 
 void Robot::Update(float dt)
 {
-    head.Update(dt, speaking);
     robotBrain.Update(dt);
+    head.Update(dt, speaking);
 }
 
 void Robot::UpdateIdle(float dt)
