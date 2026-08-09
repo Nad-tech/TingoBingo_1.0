@@ -26,6 +26,7 @@ void RobotBrain::Update(float dt)
            !speechController.IsSpeaking())
         {
             SetState(State::Idle);
+            robot.SetSpeaking(false);
         }
 }
 
@@ -33,4 +34,5 @@ void RobotBrain::Speak(const std::string& text)
 {
     SetState(State::Speaking);
     speechController.Speak(text);
+    robot.SetSpeaking(true);
 }

@@ -17,7 +17,7 @@ Robot::Robot()
 
 void Robot::Update(float dt)
 {
-    head.Update(dt);
+    head.Update(dt, speaking);
     robotBrain.Update(dt);
 }
 
@@ -29,6 +29,11 @@ void Robot::UpdateIdle(float dt)
 void Robot::Speak(const std::string& text)
 {
     robotBrain.Speak(text);
+}
+
+void Robot::SetSpeaking(bool state)
+{
+    speaking = state;
 }
 
 void Robot::SetPosition(Vector2 position)

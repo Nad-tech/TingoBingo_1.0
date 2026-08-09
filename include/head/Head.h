@@ -17,7 +17,7 @@ class Head
         void Initialise();
         void Shutdown();
 
-        void Update(float dt);
+        void Update(float dt, bool speaking);
         void Draw() const;
 
         void SetPosition(Vector2 position);

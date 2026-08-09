@@ -31,6 +31,7 @@ public:
 
 	void UpdateIdle(float dt);
 	void Speak(const std::string& text);
+	void SetSpeaking(bool state);
 
 private:
 	Vector2 position;
@@ -38,4 +39,6 @@ private:
 	Head head;
 	IdleController idleController;
 	RobotBrain robotBrain;
+
+	bool speaking = false;
 };

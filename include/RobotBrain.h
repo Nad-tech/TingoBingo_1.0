@@ -24,4 +24,5 @@ class RobotBrain
         Robot& robot;
         State state;
         SpeechController speechController;
+        bool speaking = false;
 };

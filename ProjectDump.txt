@@ -223,7 +223,7 @@ class Head
         void Initialise();
         void Shutdown();
 
-        void Update(float dt);
+        void Update(float dt, bool speaking);
         void Draw() const;
 
         void SetPosition(Vector2 position);
@@ -317,11 +317,14 @@ class Mouth : public Sprite
 {
     public:
         void Initialise() override;
-        void Update(float dt) override;
+        void Update(float dt, bool speaking);
     
         void PlayIdleMouth();
 
     private:
+        int frame = 0;
+        float frameTimer = 0.0f;
+        const float FRAME_DURATION = 0.3f;
 };
 
 
@@ -487,6 +490,7 @@ public:
 
 	void UpdateIdle(float dt);
 	void Speak(const std::string& text);
+	void SetSpeaking(bool state);
 
 private:
 	Vector2 position;
@@ -494,6 +498,8 @@ private:
 	Head head;
 	IdleController idleController;
 	RobotBrain robotBrain;
+
+	bool speaking = false;
 };
 
 
@@ -527,6 +533,7 @@ class RobotBrain
         Robot& robot;
         State state;
         SpeechController speechController;
+        bool speaking = false;
 };
 
 
@@ -1271,14 +1278,14 @@ void Head::Shutdown()
 }
 
 // Update every animated head component.
-void Head::Update(float dt)
+void Head::Update(float dt, bool speaking)
 {
     headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
     eyebrows.Update(dt);
     eyes.Update(dt);
-    mouth.Update(dt);
+    mouth.Update(dt, speaking);
     nose.Update(dt);
     pupils.Update(dt);
 }
@@ -1610,9 +1617,6 @@ void Mouth::Initialise()
     // Animation settings.
     const float ROTATION = 0.0f;
     
-    // Hold each mouth frame for one second.
-    const float FRAME_DURATION = 1.0f;
-
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
@@ -1628,9 +1632,26 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::Update(float dt)
+void Mouth::Update(float dt, bool speaking)
 {
     Sprite::Update(dt);
+
+    if(!speaking)
+    {
+        frame = 0;
+        frameTimer = 0.0f;
+        animation.SetFrame(0);
+        return;
+    }
+
+    frameTimer += dt;
+
+    if (frameTimer >= FRAME_DURATION)
+    {
+        frameTimer -= FRAME_DURATION;
+        frame = (frame == 1) ? 2 : 1;
+        animation.SetFrame(frame);
+    }
 }
 
 // Start the idle mouth animation if it isn't already playing.
@@ -1638,7 +1659,7 @@ void Mouth::PlayIdleMouth()
 {
     if (!animation.IsPlaying())
     {
-        animation.Play(0, 2);
+        animation.Play(0, 1);
     }
 }
 
@@ -1972,7 +1993,7 @@ void IdleController::Update(float dt)
     UpdateEars(dt);
     UpdateEyebrows(dt);
     UpdateEyes(dt);
-    UpdateMouth(dt);
+    //UpdateMouth(dt);
     UpdateNose(dt);
     UpdateHead(dt);
 }
@@ -2146,7 +2167,7 @@ Robot::Robot()
 
 void Robot::Update(float dt)
 {
-    head.Update(dt);
+    head.Update(dt, speaking);
     robotBrain.Update(dt);
 }
 
@@ -2158,6 +2179,11 @@ void Robot::UpdateIdle(float dt)
 void Robot::Speak(const std::string& text)
 {
     robotBrain.Speak(text);
+}
+
+void Robot::SetSpeaking(bool state)
+{
+    speaking = state;
 }
 
 void Robot::SetPosition(Vector2 position)
@@ -2245,6 +2271,7 @@ void RobotBrain::Update(float dt)
            !speechController.IsSpeaking())
         {
             SetState(State::Idle);
+            robot.SetSpeaking(false);
         }
 }
 
@@ -2252,6 +2279,7 @@ void RobotBrain::Speak(const std::string& text)
 {
     SetState(State::Speaking);
     speechController.Speak(text);
+    robot.SetSpeaking(true);
 }
 
 

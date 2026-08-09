@@ -27,9 +27,6 @@ void Mouth::Initialise()
     // Animation settings.
     const float ROTATION = 0.0f;
     
-    // Hold each mouth frame for one second.
-    const float FRAME_DURATION = 1.0f;
-
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
@@ -45,9 +42,26 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::Update(float dt)
+void Mouth::Update(float dt, bool speaking)
 {
     Sprite::Update(dt);
+
+    if(!speaking)
+    {
+        frame = 0;
+        frameTimer = 0.0f;
+        animation.SetFrame(0);
+        return;
+    }
+
+    frameTimer += dt;
+
+    if (frameTimer >= FRAME_DURATION)
+    {
+        frameTimer -= FRAME_DURATION;
+        frame = (frame == 1) ? 2 : 1;
+        animation.SetFrame(frame);
+    }
 }
 
 // Start the idle mouth animation if it isn't already playing.
@@ -55,6 +69,6 @@ void Mouth::PlayIdleMouth()
 {
     if (!animation.IsPlaying())
     {
-        animation.Play(0, 2);
+        animation.Play(0, 1);
     }
 }

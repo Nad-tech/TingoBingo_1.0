@@ -66,14 +66,14 @@ void Head::Shutdown()
 }
 
 // Update every animated head component.
-void Head::Update(float dt)
+void Head::Update(float dt, bool speaking)
 {
     headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
     eyebrows.Update(dt);
     eyes.Update(dt);
-    mouth.Update(dt);
+    mouth.Update(dt, speaking);
     nose.Update(dt);
     pupils.Update(dt);
 }
