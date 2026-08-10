@@ -51,8 +51,5 @@ void Nose::Update(float dt)
 // Start the wiggle animation if it isn't already playing.
 void Nose::PlayWiggle()
 {
-    if (!animation.IsPlaying())
-    {
-        animation.Play(0, 3);
-    }
+    animation.Play(0, 3, AnimationPriority::Idle);
 }

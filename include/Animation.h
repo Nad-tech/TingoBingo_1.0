@@ -2,6 +2,11 @@
 
 #include "raylib.h"
 
+enum class AnimationPriority
+{
+    Idle,
+    Emotion
+};
 class Animation
 {
     public:
@@ -32,7 +37,7 @@ class Animation
     void PreviousFrame();
     void NextFrame();
     
-    void Play(int startFrame, int endFrame);
+    void Play(int startFrame, int endFrame, AnimationPriority priority);
     bool IsPlaying() const;
 
 private:
@@ -51,4 +56,6 @@ private:
 
     int startFrame;
     int endFrame;
+
+    AnimationPriority priority;
 };

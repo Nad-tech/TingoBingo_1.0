@@ -50,9 +50,5 @@ void Antenna::Update(float dt)
 
 void Antenna::PlayWiggle()
 {
-    // Start the wiggle animation if it isn't already playing.
-    if (!animation.IsPlaying())
-    {
-        animation.Play(0, 7);
-    }
+    animation.Play(0, 7, AnimationPriority::Idle);
 }

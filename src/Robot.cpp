@@ -4,9 +4,7 @@
 #include "RobotBrain.h"
 #include <string>
 
-Robot::Robot()
-    : idleController(head),
-      robotBrain(*this)
+Robot::Robot() : robotBrain(*this)
 {
 	position = 
     {
@@ -19,11 +17,6 @@ void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
     head.Update(dt, speaking);
-}
-
-void Robot::UpdateIdle(float dt)
-{
-    idleController.Update(dt);
 }
 
 void Robot::Speak(const std::string& text)
@@ -86,4 +79,9 @@ void Robot::ReturnHeadToCentre()
 void Robot::LookAt(Vector2 point)
 {
     head.LookAt(point);
+}
+
+Head& Robot::GetHead()
+{
+    return head;
 }

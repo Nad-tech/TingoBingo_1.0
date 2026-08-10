@@ -43,6 +43,8 @@ class Head
         void PlayHeadWiggle(float dt);
         void PlayHeadBob(float dt);
         
+        void PlayHappyEyebrowsAnimation();
+
         void LookAt(Vector2 point);
 
     private:
@@ -58,7 +60,7 @@ class Head
         float nextHeadWiggle;
         float headWiggleFrequency;
 
-          Vector2 headBobOffset;
+        Vector2 headBobOffset;
         float headBobScale;
         float headBobAngle;
         float headBobDirection;

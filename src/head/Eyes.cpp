@@ -51,9 +51,5 @@ void Eyes::Update(float dt)
 
 void Eyes::PlayBlink()
 {
-    // Start the blink animation if it isn't already playing.
-    if (!animation.IsPlaying())
-    {
-        animation.Play(0, 4);
-    }
+    animation.Play(0, 4, AnimationPriority::Idle);
 }

@@ -71,7 +71,7 @@ void Head::Update(float dt, bool speaking)
     headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
-    eyebrows.Update(dt);
+    eyebrows.UpdateEyebrows(dt);
     eyes.Update(dt);
     mouth.UpdateMouth(dt, speaking);
     nose.Update(dt);
@@ -163,7 +163,12 @@ void Head::PlayIdleEarsAnimation()
 
 void Head::PlayIdleEyebrowsAnimation()
 {
-    eyebrows.PlayWiggle();
+    eyebrows.PlayIdleWiggle();
+}
+
+void Head::PlayHappyEyebrowsAnimation()
+{
+    eyebrows.PlayHappyWiggle();
 }
 
 void Head::PlayIdleEyesAnimation()

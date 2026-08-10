@@ -6,9 +6,10 @@ class Eyebrows : public Sprite
 {
     public:
         void Initialise() override;
-        void Update(float dt) override;
+        void UpdateEyebrows(float dt);
     
-        void PlayWiggle();
+        void PlayIdleWiggle();
+        void PlayHappyWiggle();
 
     private:
 };

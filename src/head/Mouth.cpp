@@ -48,9 +48,9 @@ void Mouth::UpdateMouth(float dt, bool speaking)
 
     if(!speaking)
     {
-        frame = 0;
+        frame = 1;
         frameTimer = 0.0f;
-        animation.SetFrame(0);
+        animation.SetFrame(frame);
         return;
     }
 
@@ -67,8 +67,5 @@ void Mouth::UpdateMouth(float dt, bool speaking)
 // Start the idle mouth animation if it isn't already playing.
 void Mouth::PlayIdleMouth()
 {
-    if (!animation.IsPlaying())
-    {
-        animation.Play(0, 1);
-    }
+    animation.Play(0, 1, AnimationPriority::Idle);
 }

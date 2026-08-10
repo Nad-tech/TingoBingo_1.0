@@ -50,9 +50,5 @@ void Ears::Update(float dt)
 
 void Ears::PlayWiggle()
 {
-    // Start the wiggle animation if it isn't already playing.
-    if (!animation.IsPlaying())
-    {
-        animation.Play(0, 4);
-    }
+    animation.Play(0, 4, AnimationPriority::Idle);
 }

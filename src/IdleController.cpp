@@ -36,7 +36,7 @@ void IdleController::Update(float dt)
     UpdateEars(dt);
     UpdateEyebrows(dt);
     UpdateEyes(dt);
-    //UpdateMouth(dt);
+    //UpdateMouth(dt); speech controller controls mouth
     UpdateNose(dt);
     UpdateHead(dt);
 }

@@ -15,7 +15,7 @@ void Eyebrows::Initialise()
     texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
 
     // Sprite sheet layout.
-    const int COLUMNS = 2;
+    const int COLUMNS = 4;
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
@@ -42,17 +42,17 @@ void Eyebrows::Initialise()
     scale = SCALE;
 }
 
-void Eyebrows::Update(float dt)
+void Eyebrows::UpdateEyebrows(float dt)
 {
-    // Advance the eyebrow animation.
     Sprite::Update(dt);
 }
 
-void Eyebrows::PlayWiggle()
+void Eyebrows::PlayIdleWiggle()
 {
-    // Start the wiggle animation if it isn't already playing.
-    if (!animation.IsPlaying())
-    {
-        animation.Play(0, 1);
-    }
+    animation.Play(0, 1, AnimationPriority::Idle);
+}
+
+void Eyebrows::PlayHappyWiggle()
+{
+    animation.Play(2, 3, AnimationPriority::Emotion);
 }

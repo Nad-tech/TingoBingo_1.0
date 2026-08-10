@@ -28,6 +28,8 @@ Animation::Animation()
 
     startFrame = 0;
     endFrame = 0;
+
+    priority = AnimationPriority::Idle;
 }
 
 // Configure the animation using information from
@@ -79,6 +81,7 @@ void Animation::Update(float dt)
     {
         frame = startFrame;
         playing = false;
+        priority = AnimationPriority::Idle;
     }
 }
 
@@ -149,10 +152,11 @@ int Animation::GetTotalFrames() const
 }
 
 // Play a section of the sprite sheet once.
-void Animation::Play(int start, int end)
+void Animation::Play(int start, int end, AnimationPriority newPriority)
 {
-    // Ignore the request if an animation is already playing.
-    if (playing)
+    // Don't interrupt an animation with an equal
+    // or higher priority.
+    if (playing && static_cast<int>(newPriority) <= static_cast<int>(priority))
         return;
 
     startFrame = start;
@@ -162,6 +166,7 @@ void Animation::Play(int start, int end)
     frame = startFrame;
     frameTimer = 0.0f;
 
+    priority = newPriority;
     playing = true;
 }
 

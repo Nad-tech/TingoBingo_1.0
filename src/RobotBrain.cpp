@@ -2,13 +2,17 @@
 #include "Robot.h"
 #include "Input.h"
 #include "SpeechController.h"
+#include "EmotionController.h"
+#include "IdleController.h"
 #include <string>
 
 class Robot; //Forward declaration
 
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
-      state(State::Idle)
+      state(State::Idle),
+      idleController(robot.GetHead()),
+      emotionController(robot.GetHead())
 {}
 
 void RobotBrain::SetState(State state)
@@ -18,8 +22,8 @@ void RobotBrain::SetState(State state)
 
 void RobotBrain::Update(float dt)
 {
-    robot.UpdateIdle(dt);
-
+    idleController.Update(dt);
+    emotionController.Update(dt);
     speechController.Update();
 
     // Speech audio has started playing.
@@ -27,6 +31,7 @@ void RobotBrain::Update(float dt)
         speechController.SoundLoaded())
     {
         robot.SetSpeaking(true);
+        emotionController.SetEmotion(Emotion::Happy);
     }
 
     // Speech has completely finished.
@@ -35,6 +40,7 @@ void RobotBrain::Update(float dt)
     {
         SetState(State::Idle);
         robot.SetSpeaking(false);
+        emotionController.SetEmotion(Emotion::Neutral);
     }
 }
 
