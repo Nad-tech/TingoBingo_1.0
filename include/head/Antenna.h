@@ -10,4 +10,6 @@ class Antenna : public Sprite
         void PlayWiggle();
     
     private:
+        float antennaAnimationTimer = 0.0f;
+        float nextAntennaAnimation = 3.0f;
 };

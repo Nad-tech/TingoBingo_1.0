@@ -9,6 +9,7 @@
 #include "head/Eyebrows.h"
 #include "Constants.h"
 #include "Emotion.h"
+#include "Animation.h"
 
 void Eyebrows::Initialise()
 {
@@ -46,30 +47,62 @@ void Eyebrows::Initialise()
 void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
 {
     Sprite::Update(dt);
-    
-    if(emotion == Emotion::Neutral)
+
+    // Happy behaviour.
+    bool happy = speaking || emotion == Emotion::Happy;
+
+    if (happy && !wasHappy)
     {
-        SetIdle();
+        animation.Play(2, 3, AnimationPriority::Emotion);
+
+        happyAnimationTimer = 0.0f;
+        nextHappyAnimation =
+            GetRandomValue(1000, 5000) / 1000.0f;
+
+        wasHappy = true;
+        return;
     }
 
-    if(emotion == Emotion::Happy)
+    if (happy)
     {
-        SetHappy();
+        happyAnimationTimer += dt;
+
+        if (happyAnimationTimer > nextHappyAnimation)
+        {
+            animation.Play(2, 3, AnimationPriority::Emotion);
+
+            happyAnimationTimer = 0.0f;
+            nextHappyAnimation =
+                GetRandomValue(1000, 5000) / 1000.0f;
+        }
+
+        return;
     }
 
-    if(speaking) 
+    // Happy has just ended.
+    if (wasHappy)
     {
-        SetHappy();
+        animation.Stop();
+        animation.Play(0, 1, AnimationPriority::Idle);
+        
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation =
+            GetRandomValue(1000, 5000) / 1000.0f;
+
+        wasHappy = false;
+        return;
     }
 
-}
+    // Neutral idle behaviour.
+    idleAnimationTimer += dt;
 
-void Eyebrows::SetIdle()
-{
-    animation.SetFrame(0);
-}
-
-void Eyebrows::SetHappy()
-{
-    animation.SetFrame(2);
+    if (idleAnimationTimer > nextIdleAnimation)
+    {
+        animation.Stop();
+        animation.Play(0, 1, AnimationPriority::Idle);
+        
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation =
+            GetRandomValue(1000, 5000) / 1000.0f;
+    }
 }

@@ -77,6 +77,8 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
     mouth.UpdateMouth(dt, speaking, emotion);
     nose.Update(dt);
     pupils.Update(dt);
+
+    PlayIdleHeadTransform(dt);
 }
 
 void Head::Draw() const
@@ -160,16 +162,6 @@ void Head::PlayIdleAntennaAnimation()
 void Head::PlayIdleEarsAnimation()
 {
     ears.PlayWiggle();
-}
-
-void Head::PlayIdleEyebrowsAnimation()
-{
-    eyebrows.SetIdle();
-}
-
-void Head::PlayHappyEyebrowsAnimation()
-{
-    eyebrows.SetHappy();
 }
 
 void Head::PlayIdleEyesAnimation()

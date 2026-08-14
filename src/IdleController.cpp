@@ -76,7 +76,7 @@ void IdleController::UpdateEyebrows(float dt)
 
     if (eyebrowsIdleAnimationTimer > nextEyebrowsIdleAnimation)
     {
-        head.PlayIdleEyebrowsAnimation();
+       // head.PlayIdleEyebrowsAnimation();
 
         eyebrowsIdleAnimationTimer = 0.0f;
         nextEyebrowsIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;

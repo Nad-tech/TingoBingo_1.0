@@ -36,7 +36,6 @@ class Head
 
         void PlayIdleAntennaAnimation();
         void PlayIdleEarsAnimation();
-        void PlayIdleEyebrowsAnimation();
         void PlayIdleEyesAnimation();
         void PlayIdleMouthAnimation();
         void PlayIdleNoseAnimation();
@@ -44,7 +43,6 @@ class Head
         void PlayHeadWiggle(float dt);
         void PlayHeadBob(float dt);
         
-        void PlayHappyEyebrowsAnimation();
         void PlayHappyMouthAnimation();
 
         void LookAt(Vector2 point);

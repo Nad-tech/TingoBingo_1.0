@@ -1,7 +1,6 @@
 #pragma once
 
 #include "SpeechController.h"
-#include "IdleController.h"
 #include <string>
 #include "Emotion.h"
 
@@ -28,7 +27,6 @@ class RobotBrain
         Robot& robot;
         State state;
         SpeechController speechController;
-        IdleController idleController;
         bool speaking = false;
         float happyTimer = 0.0f;
         Emotion emotion;

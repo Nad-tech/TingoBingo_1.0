@@ -28,8 +28,6 @@ Animation::Animation()
 
     startFrame = 0;
     endFrame = 0;
-
-    priority = AnimationPriority::Idle;
 }
 
 // Configure the animation using information from
@@ -81,7 +79,6 @@ void Animation::Update(float dt)
     {
         frame = startFrame;
         playing = false;
-        priority = AnimationPriority::Idle;
     }
 }
 
@@ -174,4 +171,9 @@ void Animation::Play(int start, int end, AnimationPriority newPriority)
 bool Animation::IsPlaying() const
 {
     return playing;
+}
+
+void Animation::Stop()
+{
+    playing = false;
 }

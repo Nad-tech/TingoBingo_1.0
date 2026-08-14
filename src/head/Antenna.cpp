@@ -8,6 +8,7 @@
 
 #include "head/Antenna.h"
 #include "Constants.h"
+#include "Animation.h"
 
 void Antenna::Initialise()
 {
@@ -46,6 +47,16 @@ void Antenna::Update(float dt)
 {
     // Advance the antenna animation.
     Sprite::Update(dt);
+    
+    
+    antennaAnimationTimer += dt;
+
+    if (antennaAnimationTimer > nextAntennaAnimation)
+    {
+        PlayWiggle();
+        antennaAnimationTimer = 0.0f;
+        nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+    }
 }
 
 void Antenna::PlayWiggle()

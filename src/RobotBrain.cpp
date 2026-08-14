@@ -2,7 +2,6 @@
 #include "Robot.h"
 #include "Input.h"
 #include "SpeechController.h"
-#include "IdleController.h"
 #include <string>
 #include "Emotion.h"
 
@@ -10,8 +9,7 @@ class Robot; //Forward declaration
 
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
-      state(State::Idle),
-      idleController(robot.GetHead())
+      state(State::Idle)
 {}
 
 void RobotBrain::SetState(State state)
@@ -19,16 +17,20 @@ void RobotBrain::SetState(State state)
     this->state = state;
 }
 
-void RobotBrain::SetEmotion(Emotion emotion)
+void RobotBrain::SetEmotion(Emotion newEmotion)
 {
-    this->emotion = emotion;
+    emotion = newEmotion;
+
+    if(newEmotion == Emotion::Happy)
+    {
+        happyTimer = 0.0f;
+    }
 }
 
 void RobotBrain::Update(float dt)
 {
-    idleController.Update(dt);
     speechController.Update();
-    
+
     // Speech audio has started playing.
     if (state == State::Speaking &&
         speechController.SoundLoaded())
@@ -46,18 +48,17 @@ void RobotBrain::Update(float dt)
         SetEmotion(Emotion::Neutral);
     }
 
-    if(emotion == Emotion::Happy && happyTimer <= 2.0f)
+    // Happy emotion lasts for 2 seconds.
+    if (emotion == Emotion::Happy)
     {
         happyTimer += dt;
-        SetEmotion(Emotion::Happy);
-    }
-    else 
-    {
-        SetEmotion(Emotion::Neutral);
-        happyTimer = 0.0f;
+
+        if (happyTimer >= 2.0f)
+        {
+            SetEmotion(Emotion::Neutral);
+        }
     }
 }
-
 
 void RobotBrain::Speak(const std::string& text)
 {

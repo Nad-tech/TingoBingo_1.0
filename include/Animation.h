@@ -40,6 +40,8 @@ class Animation
     void Play(int startFrame, int endFrame, AnimationPriority priority);
     bool IsPlaying() const;
 
+    void Stop();
+
 private:
     int frame;
 
