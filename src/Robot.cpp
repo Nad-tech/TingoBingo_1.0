@@ -3,6 +3,7 @@
 #include "Constants.h"
 #include "RobotBrain.h"
 #include <string>
+#include "Emotion.h"
 
 Robot::Robot() : robotBrain(*this)
 {
@@ -16,7 +17,7 @@ Robot::Robot() : robotBrain(*this)
 void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
-    head.Update(dt, speaking);
+    head.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
 void Robot::Speak(const std::string& text)
@@ -84,4 +85,9 @@ void Robot::LookAt(Vector2 point)
 Head& Robot::GetHead()
 {
     return head;
+}
+
+void Robot::SetEmotion(Emotion emotion)
+{
+    robotBrain.SetEmotion(emotion);
 }

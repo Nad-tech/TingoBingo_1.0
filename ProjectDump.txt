@@ -100,26 +100,18 @@ constexpr float SCALE = 2.0f;
 
 
 =====================================
-.\include\EmotionController.h
+.\include\Emotion.h
 =====================================
 
 #pragma once
 
-#include "head\Head.h"
-
-class EmotionController
+enum class Emotion
 {
-    public:
-        EmotionController(Head& head);
-
-        void Update(float dt);
-        void UpdateEyebrows(float dt);
-
-    private:
-        Head& head;
-        
-        float eyebrowsHappyAnimationTimer;
-        float nextEyebrowsHappyAnimation;
+    Neutral,
+    Happy,
+    Sad,
+    Angry,
+    Surprised
 };
 
 
@@ -198,15 +190,16 @@ class Ears : public Sprite
 #pragma once
 
 #include "Sprite.h"
+#include "Emotion.h"
 
 class Eyebrows : public Sprite
 {
     public:
         void Initialise() override;
-        void UpdateEyebrows(float dt);
+        void UpdateEyebrows(float dt, bool speaking, Emotion emotion);
     
-        void PlayIdleWiggle();
-        void PlayHappyWiggle();
+        void SetIdle();
+        void SetHappy();
 
     private:
 };
@@ -247,6 +240,7 @@ class Eyes : public Sprite
 #include "head/Headbase.h"
 #include "head/Nose.h"
 #include "head/Pupils.h"
+#include "Emotion.h"
 
 class Head
 {
@@ -255,7 +249,7 @@ class Head
         void Initialise();
         void Shutdown();
 
-        void Update(float dt, bool speaking);
+        void Update(float dt, bool speaking, Emotion emotion);
         void Draw() const;
 
         void SetPosition(Vector2 position);
@@ -282,6 +276,7 @@ class Head
         void PlayHeadBob(float dt);
         
         void PlayHappyEyebrowsAnimation();
+        void PlayHappyMouthAnimation();
 
         void LookAt(Vector2 point);
 
@@ -346,14 +341,16 @@ class Headbase : public Sprite
 #pragma once
 
 #include "Sprite.h"
+#include "Emotion.h"
 
 class Mouth : public Sprite
 {
     public:
         void Initialise() override;
-        void UpdateMouth(float dt, bool speaking);
+        void UpdateMouth(float dt, bool speaking, Emotion emotion);
     
-        void PlayIdleMouth();
+        void SetIdle();
+        void SetHappy();
 
     private:
         int frame = 0;
@@ -484,6 +481,7 @@ public:
     bool RightPressed() const;
     bool SpacePressed() const;
     Vector2 MousePosition() const;
+    bool H_Pressed() const;
 };
 
 
@@ -495,11 +493,9 @@ public:
 
 #include "raylib.h"
 #include "head/Head.h"
-#include "IdleController.h"
 #include "RobotBrain.h"
-#include "SpeechController.h"
 #include <string>
-#include "EmotionController.h"
+#include "Emotion.h"
 class Robot 
 {
 public:
@@ -522,20 +518,19 @@ public:
 
 	Vector2 GetPosition() const;
 	Vector2 GetHeadPosition() const;
-
-	void UpdateIdle(float dt);
 	
 	void Speak(const std::string& text);
 	void SetSpeaking(bool state);
-	void UpdateEmotion(float dt);
+
+	void SetEmotion(Emotion emotion);
+
+	Head& GetHead();
 
 private:
 	Vector2 position;
 	
 	Head head;
-	IdleController idleController;
 	RobotBrain robotBrain;
-	EmotionController emotionController;
 
 	bool speaking = false;
 };
@@ -548,7 +543,9 @@ private:
 #pragma once
 
 #include "SpeechController.h"
+#include "IdleController.h"
 #include <string>
+#include "Emotion.h"
 
 class Robot;
 
@@ -558,7 +555,7 @@ class RobotBrain
         enum class State
         {
             Idle,
-            Speaking
+            Speaking,
         };
 
         RobotBrain(Robot& robot);
@@ -566,12 +563,17 @@ class RobotBrain
         void Update(float dt);
         void SetState(State newState);
         void Speak(const std::string& command);
+        void SetEmotion(Emotion newEmotion);
+        Emotion GetEmotion();
 
     private:
         Robot& robot;
         State state;
         SpeechController speechController;
+        IdleController idleController;
         bool speaking = false;
+        float happyTimer = 0.0f;
+        Emotion emotion;
 };
 
 
@@ -759,6 +761,7 @@ void Animation::Update(float dt)
     {
         frame = startFrame;
         playing = false;
+        priority = AnimationPriority::Idle;
     }
 }
 
@@ -833,7 +836,7 @@ void Animation::Play(int start, int end, AnimationPriority newPriority)
 {
     // Don't interrupt an animation with an equal
     // or higher priority.
-    if (playing && newPriority <= priority)
+    if (playing && static_cast<int>(newPriority) <= static_cast<int>(priority))
         return;
 
     startFrame = start;
@@ -858,38 +861,6 @@ bool Animation::IsPlaying() const
 .\src\AudioManager.cpp
 =====================================
 
-
-
-=====================================
-.\src\EmotionController.cpp
-=====================================
-
-#include "EmotionController.h"
-#include "head\Head.h"
-
-EmotionController::EmotionController(Head& h)
-    : head(h),
-      eyebrowsHappyAnimationTimer(0.0f),
-      nextEyebrowsHappyAnimation(3.0f)
-{}
-
-void EmotionController::Update(float dt)
-{
-    UpdateEyebrows(dt);
-}
-
-void EmotionController::UpdateEyebrows(float dt)
-{
-    eyebrowsHappyAnimationTimer += dt;
-
-    if (eyebrowsHappyAnimationTimer > nextEyebrowsHappyAnimation)
-    {
-        head.PlayHappyEyebrowsAnimation();
-
-        eyebrowsHappyAnimationTimer = 0.0f;
-        nextEyebrowsHappyAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-}
 
 
 =====================================
@@ -929,6 +900,7 @@ void EmotionController::UpdateEyebrows(float dt)
 
 #include "Game.h"
 #include "Constants.h"
+#include "Emotion.h"
 
 
 // Initialise the game and load required resources.
@@ -964,6 +936,11 @@ void Game::HandleInput()
 	if (input.SpacePressed())
 	{
 		robot.Speak("Hello Alby, my name is tingo bingo");
+	}
+
+	if(input.H_Pressed())
+	{
+		robot.SetEmotion(Emotion::Happy);
 	}
 }
 
@@ -1158,6 +1135,7 @@ void Ears::PlayWiggle()
 
 #include "head/Eyebrows.h"
 #include "Constants.h"
+#include "Emotion.h"
 
 void Eyebrows::Initialise()
 {
@@ -1192,19 +1170,35 @@ void Eyebrows::Initialise()
     scale = SCALE;
 }
 
-void Eyebrows::UpdateEyebrows(float dt)
+void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
 {
     Sprite::Update(dt);
+    
+    if(emotion == Emotion::Neutral)
+    {
+        SetIdle();
+    }
+
+    if(emotion == Emotion::Happy)
+    {
+        SetHappy();
+    }
+
+    if(speaking) 
+    {
+        SetHappy();
+    }
+
 }
 
-void Eyebrows::PlayIdleWiggle()
+void Eyebrows::SetIdle()
 {
-    animation.Play(0, 1, AnimationPriority::Idle);
+    animation.SetFrame(0);
 }
 
-void Eyebrows::PlayHappyWiggle()
+void Eyebrows::SetHappy()
 {
-    animation.Play(2, 3, AnimationPriority::Emotion);
+    animation.SetFrame(2);
 }
 
 
@@ -1290,6 +1284,7 @@ void Eyes::PlayBlink()
 
 #include "head/Head.h"
 #include <cmath>
+#include "Emotion.h"
 
 // Initialise the head's transform and idle animation state.
 Head::Head() :
@@ -1341,14 +1336,14 @@ void Head::Shutdown()
 }
 
 // Update every animated head component.
-void Head::Update(float dt, bool speaking)
+void Head::Update(float dt, bool speaking, Emotion emotion)
 {
     headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
-    eyebrows.UpdateEyebrows(dt);
+    eyebrows.UpdateEyebrows(dt, speaking, emotion);
     eyes.Update(dt);
-    mouth.UpdateMouth(dt, speaking);
+    mouth.UpdateMouth(dt, speaking, emotion);
     nose.Update(dt);
     pupils.Update(dt);
 }
@@ -1438,12 +1433,12 @@ void Head::PlayIdleEarsAnimation()
 
 void Head::PlayIdleEyebrowsAnimation()
 {
-    eyebrows.PlayIdleWiggle();
+    eyebrows.SetIdle();
 }
 
 void Head::PlayHappyEyebrowsAnimation()
 {
-    eyebrows.PlayHappyWiggle();
+    eyebrows.SetHappy();
 }
 
 void Head::PlayIdleEyesAnimation()
@@ -1453,7 +1448,12 @@ void Head::PlayIdleEyesAnimation()
 
 void Head::PlayIdleMouthAnimation()
 {
-    mouth.PlayIdleMouth();
+    mouth.SetIdle();
+}
+
+void Head::PlayHappyMouthAnimation()
+{
+    mouth.SetHappy();
 }
 
 void Head::PlayIdleNoseAnimation()
@@ -1666,6 +1666,7 @@ void Headbase::SetRotation(float rotation)
 
 #include "head/Mouth.h"
 #include "Constants.h"
+#include "Emotion.h"
 
 // Load the mouth sprite sheet and initialise its animation.
 void Mouth::Initialise()
@@ -1700,15 +1701,23 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::UpdateMouth(float dt, bool speaking)
+void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 {
     Sprite::Update(dt);
 
-    if(!speaking)
+    if (emotion == Emotion::Happy && !speaking)
+    {
+        frame = 0;
+        frameTimer = 0.0f;
+        SetHappy();
+        return;
+    }
+
+    if (!speaking)
     {
         frame = 1;
         frameTimer = 0.0f;
-        animation.SetFrame(frame);
+        SetIdle();
         return;
     }
 
@@ -1723,9 +1732,14 @@ void Mouth::UpdateMouth(float dt, bool speaking)
 }
 
 // Start the idle mouth animation if it isn't already playing.
-void Mouth::PlayIdleMouth()
+void Mouth::SetIdle()
 {
-    animation.Play(0, 1, AnimationPriority::Idle);
+    animation.SetFrame(1);
+}
+
+void Mouth::SetHappy()
+{
+    animation.SetFrame(0);
 }
 
 
@@ -2190,6 +2204,11 @@ bool Input::SpacePressed() const
     return IsKeyDown(KEY_SPACE);
 }
 
+bool Input::H_Pressed() const
+{
+    return IsKeyDown(KEY_H);
+}
+
 
 =====================================
 .\src\main.cpp
@@ -2215,11 +2234,9 @@ int main ()
 #include "Constants.h"
 #include "RobotBrain.h"
 #include <string>
+#include "Emotion.h"
 
-Robot::Robot()
-    : idleController(head),
-      robotBrain(*this),
-      emotionController(head)
+Robot::Robot() : robotBrain(*this)
 {
 	position = 
     {
@@ -2231,17 +2248,7 @@ Robot::Robot()
 void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
-    head.Update(dt, speaking);
-}
-
-void Robot::UpdateIdle(float dt)
-{
-    idleController.Update(dt);
-}
-
-void Robot::UpdateEmotion(float dt)
-{
-    emotionController.Update(dt);
+    head.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
 void Robot::Speak(const std::string& text)
@@ -2306,6 +2313,16 @@ void Robot::LookAt(Vector2 point)
     head.LookAt(point);
 }
 
+Head& Robot::GetHead()
+{
+    return head;
+}
+
+void Robot::SetEmotion(Emotion emotion)
+{
+    robotBrain.SetEmotion(emotion);
+}
+
 
 =====================================
 .\src\RobotBrain.cpp
@@ -2315,13 +2332,16 @@ void Robot::LookAt(Vector2 point)
 #include "Robot.h"
 #include "Input.h"
 #include "SpeechController.h"
+#include "IdleController.h"
 #include <string>
+#include "Emotion.h"
 
 class Robot; //Forward declaration
 
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
-      state(State::Idle)
+      state(State::Idle),
+      idleController(robot.GetHead())
 {}
 
 void RobotBrain::SetState(State state)
@@ -2329,18 +2349,22 @@ void RobotBrain::SetState(State state)
     this->state = state;
 }
 
+void RobotBrain::SetEmotion(Emotion emotion)
+{
+    this->emotion = emotion;
+}
+
 void RobotBrain::Update(float dt)
 {
-    robot.UpdateIdle(dt);
-    robot.UpdateEmotion(dt);
-
+    idleController.Update(dt);
     speechController.Update();
-
+    
     // Speech audio has started playing.
     if (state == State::Speaking &&
         speechController.SoundLoaded())
     {
         robot.SetSpeaking(true);
+        SetEmotion(Emotion::Happy);
     }
 
     // Speech has completely finished.
@@ -2349,13 +2373,31 @@ void RobotBrain::Update(float dt)
     {
         SetState(State::Idle);
         robot.SetSpeaking(false);
+        SetEmotion(Emotion::Neutral);
+    }
+
+    if(emotion == Emotion::Happy && happyTimer <= 2.0f)
+    {
+        happyTimer += dt;
+        SetEmotion(Emotion::Happy);
+    }
+    else 
+    {
+        SetEmotion(Emotion::Neutral);
+        happyTimer = 0.0f;
     }
 }
+
 
 void RobotBrain::Speak(const std::string& text)
 {
     SetState(State::Speaking);
     speechController.Speak(text);
+}
+
+Emotion RobotBrain::GetEmotion()
+{
+    return emotion;
 }
 
 

@@ -32,3 +32,8 @@ bool Input::SpacePressed() const
 {
     return IsKeyDown(KEY_SPACE);
 }
+
+bool Input::H_Pressed() const
+{
+    return IsKeyDown(KEY_H);
+}

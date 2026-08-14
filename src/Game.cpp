@@ -31,6 +31,7 @@
 
 #include "Game.h"
 #include "Constants.h"
+#include "Emotion.h"
 
 
 // Initialise the game and load required resources.
@@ -66,6 +67,11 @@ void Game::HandleInput()
 	if (input.SpacePressed())
 	{
 		robot.Speak("Hello Alby, my name is tingo bingo");
+	}
+
+	if(input.H_Pressed())
+	{
+		robot.SetEmotion(Emotion::Happy);
 	}
 }
 

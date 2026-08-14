@@ -1,14 +1,16 @@
 #pragma once
 
 #include "Sprite.h"
+#include "Emotion.h"
 
 class Mouth : public Sprite
 {
     public:
         void Initialise() override;
-        void UpdateMouth(float dt, bool speaking);
+        void UpdateMouth(float dt, bool speaking, Emotion emotion);
     
-        void PlayIdleMouth();
+        void SetIdle();
+        void SetHappy();
 
     private:
         int frame = 0;

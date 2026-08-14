@@ -8,6 +8,7 @@
 
 #include "head/Eyebrows.h"
 #include "Constants.h"
+#include "Emotion.h"
 
 void Eyebrows::Initialise()
 {
@@ -42,17 +43,33 @@ void Eyebrows::Initialise()
     scale = SCALE;
 }
 
-void Eyebrows::UpdateEyebrows(float dt)
+void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
 {
     Sprite::Update(dt);
+    
+    if(emotion == Emotion::Neutral)
+    {
+        SetIdle();
+    }
+
+    if(emotion == Emotion::Happy)
+    {
+        SetHappy();
+    }
+
+    if(speaking) 
+    {
+        SetHappy();
+    }
+
 }
 
-void Eyebrows::PlayIdleWiggle()
+void Eyebrows::SetIdle()
 {
-    animation.Play(0, 1, AnimationPriority::Idle);
+    animation.SetFrame(0);
 }
 
-void Eyebrows::PlayHappyWiggle()
+void Eyebrows::SetHappy()
 {
-    animation.Play(2, 3, AnimationPriority::Emotion);
+    animation.SetFrame(2);
 }

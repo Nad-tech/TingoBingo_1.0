@@ -15,6 +15,7 @@
 
 #include "head/Head.h"
 #include <cmath>
+#include "Emotion.h"
 
 // Initialise the head's transform and idle animation state.
 Head::Head() :
@@ -66,14 +67,14 @@ void Head::Shutdown()
 }
 
 // Update every animated head component.
-void Head::Update(float dt, bool speaking)
+void Head::Update(float dt, bool speaking, Emotion emotion)
 {
     headBase.Update(dt);
     antenna.Update(dt);
     ears.Update(dt);
-    eyebrows.UpdateEyebrows(dt);
+    eyebrows.UpdateEyebrows(dt, speaking, emotion);
     eyes.Update(dt);
-    mouth.UpdateMouth(dt, speaking);
+    mouth.UpdateMouth(dt, speaking, emotion);
     nose.Update(dt);
     pupils.Update(dt);
 }
@@ -163,12 +164,12 @@ void Head::PlayIdleEarsAnimation()
 
 void Head::PlayIdleEyebrowsAnimation()
 {
-    eyebrows.PlayIdleWiggle();
+    eyebrows.SetIdle();
 }
 
 void Head::PlayHappyEyebrowsAnimation()
 {
-    eyebrows.PlayHappyWiggle();
+    eyebrows.SetHappy();
 }
 
 void Head::PlayIdleEyesAnimation()
@@ -178,7 +179,12 @@ void Head::PlayIdleEyesAnimation()
 
 void Head::PlayIdleMouthAnimation()
 {
-    mouth.PlayIdleMouth();
+    mouth.SetIdle();
+}
+
+void Head::PlayHappyMouthAnimation()
+{
+    mouth.SetHappy();
 }
 
 void Head::PlayIdleNoseAnimation()

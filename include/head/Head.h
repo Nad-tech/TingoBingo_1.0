@@ -9,6 +9,7 @@
 #include "head/Headbase.h"
 #include "head/Nose.h"
 #include "head/Pupils.h"
+#include "Emotion.h"
 
 class Head
 {
@@ -17,7 +18,7 @@ class Head
         void Initialise();
         void Shutdown();
 
-        void Update(float dt, bool speaking);
+        void Update(float dt, bool speaking, Emotion emotion);
         void Draw() const;
 
         void SetPosition(Vector2 position);
@@ -44,6 +45,7 @@ class Head
         void PlayHeadBob(float dt);
         
         void PlayHappyEyebrowsAnimation();
+        void PlayHappyMouthAnimation();
 
         void LookAt(Vector2 point);
 

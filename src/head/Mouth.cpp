@@ -8,6 +8,7 @@
 
 #include "head/Mouth.h"
 #include "Constants.h"
+#include "Emotion.h"
 
 // Load the mouth sprite sheet and initialise its animation.
 void Mouth::Initialise()
@@ -42,15 +43,23 @@ void Mouth::Initialise()
 }
 
 // Advance the mouth animation.
-void Mouth::UpdateMouth(float dt, bool speaking)
+void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 {
     Sprite::Update(dt);
 
-    if(!speaking)
+    if (emotion == Emotion::Happy && !speaking)
+    {
+        frame = 0;
+        frameTimer = 0.0f;
+        SetHappy();
+        return;
+    }
+
+    if (!speaking)
     {
         frame = 1;
         frameTimer = 0.0f;
-        animation.SetFrame(frame);
+        SetIdle();
         return;
     }
 
@@ -65,7 +74,12 @@ void Mouth::UpdateMouth(float dt, bool speaking)
 }
 
 // Start the idle mouth animation if it isn't already playing.
-void Mouth::PlayIdleMouth()
+void Mouth::SetIdle()
 {
-    animation.Play(0, 1, AnimationPriority::Idle);
+    animation.SetFrame(1);
+}
+
+void Mouth::SetHappy()
+{
+    animation.SetFrame(0);
 }

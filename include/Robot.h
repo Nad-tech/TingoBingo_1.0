@@ -4,6 +4,7 @@
 #include "head/Head.h"
 #include "RobotBrain.h"
 #include <string>
+#include "Emotion.h"
 class Robot 
 {
 public:
@@ -29,6 +30,8 @@ public:
 	
 	void Speak(const std::string& text);
 	void SetSpeaking(bool state);
+
+	void SetEmotion(Emotion emotion);
 
 	Head& GetHead();
 
