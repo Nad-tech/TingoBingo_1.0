@@ -46,10 +46,17 @@ void Nose::Initialise()
 void Nose::Update(float dt)
 {
     Sprite::Update(dt);
+
+    //Idle behaviour
+    //Wiggle nose at random intervals
+    idleAnimationTimer += dt;
+
+    if(idleAnimationTimer > nextIdleAnimation)
+    {
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+        animation.Play(0, 3, AnimationPriority::Idle);
+    }
 }
 
-// Start the wiggle animation if it isn't already playing.
-void Nose::PlayWiggle()
-{
-    animation.Play(0, 3, AnimationPriority::Idle);
-}
+    

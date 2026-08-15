@@ -34,8 +34,6 @@ class Head
         void ReturnToCentre();
         bool IsFrontFacing() const;
 
-        void PlayIdleEyesAnimation();
-        void PlayIdleNoseAnimation();
         void PlayIdleHeadTransform(float dt);
         void PlayHeadWiggle(float dt);
         void PlayHeadBob(float dt);

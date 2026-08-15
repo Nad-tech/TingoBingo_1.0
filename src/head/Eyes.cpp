@@ -47,9 +47,17 @@ void Eyes::Update(float dt)
 {
     // Advance the eye animation.
     Sprite::Update(dt);
-}
 
-void Eyes::PlayBlink()
-{
-    animation.Play(0, 4, AnimationPriority::Idle);
+    //Idle beahviour
+    //Blink at random intervals
+    idleAnimationTimer += dt;
+    
+    if(idleAnimationTimer > nextIdleAnimation)
+    {
+        animation.Play(0, 4, AnimationPriority::Idle);
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+    }
+
+    
 }

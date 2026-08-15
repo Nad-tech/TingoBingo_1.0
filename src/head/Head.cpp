@@ -154,17 +154,6 @@ bool Head::IsFrontFacing() const
     return headBase.GetFrame() == 0;
 }
 
-void Head::PlayIdleEyesAnimation()
-{
-    eyes.PlayBlink();
-}
-
-
-void Head::PlayIdleNoseAnimation()
-{
-    nose.PlayWiggle();
-}
-
 // Set the head's home rotation.
 void Head::SetRotation(float rotation)
 {
@@ -185,6 +174,11 @@ void Head::ApplyRotation(float rotation)
     mouth.SetRotation(rotation);
     nose.SetRotation(rotation);
     pupils.SetRotation(rotation);
+}
+
+float Head::GetRotation()
+{
+    return rotation;
 }
 
 // Play the head's idle movement by combining

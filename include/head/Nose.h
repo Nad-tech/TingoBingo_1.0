@@ -8,7 +8,7 @@ class Nose : public Sprite
         void Initialise() override;
         void Update(float dt) override;
 
-        void PlayWiggle();
-
     private:
+        float idleAnimationTimer = 0.0f;
+        float nextIdleAnimation = 3.0f;
 }; 
