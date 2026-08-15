@@ -51,7 +51,7 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     {
         frame = 0;
         frameTimer = 0.0f;
-        SetHappy();
+        animation.SetFrame(frame);
         return;
     }
 
@@ -59,10 +59,11 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     {
         frame = 1;
         frameTimer = 0.0f;
-        SetIdle();
+        animation.SetFrame(frame);
         return;
     }
 
+    //Animate mouth while speaking
     frameTimer += dt;
 
     if (frameTimer >= FRAME_DURATION)
@@ -71,15 +72,4 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
     }
-}
-
-// Start the idle mouth animation if it isn't already playing.
-void Mouth::SetIdle()
-{
-    animation.SetFrame(1);
-}
-
-void Mouth::SetHappy()
-{
-    animation.SetFrame(0);
 }

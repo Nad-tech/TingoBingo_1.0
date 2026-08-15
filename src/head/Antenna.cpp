@@ -45,21 +45,18 @@ void Antenna::Initialise()
 
 void Antenna::Update(float dt)
 {
-    // Advance the antenna animation.
+     // Update the base sprite behaviour before handling antenna animation.
     Sprite::Update(dt);
     
-    
+    //Idle behavior
+    //Wiggle the antenna at random intervals
     antennaAnimationTimer += dt;
 
     if (antennaAnimationTimer > nextAntennaAnimation)
     {
-        PlayWiggle();
+        animation.Play(0, 7, AnimationPriority::Idle);
         antennaAnimationTimer = 0.0f;
         nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
-void Antenna::PlayWiggle()
-{
-    animation.Play(0, 7, AnimationPriority::Idle);
-}

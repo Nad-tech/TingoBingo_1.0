@@ -154,30 +154,11 @@ bool Head::IsFrontFacing() const
     return headBase.GetFrame() == 0;
 }
 
-void Head::PlayIdleAntennaAnimation()
-{
-    antenna.PlayWiggle();
-}
-
-void Head::PlayIdleEarsAnimation()
-{
-    ears.PlayWiggle();
-}
-
 void Head::PlayIdleEyesAnimation()
 {
     eyes.PlayBlink();
 }
 
-void Head::PlayIdleMouthAnimation()
-{
-    mouth.SetIdle();
-}
-
-void Head::PlayHappyMouthAnimation()
-{
-    mouth.SetHappy();
-}
 
 void Head::PlayIdleNoseAnimation()
 {

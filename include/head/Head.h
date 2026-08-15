@@ -34,16 +34,11 @@ class Head
         void ReturnToCentre();
         bool IsFrontFacing() const;
 
-        void PlayIdleAntennaAnimation();
-        void PlayIdleEarsAnimation();
         void PlayIdleEyesAnimation();
-        void PlayIdleMouthAnimation();
         void PlayIdleNoseAnimation();
         void PlayIdleHeadTransform(float dt);
         void PlayHeadWiggle(float dt);
         void PlayHeadBob(float dt);
-        
-        void PlayHappyMouthAnimation();
 
         void LookAt(Vector2 point);
 

@@ -46,9 +46,15 @@ void Ears::Update(float dt)
 {
     // Advance the ear animation.
     Sprite::Update(dt);
-}
 
-void Ears::PlayWiggle()
-{
-    animation.Play(0, 4, AnimationPriority::Idle);
+    //Idle behavior
+    //Wiggle ears at random intervals
+    idleAnimationTimer += dt;
+
+    if(idleAnimationTimer > nextIdleAnimation)
+    { 
+        animation.Play(0, 4, AnimationPriority::Idle);
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+    }
 }
