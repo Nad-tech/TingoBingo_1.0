@@ -160,7 +160,6 @@ class Antenna : public Sprite
     public:
         void Initialise() override;
         void Update(float dt) override;
-        void PlayWiggle();
     
     private:
         float antennaAnimationTimer = 0.0f;
@@ -181,9 +180,10 @@ class Ears : public Sprite
      public:
         void Initialise() override;
         void Update(float dt) override;
-    
-        void PlayWiggle();
+   
     private:
+        float idleAnimationTimer = 0.0f;
+        float nextIdleAnimation = 0.0;
 };
 
 
@@ -226,10 +226,10 @@ class Eyes : public Sprite
     public:
         void Initialise() override;
         void Update(float dt) override;
-    
-        void PlayBlink();
 
     private:
+        float idleAnimationTimer = 0.0f;
+        float nextIdleAnimation = 0.0f;
 }; 
 
 
@@ -273,16 +273,9 @@ class Head
         void ReturnToCentre();
         bool IsFrontFacing() const;
 
-        void PlayIdleAntennaAnimation();
-        void PlayIdleEarsAnimation();
-        void PlayIdleEyesAnimation();
-        void PlayIdleMouthAnimation();
-        void PlayIdleNoseAnimation();
         void PlayIdleHeadTransform(float dt);
         void PlayHeadWiggle(float dt);
         void PlayHeadBob(float dt);
-        
-        void PlayHappyMouthAnimation();
 
         void LookAt(Vector2 point);
 
@@ -354,10 +347,7 @@ class Mouth : public Sprite
     public:
         void Initialise() override;
         void UpdateMouth(float dt, bool speaking, Emotion emotion);
-    
-        void SetIdle();
-        void SetHappy();
-
+  
     private:
         int frame = 0;
         float frameTimer = 0.0f;
@@ -379,9 +369,9 @@ class Nose : public Sprite
         void Initialise() override;
         void Update(float dt) override;
 
-        void PlayWiggle();
-
     private:
+        float idleAnimationTimer = 0.0f;
+        float nextIdleAnimation = 3.0f;
 }; 
 
 
@@ -426,50 +416,6 @@ class Pupils
     private:
         Pupil leftPupil;
         Pupil rightPupil;
-};
-
-
-=====================================
-.\include\IdleController.h
-=====================================
-
-#pragma once
-#include "head\Head.h"
-
-class IdleController 
-{
-    public:
-        IdleController(Head& h);
-        
-        void Update(float dt);
-        void UpdateAntenna(float dt);
-        void UpdateEars(float dt);
-        void UpdateEyebrows(float dt);
-        void UpdateEyes(float dt);
-        void UpdateMouth(float dt);
-        void UpdateNose(float dt);
-        void UpdateHead(float dt);
-    
-    private:
-	    Head& head;
-
-        float antennaIdleAnimationTimer;
-	    float nextAntennaIdleAnimation;
-
-        float earsIdleAnimationTimer;
-        float nextEarsIdleAnimation;
-
-        float eyebrowsIdleAnimationTimer;
-        float nextEyebrowsIdleAnimation;
-
-        float eyesIdleAnimationTimer;
-        float nextEyesIdleAnimation;
-
-        float mouthIdleAnimationTimer;
-        float nextMouthIdleAnimation;
-
-        float noseIdleAnimationTimer;
-        float nextNoseIdleAnimation;
 };
 
 
@@ -1058,24 +1004,21 @@ void Antenna::Initialise()
 
 void Antenna::Update(float dt)
 {
-    // Advance the antenna animation.
+     // Update the base sprite behaviour before handling antenna animation.
     Sprite::Update(dt);
     
-    
+    //Idle behavior
+    //Wiggle the antenna at random intervals
     antennaAnimationTimer += dt;
 
     if (antennaAnimationTimer > nextAntennaAnimation)
     {
-        PlayWiggle();
+        animation.Play(0, 7, AnimationPriority::Idle);
         antennaAnimationTimer = 0.0f;
         nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
 }
 
-void Antenna::PlayWiggle()
-{
-    animation.Play(0, 7, AnimationPriority::Idle);
-}
 
 
 =====================================
@@ -1130,11 +1073,17 @@ void Ears::Update(float dt)
 {
     // Advance the ear animation.
     Sprite::Update(dt);
-}
 
-void Ears::PlayWiggle()
-{
-    animation.Play(0, 4, AnimationPriority::Idle);
+    //Idle behavior
+    //Wiggle ears at random intervals
+    idleAnimationTimer += dt;
+
+    if(idleAnimationTimer > nextIdleAnimation)
+    { 
+        animation.Play(0, 4, AnimationPriority::Idle);
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+    }
 }
 
 
@@ -1146,8 +1095,7 @@ void Ears::PlayWiggle()
 // Eyebrows.cpp
 //
 // Handles the robot's eyebrow sprites and animation.
-// The eyebrows can play a simple two-frame wiggle
-// animation when triggered.
+// The eyebrows can play idle and emotional animations.
 //====================================================
 
 #include "head/Eyebrows.h"
@@ -1160,21 +1108,21 @@ void Eyebrows::Initialise()
     // Load the eyebrow sprite sheet.
     texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
 
-    // Sprite sheet layout.
+    // Define the sprite sheet layout.
     const int COLUMNS = 4;
     const int ROWS = 1;
 
-    // Calculate the size of a single animation frame.
+    // Determine the dimensions of each frame.
     const int FRAME_WIDTH = texture.width / COLUMNS;
     const int FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
-    // Animation settings.
+    // Configure the eyebrow animation timing and orientation.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.3f;
 
-    // Initialise the animation using the sprite sheet information.
+    // Create the animation from the sprite sheet.
     animation.Initialise
     (
         FRAME_WIDTH,
@@ -1184,29 +1132,33 @@ void Eyebrows::Initialise()
         FRAME_DURATION
     );
 
+    // Apply the default sprite transform.
     rotation = ROTATION;
     scale = SCALE;
 }
 
 void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
 {
+    // Update the base sprite behaviour before handling eyebrow animation.
     Sprite::Update(dt);
 
-    // Happy behaviour.
+    // Speaking and happiness both use the expressive eyebrow animation.
     bool happy = speaking || emotion == Emotion::Happy;
 
+    // Start the happy animation immediately when entering the happy state.
     if (happy && !wasHappy)
     {
         animation.Play(2, 3, AnimationPriority::Emotion);
 
+        // Reset the timer and choose a random delay before the next wiggle.
         happyAnimationTimer = 0.0f;
-        nextHappyAnimation =
-            GetRandomValue(1000, 5000) / 1000.0f;
+        nextHappyAnimation = GetRandomValue(1000, 5000) / 1000.0f;
 
         wasHappy = true;
         return;
     }
 
+    // While happy, occasionally repeat the eyebrow wiggle.
     if (happy)
     {
         happyAnimationTimer += dt;
@@ -1215,6 +1167,7 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
         {
             animation.Play(2, 3, AnimationPriority::Emotion);
 
+            // Reset the timer and choose a new random interval.
             happyAnimationTimer = 0.0f;
             nextHappyAnimation =
                 GetRandomValue(1000, 5000) / 1000.0f;
@@ -1223,12 +1176,13 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
         return;
     }
 
-    // Happy has just ended.
+    // Restore the idle animation when the happy state ends.
     if (wasHappy)
     {
         animation.Stop();
         animation.Play(0, 1, AnimationPriority::Idle);
-        
+
+        // Reset the idle timer so the next idle animation is delayed.
         idleAnimationTimer = 0.0f;
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
@@ -1237,14 +1191,15 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
         return;
     }
 
-    // Neutral idle behaviour.
+    // In the neutral state, occasionally play a small idle movement.
     idleAnimationTimer += dt;
 
     if (idleAnimationTimer > nextIdleAnimation)
     {
         animation.Stop();
         animation.Play(0, 1, AnimationPriority::Idle);
-        
+
+        // Reset the timer and randomise the next idle movement.
         idleAnimationTimer = 0.0f;
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
@@ -1305,11 +1260,19 @@ void Eyes::Update(float dt)
 {
     // Advance the eye animation.
     Sprite::Update(dt);
-}
 
-void Eyes::PlayBlink()
-{
-    animation.Play(0, 4, AnimationPriority::Idle);
+    //Idle beahviour
+    //Blink at random intervals
+    idleAnimationTimer += dt;
+    
+    if(idleAnimationTimer > nextIdleAnimation)
+    {
+        animation.Play(0, 4, AnimationPriority::Idle);
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+    }
+
+    
 }
 
 
@@ -1473,36 +1436,6 @@ bool Head::IsFrontFacing() const
     return headBase.GetFrame() == 0;
 }
 
-void Head::PlayIdleAntennaAnimation()
-{
-    antenna.PlayWiggle();
-}
-
-void Head::PlayIdleEarsAnimation()
-{
-    ears.PlayWiggle();
-}
-
-void Head::PlayIdleEyesAnimation()
-{
-    eyes.PlayBlink();
-}
-
-void Head::PlayIdleMouthAnimation()
-{
-    mouth.SetIdle();
-}
-
-void Head::PlayHappyMouthAnimation()
-{
-    mouth.SetHappy();
-}
-
-void Head::PlayIdleNoseAnimation()
-{
-    nose.PlayWiggle();
-}
-
 // Set the head's home rotation.
 void Head::SetRotation(float rotation)
 {
@@ -1523,6 +1456,11 @@ void Head::ApplyRotation(float rotation)
     mouth.SetRotation(rotation);
     nose.SetRotation(rotation);
     pupils.SetRotation(rotation);
+}
+
+float Head::GetRotation()
+{
+    return rotation;
 }
 
 // Play the head's idle movement by combining
@@ -1751,7 +1689,7 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     {
         frame = 0;
         frameTimer = 0.0f;
-        SetHappy();
+        animation.SetFrame(frame);
         return;
     }
 
@@ -1759,10 +1697,11 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     {
         frame = 1;
         frameTimer = 0.0f;
-        SetIdle();
+        animation.SetFrame(frame);
         return;
     }
 
+    //Animate mouth while speaking
     frameTimer += dt;
 
     if (frameTimer >= FRAME_DURATION)
@@ -1771,17 +1710,6 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
     }
-}
-
-// Start the idle mouth animation if it isn't already playing.
-void Mouth::SetIdle()
-{
-    animation.SetFrame(1);
-}
-
-void Mouth::SetHappy()
-{
-    animation.SetFrame(0);
 }
 
 
@@ -1837,13 +1765,20 @@ void Nose::Initialise()
 void Nose::Update(float dt)
 {
     Sprite::Update(dt);
+
+    //Idle behaviour
+    //Wiggle nose at random intervals
+    idleAnimationTimer += dt;
+
+    if(idleAnimationTimer > nextIdleAnimation)
+    {
+        idleAnimationTimer = 0.0f;
+        nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
+        animation.Play(0, 3, AnimationPriority::Idle);
+    }
 }
 
-// Start the wiggle animation if it isn't already playing.
-void Nose::PlayWiggle()
-{
-    animation.Play(0, 3, AnimationPriority::Idle);
-}
+    
 
 
 =====================================
@@ -2066,144 +2001,6 @@ void Pupils::LookAt(Vector2 point)
         rightDirection.x * LOOK_DISTANCE,
         rightDirection.y * LOOK_DISTANCE
     };
-}
-
-
-=====================================
-.\src\IdleController.cpp
-=====================================
-
-//====================================================
-// IdleController.cpp
-//
-// Controls the robot's idle behaviour.
-//
-// Each facial feature has its own independent timer,
-// allowing idle animations such as blinking, ear
-// wiggles and nose wiggles to occur at random
-// intervals, making the robot appear more lifelike.
-//====================================================
-
-#include "IdleController.h"
-
-// Initialise the idle timers for each head component.
-IdleController::IdleController(Head& h)
-    : head(h),
-      antennaIdleAnimationTimer(0.0f),
-      nextAntennaIdleAnimation(3.0f),
-      earsIdleAnimationTimer(0.0f),
-      nextEarsIdleAnimation(3.0f),
-      eyebrowsIdleAnimationTimer(0.0f),
-      nextEyebrowsIdleAnimation(3.0f),
-      eyesIdleAnimationTimer(0.0f),
-      nextEyesIdleAnimation(3.0f),
-      mouthIdleAnimationTimer(0.0f),
-      nextMouthIdleAnimation(3.0f),
-      noseIdleAnimationTimer(0.0f),
-      nextNoseIdleAnimation(3.0f)
-{
-}
-
-// Update every idle animation controller.
-void IdleController::Update(float dt)
-{
-    UpdateAntenna(dt);
-    UpdateEars(dt);
-    UpdateEyebrows(dt);
-    UpdateEyes(dt);
-    //UpdateMouth(dt); speech controller controls mouth
-    UpdateNose(dt);
-    UpdateHead(dt);
-}
-
-// Trigger the antenna idle animation at random intervals.
-void IdleController::UpdateAntenna(float dt)
-{
-    antennaIdleAnimationTimer += dt;
-
-    if (antennaIdleAnimationTimer > nextAntennaIdleAnimation)
-    {
-        head.PlayIdleAntennaAnimation();
-
-        antennaIdleAnimationTimer = 0.0f;
-        nextAntennaIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-}
-
-// Trigger the ear idle animation at random intervals.
-void IdleController::UpdateEars(float dt)
-{
-    earsIdleAnimationTimer += dt;
-
-    if (earsIdleAnimationTimer > nextEarsIdleAnimation)
-    {
-        head.PlayIdleEarsAnimation();
-
-        earsIdleAnimationTimer = 0.0f;
-        nextEarsIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-}
-
-// Trigger the eyebrow idle animation at random intervals.
-void IdleController::UpdateEyebrows(float dt)
-{
-    eyebrowsIdleAnimationTimer += dt;
-
-    if (eyebrowsIdleAnimationTimer > nextEyebrowsIdleAnimation)
-    {
-       // head.PlayIdleEyebrowsAnimation();
-
-        eyebrowsIdleAnimationTimer = 0.0f;
-        nextEyebrowsIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-}
-
-// Trigger the eye blink animation at random intervals.
-void IdleController::UpdateEyes(float dt)
-{
-    eyesIdleAnimationTimer += dt;
-
-    if (eyesIdleAnimationTimer > nextEyesIdleAnimation)
-    {
-        head.PlayIdleEyesAnimation();
-
-        eyesIdleAnimationTimer = 0.0f;
-        nextEyesIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-}
-
-// Trigger the mouth idle animation at random intervals.
-void IdleController::UpdateMouth(float dt)
-{
-    mouthIdleAnimationTimer += dt;
-
-    if (mouthIdleAnimationTimer > nextMouthIdleAnimation)
-    {
-        head.PlayIdleMouthAnimation();
-
-        mouthIdleAnimationTimer = 0.0f;
-        nextMouthIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-}
-
-// Trigger the nose idle animation at random intervals.
-void IdleController::UpdateNose(float dt)
-{
-    noseIdleAnimationTimer += dt;
-
-    if (noseIdleAnimationTimer > nextNoseIdleAnimation)
-    {
-        head.PlayIdleNoseAnimation();
-
-        noseIdleAnimationTimer = 0.0f;
-        nextNoseIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
-    }
-}
-
-// Update the head's idle movement.
-void IdleController::UpdateHead(float dt)
-{
-    head.PlayIdleHeadTransform(dt);
 }
 
 

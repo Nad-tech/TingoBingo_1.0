@@ -2,6 +2,7 @@
 
 #include "Robot.h"
 #include "Input.h"
+#include "Toy.h"
 class Game
 {
 public:
@@ -20,5 +21,6 @@ private:
 	
 	Robot robot;
 	Input input;
+	Toy ball;
 	Texture2D background;
 };

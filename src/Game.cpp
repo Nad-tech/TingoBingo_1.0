@@ -43,6 +43,8 @@ void Game::Initialise()
 
 	robot.Initialise();
 
+	ball.Initialise();
+
 	SetTargetFPS(TARGET_FPS);
 
 	background = LoadTexture("assets/images/background/space.jpg");
@@ -78,11 +80,11 @@ void Game::HandleInput()
 // Update the game state.
 void Game::Update(const float dt)
 {
-	// Make the robot follow the mouse with its eyes.
-	robot.LookAt(input.MousePosition());
+	robot.LookAt(ball.GetPosition());
 
-	// Update the robot and its animations.
 	robot.Update(dt);
+	
+	ball.Update(dt);
 }
 
 // Draw the current frame.
@@ -93,6 +95,7 @@ void Game::Draw()
 	DrawTexture(background, 0, 0, WHITE);
 
 	robot.Draw();
+	ball.Draw();
 }
 
 // Release resources before exiting.
