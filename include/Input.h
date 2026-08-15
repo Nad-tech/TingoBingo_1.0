@@ -9,4 +9,5 @@ public:
     bool SpacePressed() const;
     Vector2 MousePosition() const;
     bool H_Pressed() const;
+    bool LeftMouseButtonPressed() const;
 };

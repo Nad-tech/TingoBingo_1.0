@@ -6,12 +6,10 @@
 class Toy : public Sprite
 {
     public:
-        void Initialise();
-        void Update(float dt);
-        void Dragging();
-        void SetPosition(Vector2 newPosition);
-        Vector2 GetPosition();
+        void Initialise() override;
+        void UpdateToy(float dt, Vector2 mousePosition, bool mousePressed);
+        bool IsDragging() const;
 
     private:
-        Vector2 position;
+        bool dragging = false;
 };

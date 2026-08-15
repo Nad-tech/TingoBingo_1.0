@@ -20,6 +20,7 @@ public:
     virtual void Draw() const;
 
     void Shutdown();
+    
     void SetPosition(Vector2 position);
     Vector2 GetPosition() const;
 

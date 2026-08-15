@@ -84,7 +84,15 @@ void Game::Update(const float dt)
 
 	robot.Update(dt);
 	
-	ball.Update(dt);
+	ball.UpdateToy(dt, input.MousePosition(), input.LeftMouseButtonPressed());
+
+	if(ball.IsDragging())
+	{
+		robot.SetEmotion(Emotion::Happy);
+	}
+	else{
+		robot.SetEmotion(Emotion::Neutral);
+	}
 }
 
 // Draw the current frame.

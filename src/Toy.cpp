@@ -1,10 +1,10 @@
 #include "Toy.h"
 #include "raylib.h"
+#include <cmath>
 
 void Toy::Initialise()
 {
     position = Vector2(300,200);
-    Sprite::SetPosition(position);
 
     // Load the Toy sprite sheet.
     texture = LoadTexture("assets/images/Toys/ball.png");
@@ -37,18 +37,31 @@ void Toy::Initialise()
     scale = 1;
 }
 
-void Toy::Update(float dt)
+void Toy::UpdateToy(float dt, Vector2 mousePosition, bool mousePressed)
 {
     Sprite::Update(dt);
+
+    float dx = abs(position.x - mousePosition.x);
+    float dy = abs(position.y - mousePosition.y);
+
+    bool xInRange = dx >= 0 && dx <= 40;
+    bool yInrange = dy >= 0 && dy <= 40;
+
+    if(xInRange && yInrange)
+    {
+        if(mousePressed)
+        {
+            dragging = !dragging;
+        }
+    }
+
+    if(dragging)
+    {
+        position = mousePosition;
+    }
 }
 
-void Toy::SetPosition(Vector2 newPosition)
+bool Toy::IsDragging() const
 {
-    position = newPosition;
-    Sprite::SetPosition(position);
-}
-
-Vector2 Toy::GetPosition()
-{
-    return position;
+    return dragging;
 }
