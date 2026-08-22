@@ -35,6 +35,9 @@ public:
 
 	Head& GetHead();
 
+	void OnToyPickedUp(Vector2 position, std::string toyName);
+	void OnFoodPickedUp(Vector2 position, std::string foodName);
+
 private:
 	Vector2 position;
 	

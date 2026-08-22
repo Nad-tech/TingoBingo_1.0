@@ -13,15 +13,22 @@ class RobotBrain
         {
             Idle,
             Speaking,
+            Interacting
         };
 
         RobotBrain(Robot& robot);
 
         void Update(float dt);
+
         void SetState(State newState);
+        
         void Speak(const std::string& command);
+        
         void SetEmotion(Emotion newEmotion);
         Emotion GetEmotion();
+        
+        void ToyPickedUp(Vector2 position, std::string toyName);
+        void FoodPickedUp(Vector2 position, std::string foodName);
 
     private:
         Robot& robot;

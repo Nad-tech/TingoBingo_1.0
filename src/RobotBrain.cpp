@@ -70,3 +70,24 @@ Emotion RobotBrain::GetEmotion()
 {
     return emotion;
 }
+
+void RobotBrain::ToyPickedUp(Vector2 position, std::string toyName)
+{
+    if(toyName == "ball")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("Ha ha ha ha, lets play with the ball");
+        robot.LookAt(position);
+    }
+}
+
+void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
+{
+    if(foodName == "banana")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("Yummy, yummy banana. Can I eat it please?");
+        robot.LookAt(position);
+    }
+
+}

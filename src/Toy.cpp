@@ -4,10 +4,10 @@
 
 void Toy::Initialise()
 {
-    position = Vector2(300,200);
+    position = Vector2(0, 0);
 
     // Load the Toy sprite sheet.
-    texture = LoadTexture("assets/images/Toys/ball.png");
+    texture = LoadTexture(textureFilename.c_str());
 
     // Sprite sheet layout.
     const int COLUMNS = 1;
@@ -36,6 +36,12 @@ void Toy::Initialise()
     rotation = ROTATION;
     scale = 1;
 }
+
+void Toy::SetTextureFilename(std::string textureFileName)
+{
+    this->textureFilename = textureFileName;
+}
+
 
 void Toy::UpdateToy(float dt, Vector2 mousePosition, bool mousePressed)
 {

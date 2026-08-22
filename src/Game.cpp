@@ -43,8 +43,14 @@ void Game::Initialise()
 
 	robot.Initialise();
 
+	ball.SetTextureFilename("./assets/images/toys/ball.png");
 	ball.Initialise();
+	ball.SetPosition({100, 100});
 
+	banana.SetTextureFilename("./assets/images/toys/banana.png");
+	banana.Initialise();
+	banana.SetPosition({300, 300});
+	
 	SetTargetFPS(TARGET_FPS);
 
 	background = LoadTexture("assets/images/background/space.jpg");
@@ -80,19 +86,27 @@ void Game::HandleInput()
 // Update the game state.
 void Game::Update(const float dt)
 {
-	robot.LookAt(ball.GetPosition());
+	ball.UpdateToy(
+			dt, input.MousePosition(),
+			input.LeftMouseButtonPressed()
+		);
 
-	robot.Update(dt);
+	banana.UpdateToy(
+			dt, input.MousePosition(), 
+			input.LeftMouseButtonPressed()
+		);
+
+	if(banana.IsDragging())
+	{
+		robot.OnFoodPickedUp(banana.GetPosition(), "banana");
+	}
 	
-	ball.UpdateToy(dt, input.MousePosition(), input.LeftMouseButtonPressed());
-
 	if(ball.IsDragging())
 	{
-		robot.SetEmotion(Emotion::Happy);
+		robot.OnToyPickedUp(ball.GetPosition(), "ball");
 	}
-	else{
-		robot.SetEmotion(Emotion::Neutral);
-	}
+	
+	robot.Update(dt);
 }
 
 // Draw the current frame.
@@ -104,6 +118,7 @@ void Game::Draw()
 
 	robot.Draw();
 	ball.Draw();
+	banana.Draw();
 }
 
 // Release resources before exiting.

@@ -18,9 +18,9 @@ private:
 	void Update(const float dt);
 	void Draw();
 	
-	
 	Robot robot;
 	Input input;
 	Toy ball;
+	Toy banana;
 	Texture2D background;
 };

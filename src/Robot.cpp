@@ -91,3 +91,13 @@ void Robot::SetEmotion(Emotion emotion)
 {
     robotBrain.SetEmotion(emotion);
 }
+
+void Robot::OnToyPickedUp(Vector2 position, std::string toyName)
+{
+    robotBrain.ToyPickedUp(position, toyName);
+}
+
+void Robot::OnFoodPickedUp(Vector2 position, std::string foodName)
+{
+    robotBrain.FoodPickedUp(position, foodName);
+}
