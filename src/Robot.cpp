@@ -106,3 +106,18 @@ void Robot::LookForward()
 {
     head.LookForward();
 }
+
+Vector2 Robot::GetSearchRayOrigin()
+{
+    return robotBrain.GetSearchRayOrigin();
+}
+
+Vector2 Robot::GetSearchRayEnd()
+{
+    return robotBrain.GetSearchRayEnd();
+}
+
+void Robot::SetToyPointers(std::vector<Toy*> toys)
+{
+    robotBrain.SetToyPointers(toys);
+}

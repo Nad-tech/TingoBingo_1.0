@@ -23,4 +23,5 @@ private:
 	Toy ball;
 	Toy banana;
 	Texture2D background;
+	std::vector<Toy*> toys; 
 };

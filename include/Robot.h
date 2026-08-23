@@ -40,6 +40,10 @@ public:
 
 	void LookForward();
 
+	Vector2 GetSearchRayOrigin();
+	Vector2 GetSearchRayEnd();
+	void SetToyPointers(std::vector<Toy*> toys);
+
 private:
 	Vector2 position;
 	

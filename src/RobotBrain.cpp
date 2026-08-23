@@ -4,6 +4,7 @@
 #include "SpeechController.h"
 #include <string>
 #include "Emotion.h"
+#include <cmath>
 
 class Robot; //Forward declaration
 
@@ -65,22 +66,24 @@ void RobotBrain::Update(float dt)
 
         idleTimer += dt;
 
-        if (idleTimer >= 2.0f)
+        if (idleTimer >= 1.0f)
         {
+            searchTimer = 0.0f;
             idleTimer = 0.0f;
-            state = State::LookingAround;
+            state = State::Searching;
         }
     }
 
-    if (state == State::LookingAround)
+    if (state == State::Searching)
     {
-        LookAround();
+        searchTimer += dt;
 
-        lookAroundTimer += dt;
+        Search(dt);
 
-        if (lookAroundTimer >= 2.0f)
+        if (searchTimer >= 10.0f)
         {
-            lookAroundTimer = 0.0f;
+            idleTimer = 0.0f;
+            searchTimer = 0.0f;
             state = State::Idle;
         }
     }
@@ -118,7 +121,84 @@ void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
 
 }
 
-void RobotBrain::LookAround()
+void RobotBrain::Search(float dt)
 {
-    robot.LookAt({0,0});
+    searchAngle += searchSpeed * dt;
+
+    Vector2 searchDirection = 
+    {
+        cosf(searchAngle),
+        sinf(searchAngle)
+    };
+
+    searchRayOrigin = robot.GetHeadPosition();
+
+    searchRayEnd =
+    {
+        searchRayOrigin.x + searchDirection.x * 300.0f,
+        searchRayOrigin.y + searchDirection.y * 300.0f
+    };
+
+    robot.LookAt(searchRayEnd);
+
+    std::string collidedWithThis = DetectCollision
+                                    (
+                                        searchRayOrigin,
+                                        searchRayEnd
+                                    );
+
+    if(collidedWithThis == "banana")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("HEY! A banana!");
+        robot.LookAt({searchRayEnd});
+    }
+
+    if(collidedWithThis == "ball")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("OH! A ball!");
+        robot.LookAt({searchRayEnd});
+    }
+}
+
+Vector2 RobotBrain::GetSearchRayOrigin()
+{
+    return searchRayOrigin;
+}
+
+Vector2 RobotBrain::GetSearchRayEnd()
+{
+    return searchRayEnd;
+}
+
+void RobotBrain::SetToyPointers(std::vector<Toy*> toys)
+{
+    this->toys = toys;
+}
+
+std::string RobotBrain::DetectCollision(Vector2 rayOrigin, Vector2 rayEnd)
+{
+    for(Toy* toy : toys)
+    {
+        Rectangle box = toy->GetCollisionBox();
+
+        Vector2 topLeft     = { box.x, box.y };
+        Vector2 topRight    = { box.x + box.width, box.y };
+        Vector2 bottomLeft  = { box.x, box.y + box.height };
+        Vector2 bottomRight = { box.x + box.width, box.y + box.height };
+
+        if
+        (   
+            CheckCollisionPointRec(rayOrigin, box) ||
+            CheckCollisionLines(rayOrigin, rayEnd, topLeft, topRight, nullptr) ||
+            CheckCollisionLines(rayOrigin, rayEnd, topRight, bottomRight, nullptr) ||
+            CheckCollisionLines(rayOrigin, rayEnd, bottomRight, bottomLeft, nullptr) ||
+            CheckCollisionLines(rayOrigin, rayEnd, bottomLeft, topLeft, nullptr)
+        )        
+        {
+            return toy->GetName();
+        }
+    }
+    return "";
 }

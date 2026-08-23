@@ -46,11 +46,17 @@ void Game::Initialise()
 	ball.SetTextureFilename("./assets/images/toys/ball.png");
 	ball.Initialise();
 	ball.SetPosition({100, 100});
+	ball.SetName("ball");
 
 	banana.SetTextureFilename("./assets/images/toys/banana.png");
 	banana.Initialise();
 	banana.SetPosition({300, 300});
+	banana.SetName("banana");
 	
+	toys = {&ball, &banana};
+
+	robot.SetToyPointers(toys);
+
 	SetTargetFPS(TARGET_FPS);
 
 	background = LoadTexture("assets/images/background/space.jpg");
@@ -117,8 +123,14 @@ void Game::Draw()
 	DrawTexture(background, 0, 0, WHITE);
 
 	robot.Draw();
+	
+	ball.DrawCollisionBox();
 	ball.Draw();
+	
+	banana.DrawCollisionBox();
 	banana.Draw();
+	
+	DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 }
 
 // Release resources before exiting.
