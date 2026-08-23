@@ -11,6 +11,7 @@
 │   │   ├── sfx/
 │   │   ├── voice/
 │   │   │   ├── speech.wav
+│   │   │   ├── speech_raw.wav
 │   ├── fonts/
 │   │   ├── .gitkeep
 │   ├── images/
@@ -86,6 +87,9 @@
 │   │   │   │   │   ├── 0003.png
 │   │   │   │   │   ├── 0004.png
 │   │   │   │   │   ├── 0005.png
+│   │   ├── toys/
+│   │   │   ├── ball.png
+│   │   │   ├── banana.png
 │   ├── sounds/
 │   │   ├── .gitkeep
 ├── build/
@@ -96,7 +100,6 @@
 │   ├── AudioManager.h
 │   ├── Constants.h
 │   ├── Emotion.h
-│   ├── EmotionController.h
 │   ├── Game.h
 │   ├── head/
 │   │   ├── Antenna.h
@@ -109,13 +112,13 @@
 │   │   ├── Nose.h
 │   │   ├── Pupil.h
 │   │   ├── Pupils.h
-│   ├── IdleController.h
 │   ├── Input.h
 │   ├── Robot.h
 │   ├── RobotBrain.h
 │   ├── Speech.h
 │   ├── SpeechController.h
 │   ├── Sprite.h
+│   ├── Toy.h
 │   ├── Utils.h
 ├── ProjectDump.txt
 ├── README.md
@@ -126,7 +129,6 @@
 ├── src/
 │   ├── Animation.cpp
 │   ├── AudioManager.cpp
-│   ├── EmotionController.cpp
 │   ├── Game.cpp
 │   ├── head/
 │   │   ├── Antenna.cpp
@@ -139,7 +141,6 @@
 │   │   ├── Nose.cpp
 │   │   ├── Pupil.cpp
 │   │   ├── Pupils.cpp
-│   ├── IdleController.cpp
 │   ├── Input.cpp
 │   ├── main.cpp
 │   ├── Robot.cpp
@@ -147,10 +148,60 @@
 │   ├── Speech.cpp
 │   ├── SpeechController.cpp
 │   ├── Sprite.cpp
+│   ├── Toy.cpp
 ├── tools/
+│   ├── ffmpeg/
+│   │   ├── bin/
+│   │   │   ├── ffmpeg.exe
+│   │   │   ├── ffplay.exe
+│   │   │   ├── ffprobe.exe
+│   │   ├── doc/
+│   │   │   ├── bootstrap.min.css
+│   │   │   ├── community.html
+│   │   │   ├── default.css
+│   │   │   ├── developer.html
+│   │   │   ├── drawvg-reference.html
+│   │   │   ├── faq.html
+│   │   │   ├── fate.html
+│   │   │   ├── ffmpeg-all.html
+│   │   │   ├── ffmpeg-bitstream-filters.html
+│   │   │   ├── ffmpeg-codecs.html
+│   │   │   ├── ffmpeg-devices.html
+│   │   │   ├── ffmpeg-filters.html
+│   │   │   ├── ffmpeg-formats.html
+│   │   │   ├── ffmpeg-protocols.html
+│   │   │   ├── ffmpeg-resampler.html
+│   │   │   ├── ffmpeg-scaler.html
+│   │   │   ├── ffmpeg-utils.html
+│   │   │   ├── ffmpeg.html
+│   │   │   ├── ffplay-all.html
+│   │   │   ├── ffplay.html
+│   │   │   ├── ffprobe-all.html
+│   │   │   ├── ffprobe.html
+│   │   │   ├── general.html
+│   │   │   ├── git-howto.html
+│   │   │   ├── libavcodec.html
+│   │   │   ├── libavdevice.html
+│   │   │   ├── libavfilter.html
+│   │   │   ├── libavformat.html
+│   │   │   ├── libavutil.html
+│   │   │   ├── libswresample.html
+│   │   │   ├── libswscale.html
+│   │   │   ├── mailing-list-faq.html
+│   │   │   ├── nut.html
+│   │   │   ├── platform.html
+│   │   │   ├── style.min.css
+│   │   ├── LICENSE
+│   │   ├── presets/
+│   │   │   ├── libvpx-1080p.ffpreset
+│   │   │   ├── libvpx-1080p50_60.ffpreset
+│   │   │   ├── libvpx-360p.ffpreset
+│   │   │   ├── libvpx-720p.ffpreset
+│   │   │   ├── libvpx-720p50_60.ffpreset
+│   │   ├── README.txt
 │   ├── piper/
-│   │   ├── en_GB-semaine-medium.onnx
-│   │   ├── en_GB-semaine-medium.onnx.json
+│   │   ├── en_GB-alan-medium.onnx
+│   │   ├── en_GB-alan-medium.onnx.json
 │   │   ├── espeak-ng-data/
 │   │   │   ├── af_dict
 │   │   │   ├── am_dict

@@ -146,6 +146,7 @@ private:
 	Toy ball;
 	Toy banana;
 	Texture2D background;
+	std::vector<Toy*> toys; 
 };
 
 
@@ -489,6 +490,10 @@ public:
 
 	void LookForward();
 
+	Vector2 GetSearchRayOrigin();
+	Vector2 GetSearchRayEnd();
+	void SetToyPointers(std::vector<Toy*> toys);
+
 private:
 	Vector2 position;
 	
@@ -508,6 +513,9 @@ private:
 #include "SpeechController.h"
 #include <string>
 #include "Emotion.h"
+#include <vector>
+#include "Toy.h"
+#include <string>
 
 class Robot;
 
@@ -518,7 +526,7 @@ class RobotBrain
         {
             Idle,
             Speaking,
-            LookingAround
+            Searching
         };
 
         RobotBrain(Robot& robot);
@@ -535,7 +543,17 @@ class RobotBrain
         void ToyPickedUp(Vector2 position, std::string toyName);
         void FoodPickedUp(Vector2 position, std::string foodName);
         
-        void LookAround();
+        void Search(float dt);
+        Vector2 GetSearchRayOrigin();
+        Vector2 GetSearchRayEnd();
+
+        void SetToyPointers(std::vector<Toy*> toys);
+
+        std::string DetectCollision
+                        (
+                            Vector2 rayOrigin, 
+                            Vector2 rayEnd
+                        ); 
 
     private:
         Robot& robot;
@@ -544,8 +562,13 @@ class RobotBrain
         bool speaking = false;
         float happyTimer = 0.0f;
         Emotion emotion;
-        float lookAroundTimer = 0;
+        float searchTimer = 0;
         float idleTimer = 0;
+        float searchAngle = 0.0f;
+        float searchSpeed = 1.0f;
+        Vector2 searchRayOrigin = {};
+        Vector2 searchRayEnd = {};
+        std::vector<Toy*> toys;
 };
 
 
@@ -658,10 +681,16 @@ class Toy : public Sprite
         void UpdateToy(float dt, Vector2 mousePosition, bool mousePressed);
         bool IsDragging() const;
         void SetTextureFilename(std::string textureFilename);
+        void DrawCollisionBox();
+        Rectangle GetCollisionBox();
+        void SetName(std::string toyName);
+        std::string GetName();
 
     private:
         bool dragging = false;
         std::string textureFilename;
+        Rectangle collisionBox;
+        std::string toyName = "notSet";
 };
 
 
@@ -914,11 +943,17 @@ void Game::Initialise()
 	ball.SetTextureFilename("./assets/images/toys/ball.png");
 	ball.Initialise();
 	ball.SetPosition({100, 100});
+	ball.SetName("ball");
 
 	banana.SetTextureFilename("./assets/images/toys/banana.png");
 	banana.Initialise();
 	banana.SetPosition({300, 300});
+	banana.SetName("banana");
 	
+	toys = {&ball, &banana};
+
+	robot.SetToyPointers(toys);
+
 	SetTargetFPS(TARGET_FPS);
 
 	background = LoadTexture("assets/images/background/space.jpg");
@@ -985,8 +1020,14 @@ void Game::Draw()
 	DrawTexture(background, 0, 0, WHITE);
 
 	robot.Draw();
+	
+	ball.DrawCollisionBox();
 	ball.Draw();
+	
+	banana.DrawCollisionBox();
 	banana.Draw();
+	
+	DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 }
 
 // Release resources before exiting.
@@ -2292,6 +2333,21 @@ void Robot::LookForward()
     head.LookForward();
 }
 
+Vector2 Robot::GetSearchRayOrigin()
+{
+    return robotBrain.GetSearchRayOrigin();
+}
+
+Vector2 Robot::GetSearchRayEnd()
+{
+    return robotBrain.GetSearchRayEnd();
+}
+
+void Robot::SetToyPointers(std::vector<Toy*> toys)
+{
+    robotBrain.SetToyPointers(toys);
+}
+
 
 =====================================
 .\src\RobotBrain.cpp
@@ -2303,6 +2359,7 @@ void Robot::LookForward()
 #include "SpeechController.h"
 #include <string>
 #include "Emotion.h"
+#include <cmath>
 
 class Robot; //Forward declaration
 
@@ -2364,22 +2421,24 @@ void RobotBrain::Update(float dt)
 
         idleTimer += dt;
 
-        if (idleTimer >= 2.0f)
+        if (idleTimer >= 1.0f)
         {
+            searchTimer = 0.0f;
             idleTimer = 0.0f;
-            state = State::LookingAround;
+            state = State::Searching;
         }
     }
 
-    if (state == State::LookingAround)
+    if (state == State::Searching)
     {
-        LookAround();
+        searchTimer += dt;
 
-        lookAroundTimer += dt;
+        Search(dt);
 
-        if (lookAroundTimer >= 2.0f)
+        if (searchTimer >= 10.0f)
         {
-            lookAroundTimer = 0.0f;
+            idleTimer = 0.0f;
+            searchTimer = 0.0f;
             state = State::Idle;
         }
     }
@@ -2417,9 +2476,86 @@ void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
 
 }
 
-void RobotBrain::LookAround()
+void RobotBrain::Search(float dt)
 {
-    robot.LookAt({0,0});
+    searchAngle += searchSpeed * dt;
+
+    Vector2 searchDirection = 
+    {
+        cosf(searchAngle),
+        sinf(searchAngle)
+    };
+
+    searchRayOrigin = robot.GetHeadPosition();
+
+    searchRayEnd =
+    {
+        searchRayOrigin.x + searchDirection.x * 300.0f,
+        searchRayOrigin.y + searchDirection.y * 300.0f
+    };
+
+    robot.LookAt(searchRayEnd);
+
+    std::string collidedWithThis = DetectCollision
+                                    (
+                                        searchRayOrigin,
+                                        searchRayEnd
+                                    );
+
+    if(collidedWithThis == "banana")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("HEY! A banana!");
+        robot.LookAt({searchRayEnd});
+    }
+
+    if(collidedWithThis == "ball")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("OH! A ball!");
+        robot.LookAt({searchRayEnd});
+    }
+}
+
+Vector2 RobotBrain::GetSearchRayOrigin()
+{
+    return searchRayOrigin;
+}
+
+Vector2 RobotBrain::GetSearchRayEnd()
+{
+    return searchRayEnd;
+}
+
+void RobotBrain::SetToyPointers(std::vector<Toy*> toys)
+{
+    this->toys = toys;
+}
+
+std::string RobotBrain::DetectCollision(Vector2 rayOrigin, Vector2 rayEnd)
+{
+    for(Toy* toy : toys)
+    {
+        Rectangle box = toy->GetCollisionBox();
+
+        Vector2 topLeft     = { box.x, box.y };
+        Vector2 topRight    = { box.x + box.width, box.y };
+        Vector2 bottomLeft  = { box.x, box.y + box.height };
+        Vector2 bottomRight = { box.x + box.width, box.y + box.height };
+
+        if
+        (   
+            CheckCollisionPointRec(rayOrigin, box) ||
+            CheckCollisionLines(rayOrigin, rayEnd, topLeft, topRight, nullptr) ||
+            CheckCollisionLines(rayOrigin, rayEnd, topRight, bottomRight, nullptr) ||
+            CheckCollisionLines(rayOrigin, rayEnd, bottomRight, bottomLeft, nullptr) ||
+            CheckCollisionLines(rayOrigin, rayEnd, bottomLeft, topLeft, nullptr)
+        )        
+        {
+            return toy->GetName();
+        }
+    }
+    return "";
 }
 
 
@@ -2707,6 +2843,9 @@ void Sprite::SetRotation(float rotation)
 #include "raylib.h"
 #include <cmath>
 
+int FRAME_WIDTH;
+int FRAME_HEIGHT;
+
 void Toy::Initialise()
 {
     position = Vector2(0, 0);
@@ -2719,8 +2858,8 @@ void Toy::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    FRAME_WIDTH = texture.width / COLUMNS;
+    FRAME_HEIGHT = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -2740,6 +2879,14 @@ void Toy::Initialise()
 
     rotation = ROTATION;
     scale = 1;
+
+    collisionBox = Rectangle
+                        (
+                            position.x - FRAME_WIDTH/2.0f, 
+                            position.y - FRAME_HEIGHT/2.0f, 
+                            FRAME_WIDTH, 
+                            FRAME_HEIGHT
+                        );
 }
 
 void Toy::SetTextureFilename(std::string textureFileName)
@@ -2770,11 +2917,41 @@ void Toy::UpdateToy(float dt, Vector2 mousePosition, bool mousePressed)
     {
         position = mousePosition;
     }
+
+    collisionBox.x = position.x - FRAME_WIDTH/2.0f;
+    collisionBox.y = position.y - FRAME_HEIGHT/2.0f;
 }
 
 bool Toy::IsDragging() const
 {
     return dragging;
+}
+
+void Toy::DrawCollisionBox()
+{
+    DrawRectangle
+        (
+            collisionBox.x, 
+            collisionBox.y, 
+            collisionBox.width, 
+            collisionBox.height,
+            RED
+        );
+}
+
+Rectangle Toy::GetCollisionBox()
+{
+    return collisionBox;
+}
+
+void Toy::SetName(std::string name)
+{
+    toyName = name;
+}
+
+std::string Toy::GetName()
+{
+    return toyName;
 }
 
 
