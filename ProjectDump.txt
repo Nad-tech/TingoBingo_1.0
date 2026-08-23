@@ -125,6 +125,7 @@ enum class Emotion
 
 #include "Robot.h"
 #include "Input.h"
+#include "Toy.h"
 class Game
 {
 public:
@@ -140,9 +141,10 @@ private:
 	void Update(const float dt);
 	void Draw();
 	
-	
 	Robot robot;
 	Input input;
+	Toy ball;
+	Toy banana;
 	Texture2D background;
 };
 
@@ -434,6 +436,7 @@ public:
     bool SpacePressed() const;
     Vector2 MousePosition() const;
     bool H_Pressed() const;
+    bool LeftMouseButtonPressed() const;
 };
 
 
@@ -478,6 +481,9 @@ public:
 
 	Head& GetHead();
 
+	void OnToyPickedUp(Vector2 position, std::string toyName);
+	void OnFoodPickedUp(Vector2 position, std::string foodName);
+
 private:
 	Vector2 position;
 	
@@ -507,15 +513,22 @@ class RobotBrain
         {
             Idle,
             Speaking,
+            Interacting
         };
 
         RobotBrain(Robot& robot);
 
         void Update(float dt);
+
         void SetState(State newState);
+        
         void Speak(const std::string& command);
+        
         void SetEmotion(Emotion newEmotion);
         Emotion GetEmotion();
+        
+        void ToyPickedUp(Vector2 position, std::string toyName);
+        void FoodPickedUp(Vector2 position, std::string foodName);
 
     private:
         Robot& robot;
@@ -606,6 +619,7 @@ public:
     virtual void Draw() const;
 
     void Shutdown();
+    
     void SetPosition(Vector2 position);
     Vector2 GetPosition() const;
 
@@ -615,6 +629,30 @@ public:
     void MoveSpriteDown();
 
     virtual ~Sprite() = default;
+};
+
+
+=====================================
+.\include\Toy.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "Sprite.h"
+#include <string>
+
+class Toy : public Sprite
+{
+    public:
+        void Initialise() override;
+        void UpdateToy(float dt, Vector2 mousePosition, bool mousePressed);
+        bool IsDragging() const;
+        void SetTextureFilename(std::string textureFilename);
+
+    private:
+        bool dragging = false;
+        std::string textureFilename;
 };
 
 
@@ -864,6 +902,14 @@ void Game::Initialise()
 
 	robot.Initialise();
 
+	ball.SetTextureFilename("./assets/images/toys/ball.png");
+	ball.Initialise();
+	ball.SetPosition({100, 100});
+
+	banana.SetTextureFilename("./assets/images/toys/banana.png");
+	banana.Initialise();
+	banana.SetPosition({300, 300});
+	
 	SetTargetFPS(TARGET_FPS);
 
 	background = LoadTexture("assets/images/background/space.jpg");
@@ -899,10 +945,26 @@ void Game::HandleInput()
 // Update the game state.
 void Game::Update(const float dt)
 {
-	// Make the robot follow the mouse with its eyes.
-	robot.LookAt(input.MousePosition());
+	ball.UpdateToy(
+			dt, input.MousePosition(),
+			input.LeftMouseButtonPressed()
+		);
 
-	// Update the robot and its animations.
+	banana.UpdateToy(
+			dt, input.MousePosition(), 
+			input.LeftMouseButtonPressed()
+		);
+
+	if(banana.IsDragging())
+	{
+		robot.OnFoodPickedUp(banana.GetPosition(), "banana");
+	}
+	
+	if(ball.IsDragging())
+	{
+		robot.OnToyPickedUp(ball.GetPosition(), "ball");
+	}
+	
 	robot.Update(dt);
 }
 
@@ -914,6 +976,8 @@ void Game::Draw()
 	DrawTexture(background, 0, 0, WHITE);
 
 	robot.Draw();
+	ball.Draw();
+	banana.Draw();
 }
 
 // Release resources before exiting.
@@ -2019,6 +2083,7 @@ void Pupils::LookAt(Vector2 point)
 
 #include "Input.h"
 #include "raylib.h"
+#include "Constants.h"
 
 // Returns true while the left arrow key is held down.
 bool Input::LeftPressed() const
@@ -2032,10 +2097,23 @@ bool Input::RightPressed() const
     return IsKeyDown(KEY_RIGHT);
 }
 
-// Return the current mouse position.
+// Return the current mouse position, clamped to the screen dimensions.
 Vector2 Input::MousePosition() const
 {
-    return GetMousePosition();
+    Vector2 mouse = GetMousePosition();
+    Vector2 clampedMouse = mouse;
+
+    if(mouse.x >= 0 && mouse.x < SCREEN_WIDTH)
+    {
+        clampedMouse.x = mouse.x;
+    }
+
+    if(mouse.y >= 0 && mouse.y < SCREEN_HEIGHT)
+    {
+        clampedMouse.y = mouse.y;
+    }
+
+    return clampedMouse;
 }
 
 bool Input::SpacePressed() const
@@ -2046,6 +2124,11 @@ bool Input::SpacePressed() const
 bool Input::H_Pressed() const
 {
     return IsKeyDown(KEY_H);
+}
+
+bool Input::LeftMouseButtonPressed() const
+{
+    return IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 }
 
 
@@ -2162,6 +2245,16 @@ void Robot::SetEmotion(Emotion emotion)
     robotBrain.SetEmotion(emotion);
 }
 
+void Robot::OnToyPickedUp(Vector2 position, std::string toyName)
+{
+    robotBrain.ToyPickedUp(position, toyName);
+}
+
+void Robot::OnFoodPickedUp(Vector2 position, std::string foodName)
+{
+    robotBrain.FoodPickedUp(position, foodName);
+}
+
 
 =====================================
 .\src\RobotBrain.cpp
@@ -2240,6 +2333,27 @@ Emotion RobotBrain::GetEmotion()
     return emotion;
 }
 
+void RobotBrain::ToyPickedUp(Vector2 position, std::string toyName)
+{
+    if(toyName == "ball")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("Ha ha ha ha, lets play with the ball");
+        robot.LookAt(position);
+    }
+}
+
+void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
+{
+    if(foodName == "banana")
+    {
+        SetEmotion(Emotion::Happy);
+        Speak("Yummy, yummy banana. Can I eat it please?");
+        robot.LookAt(position);
+    }
+
+}
+
 
 =====================================
 .\src\Speech.cpp
@@ -2262,18 +2376,12 @@ Emotion RobotBrain::GetEmotion()
 // Convert text into a spoken WAV file using Piper.
 void Speech::Speak(const std::string& text)
 {
-    // Build the command used to launch Piper.
     std::string command =
         "echo \"" + text + "\" | "
         "\"tools\\piper\\piper.exe\" "
-        "--model \"tools\\piper\\en_GB-semaine-medium.onnx\" "
-        "--length_scale 1.5 "
-        "--noise_scale 1.3 "
-        "--noise_w 0.9 "
-        "--sentence_silence 0.03 "
+        "--model \"tools\\piper\\en_GB-alan-medium.onnx\" "
         "--output_file \"assets\\audio\\voice\\speech.wav\"";
 
-    // Execute the command and generate the speech file.
     system(command.c_str());
 }
 
@@ -2457,6 +2565,85 @@ void Sprite::MoveSpriteDown()
 void Sprite::SetRotation(float rotation)
 {
     this->rotation = rotation;
+}
+
+
+=====================================
+.\src\Toy.cpp
+=====================================
+
+#include "Toy.h"
+#include "raylib.h"
+#include <cmath>
+
+void Toy::Initialise()
+{
+    position = Vector2(0, 0);
+
+    // Load the Toy sprite sheet.
+    texture = LoadTexture(textureFilename.c_str());
+
+    // Sprite sheet layout.
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+
+    // Calculate the size of a single animation frame.
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+
+    // Animation settings.
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.06f;
+
+    // Initialise the animation using the sprite sheet information.
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = 1;
+}
+
+void Toy::SetTextureFilename(std::string textureFileName)
+{
+    this->textureFilename = textureFileName;
+}
+
+
+void Toy::UpdateToy(float dt, Vector2 mousePosition, bool mousePressed)
+{
+    Sprite::Update(dt);
+
+    float dx = abs(position.x - mousePosition.x);
+    float dy = abs(position.y - mousePosition.y);
+
+    bool xInRange = dx >= 0 && dx <= 40;
+    bool yInrange = dy >= 0 && dy <= 40;
+
+    if(xInRange && yInrange)
+    {
+        if(mousePressed)
+        {
+            dragging = !dragging;
+        }
+    }
+
+    if(dragging)
+    {
+        position = mousePosition;
+    }
+}
+
+bool Toy::IsDragging() const
+{
+    return dragging;
 }
 
 

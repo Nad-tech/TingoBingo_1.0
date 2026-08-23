@@ -22,9 +22,6 @@ void SpeechController::Update()
     {
         speech = LoadSound("assets/audio/voice/speech.wav");
 
-        SetSoundPitch(speech, 0.82f);
-        SetSoundVolume(speech, 0.85f);
-
         PlaySound(speech);
 
         wavReady = false;
