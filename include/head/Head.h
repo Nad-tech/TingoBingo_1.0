@@ -40,6 +40,8 @@ class Head
 
         void LookAt(Vector2 point);
 
+        void LookForward();
+
     private:
         Vector2 position;
     

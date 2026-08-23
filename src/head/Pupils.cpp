@@ -159,3 +159,21 @@ void Pupils::LookAt(Vector2 point)
         rightDirection.y * LOOK_DISTANCE
     };
 }
+
+void Pupils::LookForward()
+{
+    leftLookOffset = {0.0f, 0.0f};
+    rightLookOffset = {0.0f, 0.0f};
+
+    leftPupil.SetPosition(
+    {
+        headPosition.x + leftEyeOffset.x,
+        headPosition.y + leftEyeOffset.y
+    });
+
+    rightPupil.SetPosition(
+    {
+        headPosition.x + rightEyeOffset.x,
+        headPosition.y + rightEyeOffset.y
+    });
+}

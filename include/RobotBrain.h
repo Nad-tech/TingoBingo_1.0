@@ -13,7 +13,7 @@ class RobotBrain
         {
             Idle,
             Speaking,
-            Interacting
+            LookingAround
         };
 
         RobotBrain(Robot& robot);
@@ -29,6 +29,8 @@ class RobotBrain
         
         void ToyPickedUp(Vector2 position, std::string toyName);
         void FoodPickedUp(Vector2 position, std::string foodName);
+        
+        void LookAround();
 
     private:
         Robot& robot;
@@ -37,4 +39,6 @@ class RobotBrain
         bool speaking = false;
         float happyTimer = 0.0f;
         Emotion emotion;
+        float lookAroundTimer = 0;
+        float idleTimer = 0;
 };

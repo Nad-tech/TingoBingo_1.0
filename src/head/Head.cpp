@@ -252,3 +252,8 @@ void Head::LookAt(Vector2 point)
 {
     pupils.LookAt(point);
 }
+
+void Head::LookForward()
+{
+    pupils.LookForward();
+}

@@ -58,6 +58,32 @@ void RobotBrain::Update(float dt)
             SetEmotion(Emotion::Neutral);
         }
     }
+
+    if (state == State::Idle)
+    {
+        robot.LookForward();
+
+        idleTimer += dt;
+
+        if (idleTimer >= 2.0f)
+        {
+            idleTimer = 0.0f;
+            state = State::LookingAround;
+        }
+    }
+
+    if (state == State::LookingAround)
+    {
+        LookAround();
+
+        lookAroundTimer += dt;
+
+        if (lookAroundTimer >= 2.0f)
+        {
+            lookAroundTimer = 0.0f;
+            state = State::Idle;
+        }
+    }
 }
 
 void RobotBrain::Speak(const std::string& text)
@@ -90,4 +116,9 @@ void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
         robot.LookAt(position);
     }
 
+}
+
+void RobotBrain::LookAround()
+{
+    robot.LookAt({0,0});
 }

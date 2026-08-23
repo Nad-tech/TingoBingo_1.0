@@ -101,3 +101,8 @@ void Robot::OnFoodPickedUp(Vector2 position, std::string foodName)
 {
     robotBrain.FoodPickedUp(position, foodName);
 }
+
+void Robot::LookForward()
+{
+    head.LookForward();
+}

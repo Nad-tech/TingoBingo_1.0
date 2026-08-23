@@ -15,6 +15,7 @@ class Pupils
         Vector2 RotateVector(Vector2 v, float rotation);
 
         void LookAt(Vector2 point);
+        void LookForward();
 
     private:
         Pupil leftPupil;
