@@ -12,8 +12,11 @@ public:
     void Speak(const std::string& text);
     bool IsSpeaking() const;
     bool SoundLoaded();
+    ~SpeechController();
 
 private:
+
+    std::atomic<bool> stopRequested = false;
 
     // True while speech is being generated or played.
     std::atomic<bool> speaking = false;

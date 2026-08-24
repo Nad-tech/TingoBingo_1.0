@@ -124,13 +124,13 @@ void Game::Draw()
 
 	robot.Draw();
 	
-	ball.DrawCollisionBox();
+	//ball.DrawCollisionBox();
 	ball.Draw();
 	
-	banana.DrawCollisionBox();
+	//banana.DrawCollisionBox();
 	banana.Draw();
 	
-	DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
+	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 }
 
 // Release resources before exiting.

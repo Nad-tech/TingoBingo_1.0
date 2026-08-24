@@ -1,9 +1,14 @@
 #pragma once
 
 #include <string>
+#include <atomic>
 
 class Speech
 {
 public:
-    static void Speak(const std::string& text);
+    static bool Speak
+    (
+        const std::string& text,  
+        const std::atomic<bool>& stopRequested
+    );
 };
