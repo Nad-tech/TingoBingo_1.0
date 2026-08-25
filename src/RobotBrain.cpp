@@ -85,12 +85,12 @@ void RobotBrain::Update(float dt)
     // Speech audio has started playing.
     //================================================
 
-    if (state == State::Speaking &&
+    /*if (state == State::Speaking &&
         speechController.SoundLoaded())
     {
         robot.SetSpeaking(true);
         SetEmotion(Emotion::Happy);
-    }
+    }*/
 
 
     //================================================
@@ -100,7 +100,7 @@ void RobotBrain::Update(float dt)
     // finished playing.
     //================================================
 
-    if (state == State::Speaking &&
+    /*if (state == State::Speaking &&
         !speechController.IsSpeaking())
     {
         SetState(State::Idle);
@@ -108,7 +108,7 @@ void RobotBrain::Update(float dt)
         robot.SetSpeaking(false);
 
         SetEmotion(Emotion::Neutral);
-    }
+    }*/
 
 
     //================================================

@@ -18,7 +18,6 @@ Important functional/documentation mismatches:
 - Sad, Angry, and Surprised exist only as enum values. There are no distinct animations or brain behaviours for them.
 - Search returns the first intersected toy in registration order, not the closest object.
 Engineering debt:
-- The README says C++20, but [`build.sh`](C:\\dev\\raylib-projects\\TingoBingo_1.0\\scripts\\build.sh) builds as C++23. There is no standard build manifest such as CMake.
 - Pupils.cpp uses file-global state, explicitly noted in its own comment; multiple robot instances would share eye position and offsets.
 - Toy.cpp likewise uses shared global frame dimensions, so toys with different image sizes would interfere with each other’s collision sizing.
 - AudioManager.h, AudioManager.cpp, and Utils.h are empty; Speech is a thin static utility rather than a resource-owning service.

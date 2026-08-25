@@ -1,35 +1,31 @@
 #pragma once
 
 #include <string>
-#include <thread>
 #include <atomic>
+#include <thread>
 #include "raylib.h"
-
 class SpeechController
 {
 public:
+    enum class State
+    {
+        Idle,
+        Generating,
+        Playing
+    };
+
     void Update();
     void Speak(const std::string& text);
-    bool IsSpeaking() const;
-    bool SoundLoaded();
     ~SpeechController();
 
 private:
+    State state = State::Idle;
 
-    std::atomic<bool> stopRequested = false;
+    std::atomic<bool> stopRequested{false};
+    std::atomic<bool> wavReady{false};
 
-    // True while speech is being generated or played.
-    std::atomic<bool> speaking = false;
-
-    // Background thread used to generate speech with Piper.
     std::thread speechThread;
 
-    // Set by the worker thread when the WAV file is ready to play.
-    std::atomic<bool> wavReady = false;
-
-    // The currently loaded speech audio.
-    Sound speech{};
-
-    // True while the speech sound is loaded into memory.
-    bool soundLoaded = false;
+    Sound speechSound{};
+    bool soundLoaded = false; 
 };
