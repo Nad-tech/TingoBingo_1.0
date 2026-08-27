@@ -181,6 +181,13 @@ void SpeechController::Speak(const std::string& text)
 
     // The speech request has started, so it cannot be
     // considered finished while the WAV is generating.
+    //
+    // SpeechFinished must be set to false when a new speech
+    // request begins.
+    //
+    // Otherwise RobotBrain could see the initial true value
+    // while speech is still being generated and incorrectly
+    // assume that speech has already finished.
     speechFinished = false;
 
 

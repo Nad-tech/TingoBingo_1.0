@@ -922,9 +922,37 @@ public:
 #include <atomic>
 #include <thread>
 #include "raylib.h"
+
+
+//====================================================
+// SpeechController
+//
+// Manages Tingo's speech generation and audio playback.
+//
+// Speech generation is performed on a worker thread
+// using Piper/FFmpeg, while Raylib audio operations
+// are handled on the main thread.
+//
+// Speech lifecycle:
+//
+//     Idle → Generating → Playing → Idle
+//
+// Generating = Piper/FFmpeg are creating the WAV file.
+// Playing    = Raylib is playing the generated WAV.
+// Idle       = No speech is currently active.
+//====================================================
+
 class SpeechController
 {
 public:
+
+    //================================================
+    // State
+    //
+    // Represents the current stage of the speech
+    // lifecycle.
+    //================================================
+
     enum class State
     {
         Idle,
@@ -932,26 +960,122 @@ public:
         Playing
     };
 
+
+    //================================================
+    // Update
+    //
+    // Runs on the main thread.
+    //
+    // Checks whether the worker thread has generated
+    // the WAV file and, if so, loads and plays it
+    // through Raylib.
+    //
+    // Also detects when Raylib has finished playing
+    // the speech.
+    //================================================
+
     void Update();
-    
+
+
+    //================================================
+    // Speak
+    //
+    // Starts a new speech request.
+    //
+    // Speech generation is performed on a worker
+    // thread so Piper/FFmpeg do not block the
+    // main game loop.
+    //================================================
+
     void Speak(const std::string& text);
-    
+
+
+    //================================================
+    // Destructor
+    //
+    // Requests the speech worker to stop and joins
+    // the worker thread before the controller is
+    // destroyed.
+    //================================================
+
     ~SpeechController();
+
+
+    //================================================
+    // SoundLoaded
+    //
+    // Returns true when the generated speech WAV
+    // is currently loaded into a Raylib Sound.
+    //================================================
 
     bool SoundLoaded();
 
+
+    //================================================
+    // SpeechFinished
+    //
+    // Returns true when the complete speech lifecycle
+    // has finished.
+    //
+    // This remains false while speech is generating
+    // or playing, and becomes true once playback has
+    // finished and the controller returns to Idle.
+    //================================================
+
     bool SpeechFinished();
 
+
 private:
+
+    // Current stage of the speech lifecycle.
     State state = State::Idle;
 
+
+    //================================================
+    // Worker Thread Communication
+    //================================================
+
+    // Set by the main thread when shutdown has been
+    // requested.
+    //
+    // The speech worker checks this flag while
+    // generating speech and stops when requested.
     std::atomic<bool> stopRequested{false};
+
+
+    // Set by the worker thread when Speech::Speak()
+    // has successfully generated the WAV file.
+    //
+    // The main thread checks this flag in Update().
     std::atomic<bool> wavReady{false};
 
+
+    // Worker thread responsible for speech generation.
     std::thread speechThread;
 
+
+    //================================================
+    // Raylib Audio
+    //================================================
+
+    // The generated speech audio loaded by Raylib.
     Sound speechSound{};
-    bool soundLoaded = false; 
+
+
+    // True while speechSound contains a loaded
+    // Raylib Sound.
+    bool soundLoaded = false;
+
+
+    // Tracks whether the complete speech request has
+    // finished.
+    //
+    // false = generating or playing
+    // true  = speech has completely finished
+    //
+    // This is separate from SoundIsPlaying() because
+    // speech can be not playing while it is still
+    // being generated.
     bool speechFinished = true;
 };
 
@@ -2739,7 +2863,15 @@ void Robot::SetToyPointers(std::vector<Toy*> toys)
 #include <cmath>
 #include <iostream>
 
-class Robot; // Forward declaration
+
+//====================================================
+// Forward declaration
+//
+// RobotBrain stores a reference to Robot, so Robot
+// only needs to be known as a class here.
+//====================================================
+
+class Robot;
 
 
 //====================================================
@@ -2748,25 +2880,42 @@ class Robot; // Forward declaration
 // Controls Tingo's high-level behaviour.
 //
 // The brain manages:
-// - Robot states (Idle, Searching, Speaking, etc.)
+//
+// - Robot behaviour states
 // - Emotions
 // - Speech
+// - Idle behaviour
 // - Searching for objects
 // - The search ray used to detect objects
+//
+// RobotBrain controls what Tingo is doing, while
+// Robot and Head handle the physical and visual
+// parts of the robot.
 //====================================================
 
+
+//====================================================
+// Constructor
+//
+// Start Tingo in the Idle state with a Neutral
+// emotional state.
+//====================================================
 
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
       state(State::Idle),
       emotion(Emotion::Neutral)
-{}
+{
+}
 
 
 //====================================================
 // SetState
 //
-// Changes the robot's current behaviour state.
+// Changes Tingo's current high-level behaviour state.
+//
+// State is used by Update() to determine which
+// behaviour should currently run.
 //====================================================
 
 void RobotBrain::SetState(State state)
@@ -2778,10 +2927,10 @@ void RobotBrain::SetState(State state)
 //====================================================
 // SetEmotion
 //
-// Changes Tingo's current emotion.
+// Changes Tingo's current emotional state.
 //
-// Happy also resets the happy timer so the emotion
-// gets its full duration whenever it is triggered.
+// When Happy is triggered, the happy timer is reset
+// so Tingo gets the full duration of the emotion.
 //====================================================
 
 void RobotBrain::SetEmotion(Emotion newEmotion)
@@ -2798,9 +2947,14 @@ void RobotBrain::SetEmotion(Emotion newEmotion)
 //====================================================
 // Update
 //
-// Main update function for the brain.
+// Main update function for RobotBrain.
 //
-// Handles:
+// The SpeechController is updated first so that
+// speech generation and audio playback are processed
+// before the brain checks the current speech state.
+//
+// The brain then handles:
+//
 // - Speech
 // - Emotions
 // - Idle behaviour
@@ -2809,29 +2963,37 @@ void RobotBrain::SetEmotion(Emotion newEmotion)
 
 void RobotBrain::Update(float dt)
 {
+    // Debug information used to monitor the speech
+    // lifecycle while developing the system.
     std::cout << "Brain state: "
-          << static_cast<int>(state)
-          << " | Sound loaded: "
-          << speechController.SoundLoaded()
-          << " | Speech finished: "
-          << speechController.SpeechFinished()
-          << '\n';
+              << static_cast<int>(state)
+              << " | Sound loaded: "
+              << speechController.SoundLoaded()
+              << " | Speech finished: "
+              << speechController.SpeechFinished()
+              << '\n';
 
+
+    // Update the speech system before checking its state.
     speechController.Update();
 
 
     //================================================
     // SPEAKING
     //
-    // Speech audio has started playing.
+    // Once the generated sound has been loaded,
+    // tell the Robot that speech is active.
+    //
+    // SpeechFinished() must be false here because
+    // the speech may still be playing.
     //================================================
 
     if(state == State::Speaking &&
-        speechController.SoundLoaded() &&
-        !speechController.SpeechFinished() 
-      )
+       speechController.SoundLoaded() &&
+       !speechController.SpeechFinished())
     {
         robot.SetSpeaking(true);
+
         SetEmotion(Emotion::Happy);
     }
 
@@ -2839,12 +3001,18 @@ void RobotBrain::Update(float dt)
     //================================================
     // SPEAKING FINISHED
     //
-    // Return to Idle when speech has completely
-    // finished playing.
+    // Return Tingo to Idle once the SpeechController
+    // reports that the complete speech lifecycle has
+    // finished.
+    //
+    // SpeechFinished() is different from simply
+    // checking whether sound is playing because speech
+    // can be in the Generating state before playback
+    // begins.
     //================================================
 
-    if (state == State::Speaking &&
-        speechController.SpeechFinished())
+    if(state == State::Speaking &&
+       speechController.SpeechFinished())
     {
         std::cout << "BRAIN DETECTED SPEECH FINISHED\n";
 
@@ -2859,15 +3027,15 @@ void RobotBrain::Update(float dt)
     //================================================
     // HAPPY EMOTION
     //
-    // Happy lasts for two seconds before returning
-    // to Neutral.
+    // Happy lasts for two seconds before Tingo
+    // returns to the Neutral emotion.
     //================================================
 
-    if (emotion == Emotion::Happy)
+    if(emotion == Emotion::Happy)
     {
         happyTimer += dt;
 
-        if (happyTimer >= 2.0f)
+        if(happyTimer >= 2.0f)
         {
             SetEmotion(Emotion::Neutral);
         }
@@ -2877,18 +3045,19 @@ void RobotBrain::Update(float dt)
     //================================================
     // IDLE
     //
-    // Tingo looks forward while idle.
+    // While idle, Tingo looks forward.
     //
-    // After 10 seconds, enter Searching mode.
+    // After ten seconds of inactivity, Tingo enters
+    // Searching mode.
     //================================================
 
-    if (state == State::Idle)
+    if(state == State::Idle)
     {
         robot.LookForward();
 
         idleTimer += dt;
 
-        if (idleTimer >= 10.0f)
+        if(idleTimer >= 10.0f)
         {
             searchTimer = 0.0f;
             idleTimer = 0.0f;
@@ -2901,20 +3070,21 @@ void RobotBrain::Update(float dt)
     //================================================
     // SEARCHING
     //
-    // Tingo continuously rotates a search direction
-    // and uses a ray to look for objects.
+    // While searching, Tingo continuously rotates
+    // its search direction and uses a ray to look
+    // for registered objects.
     //
     // Searching lasts for ten seconds before Tingo
     // returns to Idle.
     //================================================
 
-    if (state == State::Searching)
+    if(state == State::Searching)
     {
         searchTimer += dt;
 
         Search(dt);
 
-        if (searchTimer >= 10.0f)
+        if(searchTimer >= 10.0f)
         {
             idleTimer = 0.0f;
             searchTimer = 0.0f;
@@ -2928,20 +3098,31 @@ void RobotBrain::Update(float dt)
 //====================================================
 // Speak
 //
-// Starts speech and switches the brain into the
-// Speaking state.
+// Starts a new speech request and changes the brain
+// state to Speaking.
+//
+// SpeechController handles the actual speech
+// generation and playback.
 //====================================================
 
 void RobotBrain::Speak(const std::string& text)
 {
+    // Debug message used to confirm that the brain
+    // has received a speech request.
     std::cout << "ROBOT BRAIN SPEAK CALLED\n";
+
+
+    // Tell the brain that Tingo is now handling speech.
     SetState(State::Speaking);
 
+
+    // Debug message used to confirm the state change.
     std::cout << "Brain state after SetState: "
               << static_cast<int>(state)
               << '\n';
 
 
+    // Pass the speech request to the SpeechController.
     speechController.Speak(text);
 }
 
@@ -2949,7 +3130,7 @@ void RobotBrain::Speak(const std::string& text)
 //====================================================
 // GetEmotion
 //
-// Returns Tingo's current emotion.
+// Returns Tingo's current emotional state.
 //====================================================
 
 Emotion RobotBrain::GetEmotion()
@@ -3003,18 +3184,18 @@ void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
 //====================================================
 // Search
 //
-// Rotates Tingo's search direction continuously.
+// Controls Tingo's searching behaviour.
 //
-// The search direction is calculated from an angle
-// using sine and cosine.
+// A continuously changing angle is converted into
+// a direction vector using sine and cosine.
 //
 // The same direction is used for:
 //
-// 1. Moving Tingo's pupils.
+// 1. Moving the pupils.
 // 2. Creating the search ray.
 //
-// The ray currently extends 300 pixels from Tingo's
-// head position.
+// This keeps Tingo's gaze and search direction
+// synchronised.
 //====================================================
 
 void RobotBrain::Search(float dt)
@@ -3029,8 +3210,7 @@ void RobotBrain::Search(float dt)
     // sin = Y direction
     //
     // As the angle increases, the direction rotates
-    // around Tingo in a circle.
-
+    // around Tingo.
     Vector2 searchDirection =
     {
         cosf(searchAngle),
@@ -3039,13 +3219,11 @@ void RobotBrain::Search(float dt)
 
 
     // The ray starts at Tingo's head position.
-
     searchRayOrigin = robot.GetHeadPosition();
 
 
-    // Extend the search direction 300 pixels
-    // to create the end point of the ray.
-
+    // Extend the direction 300 pixels from Tingo's
+    // head to create the search ray.
     searchRayEnd =
     {
         searchRayOrigin.x + searchDirection.x * 300.0f,
@@ -3053,14 +3231,13 @@ void RobotBrain::Search(float dt)
     };
 
 
-    // Make Tingo's pupils look along the search ray.
-
+    // Make Tingo's pupils look in the same direction
+    // as the search ray.
     robot.LookAt(searchRayEnd);
 
 
     // Check whether the search ray has hit any
     // registered toys.
-
     std::string collidedWithThis =
         DetectCollision(
             searchRayOrigin,
@@ -3100,7 +3277,8 @@ void RobotBrain::Search(float dt)
 //====================================================
 // GetSearchRayOrigin
 //
-// Returns the current start point of the search ray.
+// Returns the current starting position of the
+// search ray.
 //====================================================
 
 Vector2 RobotBrain::GetSearchRayOrigin()
@@ -3112,7 +3290,8 @@ Vector2 RobotBrain::GetSearchRayOrigin()
 //====================================================
 // GetSearchRayEnd
 //
-// Returns the current end point of the search ray.
+// Returns the current ending position of the
+// search ray.
 //====================================================
 
 Vector2 RobotBrain::GetSearchRayEnd()
@@ -3124,11 +3303,11 @@ Vector2 RobotBrain::GetSearchRayEnd()
 //====================================================
 // SetToyPointers
 //
-// Gives the brain pointers to the toys that it is
+// Gives RobotBrain pointers to the toys it is
 // allowed to detect.
 //
-// The RobotBrain does NOT own these Toys.
-// Game still owns them.
+// RobotBrain does not own the Toys.
+// Game remains responsible for their lifetime.
 //====================================================
 
 void RobotBrain::SetToyPointers(std::vector<Toy*> toys)
@@ -3142,35 +3321,31 @@ void RobotBrain::SetToyPointers(std::vector<Toy*> toys)
 //
 // Tests the search ray against every registered Toy.
 //
-// Each Toy provides a Rectangle collision box.
+// The ray is checked against:
 //
-// The ray is tested against:
-//
-// - The inside of the rectangle
+// - The inside of the collision rectangle
 // - Top edge
 // - Right edge
 // - Bottom edge
 // - Left edge
 //
-// If the ray intersects a Toy, its name is returned.
+// Returns the name of the first Toy hit.
 //
-// If nothing is hit, an empty string is returned.
+// Returns an empty string when nothing is detected.
 //====================================================
 
 std::string RobotBrain::DetectCollision(
     Vector2 rayOrigin,
     Vector2 rayEnd)
 {
-    // Check every Toy that the brain knows about.
-
+    // Check every toy registered with the brain.
     for(Toy* toy : toys)
     {
         Rectangle box = toy->GetCollisionBox();
 
 
         // Calculate the four corners of the
-        // Toy's collision rectangle.
-
+        // collision rectangle.
         Vector2 topLeft =
         {
             box.x,
@@ -3196,14 +3371,14 @@ std::string RobotBrain::DetectCollision(
         };
 
 
-        // Check whether the ray intersects the
-        // collision rectangle.
+        // Check whether the search ray intersects
+        // the collision rectangle.
         //
         // The first check handles the special case
-        // where the ray origin starts inside the box.
+        // where the ray starts inside the rectangle.
         //
-        // The remaining four checks test the ray
-        // against each edge of the rectangle.
+        // The remaining checks test the ray against
+        // each edge of the rectangle.
 
         if
         (
@@ -3243,14 +3418,12 @@ std::string RobotBrain::DetectCollision(
         )
         {
             // Return the name of the Toy that was hit.
-
             return toy->GetName();
         }
     }
 
 
-    // Nothing was detected.
-
+    // No collision was detected.
     return "";
 }
 
@@ -3922,70 +4095,111 @@ bool Speech::Speak
 //
 // Runs on the main thread.
 //
-// Handles communication between the worker thread
-// and the Raylib audio system.
+// Handles communication between the speech worker
+// thread and the Raylib audio system.
 //
-// The worker thread generates the WAV file.
-// The main thread detects when it is ready and
-// handles loading and playing the audio.
+// The worker thread is responsible for generating
+// the WAV file.
+//
+// The main thread is responsible for loading and
+// playing the WAV through Raylib.
+//
+// Speech lifecycle:
+//
+//     Generating → Playing → Idle
+//
+// speechFinished remains false while speech is
+// generating or playing, and becomes true when
+// playback has completely finished.
 //====================================================
 
 void SpeechController::Update()
 {
-    // The worker thread sets wavReady to true when
-    // Speech::Speak() has successfully generated the WAV.
+    //================================================
+    // WAV READY
     //
-    // Because wavReady is atomic, the worker thread
-    // can safely write to it while the main thread
-    // reads it here.
+    // The worker thread sets wavReady to true when
+    // Speech::Speak() has successfully generated
+    // the WAV file.
+    //
+    // Because wavReady is atomic, it can safely be
+    // written by the worker thread and read by the
+    // main thread.
+    //================================================
+
     if(wavReady)
     {
         std::cout << "WAV is ready\n";
 
-        // Reset the flag so we don't load and play
-        // the same WAV again on the next frame.
+
+        // Reset the flag so the same WAV is not
+        // loaded and played again on the next frame.
         wavReady = false;
+
 
         // Load the generated WAV into a Raylib Sound.
         //
-        // This happens on the main thread rather than
-        // the speech worker thread.
-        speechSound = LoadSound("./assets/audio/voice/speech.wav");
+        // Raylib audio operations are performed on
+        // the main thread rather than the worker thread.
+        speechSound =
+            LoadSound("./assets/audio/voice/speech.wav");
 
         soundLoaded = true;
+
 
         // Start playing the generated speech.
         PlaySound(speechSound);
 
-        // Speech generation is finished and audio
-        // playback has now started.
+
+        // Speech generation is complete and the
+        // generated audio has now started playing.
         state = State::Playing;
+
+
+        // The complete speech request is not finished
+        // yet because the sound is currently playing.
         speechFinished = false;
     }
 
 
-    // Check whether we are currently playing speech
-    // and Raylib has finished playing the sound.
+    //================================================
+    // PLAYBACK FINISHED
     //
-    // IsSoundPlaying() returns false when playback
+    // Check whether speech is currently playing
+    // and Raylib has finished the sound.
+    //
+    // IsSoundPlaying() returns false once playback
     // has completed.
-    if(state == State::Playing && !IsSoundPlaying(speechSound))
+    //
+    // IsSoundPlaying() is a Raylib function that checks
+    // whether the Sound is currently being played.
+    //================================================
+
+    if(state == State::Playing &&
+       !IsSoundPlaying(speechSound))
     {
         std::cout << "PLAYBACK FINISHED\n";
 
-        // The audio has finished, so we no longer
-        // need the Raylib Sound object.
+
+        // The audio has finished playing, so the
+        // Raylib Sound resource can now be released.
         UnloadSound(speechSound);
 
-        // Keep track of the fact that the sound is
-        // no longer loaded.
+
+        // Keep track of the fact that there is no
+        // longer a loaded speech sound.
         soundLoaded = false;
 
-        // The complete speech lifecycle is finished.
+
+        // The complete speech lifecycle has finished.
         //
-        // This is important because Speak() only
-        // accepts a new request when the state is Idle.
+        // Returning to Idle allows the controller to
+        // accept another speech request.
         state = State::Idle;
+
+
+        // Tell the RobotBrain that the entire speech
+        // request has now finished.
         speechFinished = true;
     }
 }
@@ -3996,60 +4210,85 @@ void SpeechController::Update()
 //
 // Starts a new speech request.
 //
-// The actual speech generation happens on a worker
-// thread so that Piper/FFmpeg do not block the
-// main game thread.
+// Speech generation is performed on a worker thread
+// so Piper and FFmpeg do not block the main game loop.
+//
+// The controller moves into the Generating state
+// immediately while the worker creates the WAV file.
 //====================================================
 
 void SpeechController::Speak(const std::string& text)
 {
-    // Only start speech if the controller is idle.
+    //================================================
+    // CHECK WHETHER SPEECH CAN START
     //
-    // This prevents another speech worker from being
+    // A new speech request can only begin when the
+    // controller is Idle.
+    //
+    // This prevents another worker thread from being
     // created while speech is already generating or
     // playing.
+    //================================================
+
     if (state != State::Idle)
     {
         return;
     }
 
 
-    // A previous worker thread may have already finished.
+    //================================================
+    // JOIN PREVIOUS WORKER
     //
-    // IMPORTANT:
-    // A finished std::thread is still "joinable" until
-    // it has been joined or detached.
+    // A std::thread remains joinable even after the
+    // function running on it has finished.
     //
     // Join the previous worker before reusing the
     // speechThread object.
+    //================================================
+
     if(speechThread.joinable())
     {
-        // Wait for the previous worker thread to finish
-        // and cleanly join it with the main thread.
+        // Wait for the previous worker to finish and
+        // safely join it with the main thread.
         speechThread.join();
     }
 
 
-    // Tell the rest of the program that speech generation
-    // is now in progress.
+    //================================================
+    // START GENERATION
+    //================================================
+
+    // Tell the controller that speech generation is
+    // now in progress.
     //
-    // This also prevents another Speak() call from
-    // starting another worker.
+    // This prevents another Speak() request from
+    // starting while the current request is active.
     state = State::Generating;
 
 
+    // The speech request has started, so it cannot be
+    // considered finished while the WAV is generating.
+    speechFinished = false;
+
+
+    //================================================
+    // CREATE WORKER THREAD
+    //================================================
+
     // Create and start the worker thread.
     //
-    // The lambda is the function that the worker thread
-    // will execute.
+    // The lambda contains the code executed by the
+    // worker thread.
     //
     // [this, text] means:
     //
-    //     this -> give the lambda access to this
-    //             SpeechController object.
+    // this
+    //     Gives the lambda access to this
+    //     SpeechController object.
     //
-    //     text -> make a copy of the speech text for
-    //             the worker thread.
+    // text
+    //     Makes a copy of the speech text so the
+    //     worker has its own copy to use.
     speechThread = std::thread([this, text]()
     {
         std::cout << "Worker started\n";
@@ -4057,34 +4296,41 @@ void SpeechController::Speak(const std::string& text)
         std::cout << "Before Speech::Speak()\n";
 
 
-        // Generate the speech on the worker thread.
+        //================================================
+        // GENERATE SPEECH
         //
-        // Speech::Speak() handles Piper and FFmpeg.
+        // Speech::Speak() runs Piper and FFmpeg on
+        // the worker thread.
         //
         // stopRequested is shared between the main
         // thread and worker thread and allows the
-        // controller to request that generation stops.
-        bool success = Speech::Speak(text, stopRequested);
+        // generation process to be cancelled.
+        //================================================
+
+        bool success =
+            Speech::Speak(text, stopRequested);
 
 
         std::cout << "After Speech::Speak()\n";
 
 
-        // If speech generation succeeded, tell the
-        // main thread that the WAV is ready.
-        //
-        // The worker does NOT call LoadSound() or
-        // PlaySound() itself. Those Raylib operations
-        // are handled by Update() on the main thread.
+        //================================================
+        // GENERATION RESULT
+        //================================================
+
         if (success)
         {
+            // The WAV has successfully been generated.
+            //
+            // Tell the main thread that it can now
+            // load and play the WAV.
             wavReady = true;
         }
         else
         {
-            // Generation failed or was cancelled.
+            // Speech generation failed or was cancelled.
             //
-            // No WAV will be played, so return the
+            // No audio will be played, so return the
             // controller to the Idle state.
             state = State::Idle;
         }
@@ -4095,11 +4341,10 @@ void SpeechController::Speak(const std::string& text)
 //====================================================
 // Destructor
 //
-// Called when the SpeechController is destroyed.
+// Called when SpeechController is destroyed.
 //
-// The destructor makes sure the worker thread has
-// been safely stopped and joined before the
-// SpeechController object disappears.
+// Ensures the speech worker is safely stopped and
+// joined before the SpeechController object disappears.
 //====================================================
 
 SpeechController::~SpeechController()
@@ -4107,26 +4352,34 @@ SpeechController::~SpeechController()
     std::cout << "SpeechController destructor\n";
 
 
+    //================================================
+    // REQUEST WORKER SHUTDOWN
+    //================================================
+
     // Tell Speech::Speak() that shutdown has been
     // requested.
     //
-    // Speech::Speak() receives this atomic flag and
-    // periodically checks it while Piper/FFmpeg
-    // are running.
+    // Speech::Speak() periodically checks this flag
+    // while Piper and FFmpeg are running.
     stopRequested = true;
 
 
-    // Check whether the std::thread still represents
-    // a thread that has not been joined or detached.
+    //================================================
+    // JOIN WORKER
+    //================================================
+
+    // Check whether the worker thread still needs
+    // to be joined.
     if (speechThread.joinable())
     {
         std::cout << "Joining speech thread\n";
 
 
-        // Wait for the worker to finish.
+        // Wait for the worker to finish before
+        // destroying the SpeechController.
         //
-        // This prevents the SpeechController from being
-        // destroyed while the worker is still using it.
+        // This prevents the worker from accessing
+        // the controller after it has been destroyed.
         speechThread.join();
 
 
@@ -4134,10 +4387,37 @@ SpeechController::~SpeechController()
     }
 }
 
+
+//====================================================
+// SoundLoaded
+//
+// Returns true while the generated speech WAV is
+// currently loaded as a Raylib Sound.
+//====================================================
+
 bool SpeechController::SoundLoaded()
 {
     return soundLoaded;
 }
+
+
+//====================================================
+// SpeechFinished
+//
+// Returns true when the complete speech lifecycle
+// has finished.
+//
+// false:
+//     Speech is generating or playing.
+//
+// true:
+//     Playback has finished and the controller
+//     has returned to Idle.
+//
+// This is deliberately separate from checking whether
+// the sound is playing because speech can be temporarily
+// "not playing" while the WAV is still being generated.
+//====================================================
 
 bool SpeechController::SpeechFinished()
 {

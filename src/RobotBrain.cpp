@@ -251,23 +251,28 @@ void RobotBrain::Update(float dt)
 
 void RobotBrain::Speak(const std::string& text)
 {
-    // Debug message used to confirm that the brain
-    // has received a speech request.
-    std::cout << "ROBOT BRAIN SPEAK CALLED\n";
+    // Only start a new speech request when the previous
+    // speech has completely finished.
+    if(speechController.SpeechFinished())
+    {
+        // Debug message used to confirm that the brain
+        // has received a speech request.
+        std::cout << "ROBOT BRAIN SPEAK CALLED\n";
 
 
-    // Tell the brain that Tingo is now handling speech.
-    SetState(State::Speaking);
+        // Tell the brain that Tingo is now handling speech.
+        SetState(State::Speaking);
 
 
-    // Debug message used to confirm the state change.
-    std::cout << "Brain state after SetState: "
-              << static_cast<int>(state)
-              << '\n';
+        // Debug message used to confirm the state change.
+        std::cout << "Brain state after SetState: "
+                << static_cast<int>(state)
+                << '\n';
 
 
-    // Pass the speech request to the SpeechController.
-    speechController.Speak(text);
+        // Pass the speech request to the SpeechController.
+        speechController.Speak(text);
+    }
 }
 
 

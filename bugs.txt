@@ -1,24 +1,49 @@
-
-
-🟡 Pupils.h
-
-
-
 3. Known issues / bugs
 
 
 High priority:
 
-- Dragging calls pickup callbacks every frame, not once when the toy is picked up. This repeatedly resets happiness and requests speech. Search detection has the same repeated-trigger issue and no detection cooldown.
-- Speak() changes the brain state even if SpeechController rejects the request as already speaking. State and speech playback can therefore diverge.
+- Dragging calls pickup callbacks every frame, not once when
+  the toy is picked up. This repeatedly resets happiness
+  and requests speech. Search detection has the same
+  repeated-trigger issue and no detection cooldown.
+
 Important functional/documentation mismatches:
-- The README’s “mouse-controlled pupil tracking” is not implemented. Mouse input controls toy dragging; no current call directs pupils to the mouse.
-- Arrow-key head orientation is effectively non-functional: Headbase is configured as a one-frame sprite sheet, so left/right frame changes wrap to frame zero. Only transform-based idle wiggle visibly rotates the head.
-- The README describes an EmotionController, but the codebase has only Emotion plus emotion handling in RobotBrain.
-- Sad, Angry, and Surprised exist only as enum values. There are no distinct animations or brain behaviours for them.
-- Search returns the first intersected toy in registration order, not the closest object.
+
+- The README's "mouse-controlled pupil tracking" is not
+  implemented. Mouse input controls toy dragging; no
+  current call directs pupils to the mouse.
+
+- Arrow-key head orientation is effectively non-functional:
+  Headbase is configured as a one-frame sprite sheet, so
+  left/right frame changes wrap to frame zero. Only
+  transform-based idle wiggle visibly rotates the head.
+
+- The README describes an EmotionController, but the
+  codebase has only Emotion plus emotion handling in
+  RobotBrain.
+
+- Sad, Angry, and Surprised exist only as enum values.
+  There are no distinct animations or brain behaviours
+  for them.
+
+- Search returns the first intersected toy in registration
+  order, not the closest object.
+
+
 Engineering debt:
-- Pupils.cpp uses file-global state, explicitly noted in its own comment; multiple robot instances would share eye position and offsets.
-- Toy.cpp likewise uses shared global frame dimensions, so toys with different image sizes would interfere with each other’s collision sizing.
-- AudioManager.h, AudioManager.cpp, and Utils.h are empty; Speech is a thin static utility rather than a resource-owning service.
-- Resource-loading and TTS/audio failures are not checked or surfaced.
+
+- Pupils.cpp uses file-global state, explicitly noted in
+  its own comment; multiple robot instances would share
+  eye position and offsets.
+
+- Toy.cpp likewise uses shared global frame dimensions,
+  so toys with different image sizes would interfere
+  with each other's collision sizing.
+
+- 
+  Speech is a thin static utility rather than a
+  resource-owning service.
+
+- Resource-loading and TTS/audio failures are not checked
+  or surfaced.
