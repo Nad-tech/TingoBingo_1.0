@@ -5,8 +5,17 @@
 #include <string>
 #include "Emotion.h"
 #include <cmath>
+#include <iostream>
 
-class Robot; // Forward declaration
+
+//====================================================
+// Forward declaration
+//
+// RobotBrain stores a reference to Robot, so Robot
+// only needs to be known as a class here.
+//====================================================
+
+class Robot;
 
 
 //====================================================
@@ -15,25 +24,42 @@ class Robot; // Forward declaration
 // Controls Tingo's high-level behaviour.
 //
 // The brain manages:
-// - Robot states (Idle, Searching, Speaking, etc.)
+//
+// - Robot behaviour states
 // - Emotions
 // - Speech
+// - Idle behaviour
 // - Searching for objects
 // - The search ray used to detect objects
+//
+// RobotBrain controls what Tingo is doing, while
+// Robot and Head handle the physical and visual
+// parts of the robot.
 //====================================================
 
+
+//====================================================
+// Constructor
+//
+// Start Tingo in the Idle state with a Neutral
+// emotional state.
+//====================================================
 
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
       state(State::Idle),
       emotion(Emotion::Neutral)
-{}
+{
+}
 
 
 //====================================================
 // SetState
 //
-// Changes the robot's current behaviour state.
+// Changes Tingo's current high-level behaviour state.
+//
+// State is used by Update() to determine which
+// behaviour should currently run.
 //====================================================
 
 void RobotBrain::SetState(State state)
@@ -45,10 +71,10 @@ void RobotBrain::SetState(State state)
 //====================================================
 // SetEmotion
 //
-// Changes Tingo's current emotion.
+// Changes Tingo's current emotional state.
 //
-// Happy also resets the happy timer so the emotion
-// gets its full duration whenever it is triggered.
+// When Happy is triggered, the happy timer is reset
+// so Tingo gets the full duration of the emotion.
 //====================================================
 
 void RobotBrain::SetEmotion(Emotion newEmotion)
@@ -65,9 +91,14 @@ void RobotBrain::SetEmotion(Emotion newEmotion)
 //====================================================
 // Update
 //
-// Main update function for the brain.
+// Main update function for RobotBrain.
 //
-// Handles:
+// The SpeechController is updated first so that
+// speech generation and audio playback are processed
+// before the brain checks the current speech state.
+//
+// The brain then handles:
+//
 // - Speech
 // - Emotions
 // - Idle behaviour
@@ -76,53 +107,79 @@ void RobotBrain::SetEmotion(Emotion newEmotion)
 
 void RobotBrain::Update(float dt)
 {
+    // Debug information used to monitor the speech
+    // lifecycle while developing the system.
+    std::cout << "Brain state: "
+              << static_cast<int>(state)
+              << " | Sound loaded: "
+              << speechController.SoundLoaded()
+              << " | Speech finished: "
+              << speechController.SpeechFinished()
+              << '\n';
+
+
+    // Update the speech system before checking its state.
     speechController.Update();
 
 
     //================================================
     // SPEAKING
     //
-    // Speech audio has started playing.
+    // Once the generated sound has been loaded,
+    // tell the Robot that speech is active.
+    //
+    // SpeechFinished() must be false here because
+    // the speech may still be playing.
     //================================================
 
-    /*if (state == State::Speaking &&
-        speechController.SoundLoaded())
+    if(state == State::Speaking &&
+       speechController.SoundLoaded() &&
+       !speechController.SpeechFinished())
     {
         robot.SetSpeaking(true);
+
         SetEmotion(Emotion::Happy);
-    }*/
+    }
 
 
     //================================================
     // SPEAKING FINISHED
     //
-    // Return to Idle when speech has completely
-    // finished playing.
+    // Return Tingo to Idle once the SpeechController
+    // reports that the complete speech lifecycle has
+    // finished.
+    //
+    // SpeechFinished() is different from simply
+    // checking whether sound is playing because speech
+    // can be in the Generating state before playback
+    // begins.
     //================================================
 
-    /*if (state == State::Speaking &&
-        !speechController.IsSpeaking())
+    if(state == State::Speaking &&
+       speechController.SpeechFinished())
     {
+        std::cout << "BRAIN DETECTED SPEECH FINISHED\n";
+
         SetState(State::Idle);
 
         robot.SetSpeaking(false);
 
         SetEmotion(Emotion::Neutral);
-    }*/
+    }
 
 
     //================================================
     // HAPPY EMOTION
     //
-    // Happy lasts for two seconds before returning
-    // to Neutral.
+    // Happy lasts for two seconds before Tingo
+    // returns to the Neutral emotion.
     //================================================
 
-    if (emotion == Emotion::Happy)
+    if(emotion == Emotion::Happy)
     {
         happyTimer += dt;
 
-        if (happyTimer >= 2.0f)
+        if(happyTimer >= 2.0f)
         {
             SetEmotion(Emotion::Neutral);
         }
@@ -132,18 +189,19 @@ void RobotBrain::Update(float dt)
     //================================================
     // IDLE
     //
-    // Tingo looks forward while idle.
+    // While idle, Tingo looks forward.
     //
-    // After 10 seconds, enter Searching mode.
+    // After ten seconds of inactivity, Tingo enters
+    // Searching mode.
     //================================================
 
-    if (state == State::Idle)
+    if(state == State::Idle)
     {
         robot.LookForward();
 
         idleTimer += dt;
 
-        if (idleTimer >= 10.0f)
+        if(idleTimer >= 10.0f)
         {
             searchTimer = 0.0f;
             idleTimer = 0.0f;
@@ -156,20 +214,21 @@ void RobotBrain::Update(float dt)
     //================================================
     // SEARCHING
     //
-    // Tingo continuously rotates a search direction
-    // and uses a ray to look for objects.
+    // While searching, Tingo continuously rotates
+    // its search direction and uses a ray to look
+    // for registered objects.
     //
     // Searching lasts for ten seconds before Tingo
     // returns to Idle.
     //================================================
 
-    if (state == State::Searching)
+    if(state == State::Searching)
     {
         searchTimer += dt;
 
         Search(dt);
 
-        if (searchTimer >= 10.0f)
+        if(searchTimer >= 10.0f)
         {
             idleTimer = 0.0f;
             searchTimer = 0.0f;
@@ -183,14 +242,31 @@ void RobotBrain::Update(float dt)
 //====================================================
 // Speak
 //
-// Starts speech and switches the brain into the
-// Speaking state.
+// Starts a new speech request and changes the brain
+// state to Speaking.
+//
+// SpeechController handles the actual speech
+// generation and playback.
 //====================================================
 
 void RobotBrain::Speak(const std::string& text)
 {
+    // Debug message used to confirm that the brain
+    // has received a speech request.
+    std::cout << "ROBOT BRAIN SPEAK CALLED\n";
+
+
+    // Tell the brain that Tingo is now handling speech.
     SetState(State::Speaking);
 
+
+    // Debug message used to confirm the state change.
+    std::cout << "Brain state after SetState: "
+              << static_cast<int>(state)
+              << '\n';
+
+
+    // Pass the speech request to the SpeechController.
     speechController.Speak(text);
 }
 
@@ -198,7 +274,7 @@ void RobotBrain::Speak(const std::string& text)
 //====================================================
 // GetEmotion
 //
-// Returns Tingo's current emotion.
+// Returns Tingo's current emotional state.
 //====================================================
 
 Emotion RobotBrain::GetEmotion()
@@ -252,18 +328,18 @@ void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
 //====================================================
 // Search
 //
-// Rotates Tingo's search direction continuously.
+// Controls Tingo's searching behaviour.
 //
-// The search direction is calculated from an angle
-// using sine and cosine.
+// A continuously changing angle is converted into
+// a direction vector using sine and cosine.
 //
 // The same direction is used for:
 //
-// 1. Moving Tingo's pupils.
+// 1. Moving the pupils.
 // 2. Creating the search ray.
 //
-// The ray currently extends 300 pixels from Tingo's
-// head position.
+// This keeps Tingo's gaze and search direction
+// synchronised.
 //====================================================
 
 void RobotBrain::Search(float dt)
@@ -278,8 +354,7 @@ void RobotBrain::Search(float dt)
     // sin = Y direction
     //
     // As the angle increases, the direction rotates
-    // around Tingo in a circle.
-
+    // around Tingo.
     Vector2 searchDirection =
     {
         cosf(searchAngle),
@@ -288,13 +363,11 @@ void RobotBrain::Search(float dt)
 
 
     // The ray starts at Tingo's head position.
-
     searchRayOrigin = robot.GetHeadPosition();
 
 
-    // Extend the search direction 300 pixels
-    // to create the end point of the ray.
-
+    // Extend the direction 300 pixels from Tingo's
+    // head to create the search ray.
     searchRayEnd =
     {
         searchRayOrigin.x + searchDirection.x * 300.0f,
@@ -302,14 +375,13 @@ void RobotBrain::Search(float dt)
     };
 
 
-    // Make Tingo's pupils look along the search ray.
-
+    // Make Tingo's pupils look in the same direction
+    // as the search ray.
     robot.LookAt(searchRayEnd);
 
 
     // Check whether the search ray has hit any
     // registered toys.
-
     std::string collidedWithThis =
         DetectCollision(
             searchRayOrigin,
@@ -349,7 +421,8 @@ void RobotBrain::Search(float dt)
 //====================================================
 // GetSearchRayOrigin
 //
-// Returns the current start point of the search ray.
+// Returns the current starting position of the
+// search ray.
 //====================================================
 
 Vector2 RobotBrain::GetSearchRayOrigin()
@@ -361,7 +434,8 @@ Vector2 RobotBrain::GetSearchRayOrigin()
 //====================================================
 // GetSearchRayEnd
 //
-// Returns the current end point of the search ray.
+// Returns the current ending position of the
+// search ray.
 //====================================================
 
 Vector2 RobotBrain::GetSearchRayEnd()
@@ -373,11 +447,11 @@ Vector2 RobotBrain::GetSearchRayEnd()
 //====================================================
 // SetToyPointers
 //
-// Gives the brain pointers to the toys that it is
+// Gives RobotBrain pointers to the toys it is
 // allowed to detect.
 //
-// The RobotBrain does NOT own these Toys.
-// Game still owns them.
+// RobotBrain does not own the Toys.
+// Game remains responsible for their lifetime.
 //====================================================
 
 void RobotBrain::SetToyPointers(std::vector<Toy*> toys)
@@ -391,35 +465,31 @@ void RobotBrain::SetToyPointers(std::vector<Toy*> toys)
 //
 // Tests the search ray against every registered Toy.
 //
-// Each Toy provides a Rectangle collision box.
+// The ray is checked against:
 //
-// The ray is tested against:
-//
-// - The inside of the rectangle
+// - The inside of the collision rectangle
 // - Top edge
 // - Right edge
 // - Bottom edge
 // - Left edge
 //
-// If the ray intersects a Toy, its name is returned.
+// Returns the name of the first Toy hit.
 //
-// If nothing is hit, an empty string is returned.
+// Returns an empty string when nothing is detected.
 //====================================================
 
 std::string RobotBrain::DetectCollision(
     Vector2 rayOrigin,
     Vector2 rayEnd)
 {
-    // Check every Toy that the brain knows about.
-
+    // Check every toy registered with the brain.
     for(Toy* toy : toys)
     {
         Rectangle box = toy->GetCollisionBox();
 
 
         // Calculate the four corners of the
-        // Toy's collision rectangle.
-
+        // collision rectangle.
         Vector2 topLeft =
         {
             box.x,
@@ -445,14 +515,14 @@ std::string RobotBrain::DetectCollision(
         };
 
 
-        // Check whether the ray intersects the
-        // collision rectangle.
+        // Check whether the search ray intersects
+        // the collision rectangle.
         //
         // The first check handles the special case
-        // where the ray origin starts inside the box.
+        // where the ray starts inside the rectangle.
         //
-        // The remaining four checks test the ray
-        // against each edge of the rectangle.
+        // The remaining checks test the ray against
+        // each edge of the rectangle.
 
         if
         (
@@ -492,13 +562,11 @@ std::string RobotBrain::DetectCollision(
         )
         {
             // Return the name of the Toy that was hit.
-
             return toy->GetName();
         }
     }
 
 
-    // Nothing was detected.
-
+    // No collision was detected.
     return "";
 }

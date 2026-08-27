@@ -6,16 +6,52 @@
 
 #include "raylib.h"
 
+
+//====================================================
+// AnimationPriority
+//
+// Determines which animations are allowed to control
+// the Animation object when another animation is
+// already playing.
+//
+// Idle animations are low priority and can be
+// interrupted by higher-priority animations such as
+// emotions.
+//====================================================
+
 enum class AnimationPriority
 {
     Idle,
     Emotion
 };
+
+
+//====================================================
+// Animation
+//
+// Controls sprite-sheet animation.
+//
+// Animation tracks the current frame, timing,
+// animation range and playback state.
+//
+// Individual sprites such as the eyes and mouth use
+// this class to control their own animations.
+//====================================================
+
 class Animation
 {
-    public:
+public:
+
+    // Create an animation with its default state.
     Animation();
 
+
+    //================================================
+    // Initialisation
+    //================================================
+
+    // Configure the animation using the dimensions
+    // and layout of the sprite sheet.
     void Initialise
     (
         int frameWidth,
@@ -25,44 +61,104 @@ class Animation
         float frameDuration
     );
 
+
+    //================================================
+    // Playback
+    //================================================
+
+    // Advance the animation based on elapsed time.
     void Update(float dt);
 
+    // Return the source rectangle for the current
+    // frame of the sprite sheet.
     Rectangle GetSourceRectangle() const;
 
+
+    // Return the dimensions of an individual frame.
     int GetFrameWidth() const;
     int GetFrameHeight() const;
 
+
+    //================================================
+    // Frame Control
+    //================================================
+
+    // Set the current animation frame directly.
     void SetFrame(int newFrame);
+
+    // Return the current animation frame.
     int GetFrame() const;
+
+    // Return the total number of frames in the
+    // sprite sheet.
     int GetTotalFrames() const;
-    
+
+    // Reset the animation back to its initial state.
     void Reset();
 
+    // Move one frame backwards or forwards.
     void PreviousFrame();
     void NextFrame();
-    
-    void Play(int startFrame, int endFrame, AnimationPriority priority);
+
+
+    //================================================
+    // Animation Sequences
+    //================================================
+
+    // Play a range of frames using the supplied
+    // animation priority.
+    //
+    // Higher-priority animations can interrupt
+    // lower-priority animations.
+    void Play(
+        int startFrame,
+        int endFrame,
+        AnimationPriority priority
+    );
+
+    // Return true while an animation sequence is playing.
     bool IsPlaying() const;
 
+    // Stop the current animation.
     void Stop();
 
+
 private:
+
+    // Current frame being displayed.
     int frame;
 
+
+    // Dimensions of an individual sprite frame.
     int frameWidth;
     int frameHeight;
 
+
+    // Total number of frames in the sprite sheet
+    // and number of columns used by the sheet.
     int totalFrames;
     int columns;
 
+
+    // Tracks elapsed time for the current frame.
+    // frameDuration determines how long each frame
+    // remains visible.
     float frameTimer;
     float frameDuration;
 
+
+    // True while an animation sequence is active.
     bool playing;
 
+
+    // First and last frames of the current animation
+    // sequence.
     int startFrame;
     int endFrame;
 
+
+    // Priority of the animation currently controlling
+    // this Animation object.
     AnimationPriority priority;
 };
 
@@ -100,6 +196,14 @@ constexpr float SCALE = 2.0f;
 =====================================
 
 #pragma once
+
+
+//====================================================
+// Emotion
+//
+// High-level emotional states used by RobotBrain
+// to control Tingo's facial expressions and behaviour.
+//====================================================
 
 enum class Emotion
 {
@@ -247,68 +351,196 @@ class Eyes : public Sprite
 #include "head/Pupils.h"
 #include "Emotion.h"
 
+
+//====================================================
+// Head
+//
+// Controls the complete robot head.
+//
+// Head owns all of the individual head components and
+// keeps them synchronised so they behave as one unit.
+//
+// Facial features such as the eyes, mouth, eyebrows
+// and pupils can animate independently while the
+// Headbase handles the main head orientation.
+//====================================================
+
 class Head
 {
-    public:
-        Head();
-        void Initialise();
-        void Shutdown();
+public:
 
-        void Update(float dt, bool speaking, Emotion emotion);
-        void Draw() const;
+    // Initialise the head's transform and idle
+    // animation state.
+    Head();
 
-        void SetPosition(Vector2 position);
-        void ApplyPosition(Vector2 position);
-        Vector2 GetPosition() const;
-        
-        void SetRotation(float rotation);
-        void ApplyRotation(float rotation);
-        float GetRotation();
 
-        void RotateLeft();
-        void RotateRight();
-        void ReturnToCentre();
-        bool IsFrontFacing() const;
+    // Load and release all head component resources.
+    void Initialise();
+    void Shutdown();
 
-        void PlayIdleHeadTransform(float dt);
-        void PlayHeadWiggle(float dt);
-        void PlayHeadBob(float dt);
 
-        void LookAt(Vector2 point);
+    // Update all head components and their animations.
+    //
+    // speaking and emotion are passed to the facial
+    // components so they can respond to the robot's
+    // current behaviour.
+    void Update(float dt, bool speaking, Emotion emotion);
 
-        void LookForward();
+    // Draw the complete head.
+    void Draw() const;
 
-    private:
-        Vector2 position;
-    
-        float rotation;
-        float scale;
-          
-        float homeRotation;
-        float headWiggleTimer;
-        float headWiggleAmplitude;
-        bool headWiggling;
-        float nextHeadWiggle;
-        float headWiggleFrequency;
 
-        Vector2 headBobOffset;
-        float headBobScale;
-        float headBobAngle;
-        float headBobDirection;
-        float randomHeadBobSignTimer;
-        float headBobRadiusX;
-        float headBobRadiusY;
-        float headBobSpeed;
-        Vector2 homePosition;
+    //================================================
+    // Position
+    //================================================
 
-        Headbase headBase;
-        Eyes eyes;
-        Antenna antenna;
-        Ears ears;
-        Eyebrows eyebrows;
-        Mouth mouth;
-        Nose nose;
-        Pupils pupils;
+    // Set the head's world position.
+    void SetPosition(Vector2 position);
+
+    // Apply a position to all head components.
+    void ApplyPosition(Vector2 position);
+
+    // Return the head's current position.
+    Vector2 GetPosition() const;
+
+
+    //================================================
+    // Rotation
+    //================================================
+
+    // Set the head's rotation.
+    void SetRotation(float rotation);
+
+    // Apply a rotation to all head components.
+    void ApplyRotation(float rotation);
+
+    // Return the current head rotation.
+    float GetRotation();
+
+
+    //================================================
+    // Head Orientation
+    //================================================
+
+    // Rotate the head one frame left or right.
+    void RotateLeft();
+    void RotateRight();
+
+    // Gradually return the head to its forward-facing
+    // position.
+    void ReturnToCentre();
+
+    // Return true when the front-facing head sprite
+    // is currently active.
+    bool IsFrontFacing() const;
+
+
+    //================================================
+    // Idle Animation
+    //================================================
+
+    // Update the combined idle head movement.
+    void PlayIdleHeadTransform(float dt);
+
+    // Play the random side-to-side head wiggle.
+    void PlayHeadWiggle(float dt);
+
+    // Play the slow, organic head bob.
+    void PlayHeadBob(float dt);
+
+
+    //================================================
+    // Eye Direction
+    //================================================
+
+    // Make the pupils look towards a specific point.
+    void LookAt(Vector2 point);
+
+    // Return the pupils to their forward-facing position.
+    void LookForward();
+
+
+private:
+
+    // Current world position of the head.
+    Vector2 position;
+
+    // Current visual rotation and scale of the head.
+    float rotation;
+    float scale;
+
+
+    //================================================
+    // Head Wiggle State
+    //================================================
+
+    // Rotation used as the head's normal resting position.
+    float homeRotation;
+
+    // Tracks the progress of the current wiggle.
+    float headWiggleTimer;
+
+    // Current strength of the wiggle.
+    float headWiggleAmplitude;
+
+    // True while a wiggle animation is active.
+    bool headWiggling;
+
+    // Time remaining before another wiggle can begin.
+    float nextHeadWiggle;
+
+    // Controls how quickly the wiggle oscillates.
+    float headWiggleFrequency;
+
+
+    //================================================
+    // Head Bob State
+    //================================================
+
+    // Current positional offset produced by the bob.
+    Vector2 headBobOffset;
+
+    // Controls the scale of the bob movement.
+    float headBobScale;
+
+    // Current position within the bob's movement cycle.
+    float headBobAngle;
+
+    // Direction of the bobbing motion.
+    float headBobDirection;
+
+    // Time remaining before the bobbing direction
+    // and movement parameters are randomised.
+    float randomHeadBobSignTimer;
+
+    // Horizontal and vertical size of the bob movement.
+    float headBobRadiusX;
+    float headBobRadiusY;
+
+    // Speed of the bobbing motion.
+    float headBobSpeed;
+
+    // Position the head returns to after applying
+    // its idle movement.
+    Vector2 homePosition;
+
+
+    //================================================
+    // Head Components
+    //================================================
+
+    // Main head sprite. Contains the different head
+    // orientations.
+    Headbase headBase;
+
+    // Independently animated facial components.
+    Eyes eyes;
+    Antenna antenna;
+    Ears ears;
+    Eyebrows eyebrows;
+    Mouth mouth;
+    Nose nose;
+    Pupils pupils;
 };
 
 
@@ -399,23 +631,61 @@ class Pupil : public Sprite
 #include "head/Pupil.h"
 #include "raylib.h"
 
+
+//====================================================
+// Pupils
+//
+// Controls both of the robot's pupils as a pair.
+//
+// Pupils can be positioned and rotated together,
+// while LookAt() and LookForward() control where
+// Tingo's eyes are looking.
+//====================================================
+
 class Pupils
 {
-    public:
-        void Initialise();
-        void Shutdown();
-        void Update(float dt);
-        void Draw() const;
-        void SetPosition(Vector2 position);
-        void SetRotation(float rotation);
-        Vector2 RotateVector(Vector2 v, float rotation);
+public:
 
-        void LookAt(Vector2 point);
-        void LookForward();
+    // Load the pupil resources.
+    void Initialise();
 
-    private:
-        Pupil leftPupil;
-        Pupil rightPupil;
+    // Release the pupil resources.
+    void Shutdown();
+
+    // Update both pupils.
+    void Update(float dt);
+
+    // Draw both pupils.
+    void Draw() const;
+
+
+    // Set the position of both pupils.
+    void SetPosition(Vector2 position);
+
+    // Set the rotation of both pupils.
+    void SetRotation(float rotation);
+
+
+    // Rotate a vector around the origin.
+    //
+    // Used when calculating pupil positions relative
+    // to the head's rotation.
+    Vector2 RotateVector(Vector2 v, float rotation);
+
+
+    // Make both pupils look towards a target point.
+    void LookAt(Vector2 point);
+
+    // Return both pupils to their normal forward-facing
+    // position.
+    void LookForward();
+
+
+private:
+
+    // The two independently rendered pupils.
+    Pupil leftPupil;
+    Pupil rightPupil;
 };
 
 
@@ -449,52 +719,108 @@ public:
 #include "RobotBrain.h"
 #include <string>
 #include "Emotion.h"
-class Robot 
+
+
+//====================================================
+// Robot
+//
+// Represents the complete TingoBingo robot.
+//
+// Robot acts as the interface between the game,
+// RobotBrain and Head. RobotBrain controls behaviour
+// while Head handles the robot's visual appearance
+// and facial animations.
+//====================================================
+
+class Robot
 {
 public:
-	
-	Robot();	
 
-	void Update(float dt);
-	void Draw() const;
-	
-	void Initialise();
-	void Shutdown();
+    // Create the robot and initialise its starting state.
+    Robot();
 
-	void SetPosition(Vector2 position);
-	
-	void RotateHeadLeft();
-	void RotateHeadRight();
-	void ReturnHeadToCentre();
 
-	void LookAt(Vector2 point);
+    // Update the robot's behaviour and visual state.
+    void Update(float dt);
 
-	Vector2 GetPosition() const;
-	Vector2 GetHeadPosition() const;
-	
-	void Speak(const std::string& text);
-	void SetSpeaking(bool state);
+    // Draw the robot.
+    void Draw() const;
 
-	void SetEmotion(Emotion emotion);
 
-	Head& GetHead();
+    // Load and release the robot's visual resources.
+    void Initialise();
+    void Shutdown();
 
-	void OnToyPickedUp(Vector2 position, std::string toyName);
-	void OnFoodPickedUp(Vector2 position, std::string foodName);
 
-	void LookForward();
+    // Set the robot's world position.
+    void SetPosition(Vector2 position);
 
-	Vector2 GetSearchRayOrigin();
-	Vector2 GetSearchRayEnd();
-	void SetToyPointers(std::vector<Toy*> toys);
+
+    // Control the head's rotation.
+    void RotateHeadLeft();
+    void RotateHeadRight();
+    void ReturnHeadToCentre();
+
+
+    // Make the robot look towards a specific point.
+    void LookAt(Vector2 point);
+
+
+    // Return the robot and head positions.
+    Vector2 GetPosition() const;
+    Vector2 GetHeadPosition() const;
+
+
+    // Send a speech request to RobotBrain and update
+    // the speaking state used by the head's animations.
+    void Speak(const std::string& text);
+    void SetSpeaking(bool state);
+
+
+    // Change the robot's emotional state.
+    void SetEmotion(Emotion emotion);
+
+
+    // Access the robot's Head object.
+    Head& GetHead();
+
+
+    // Notify RobotBrain when the robot interacts with
+    // toys or food.
+    void OnToyPickedUp(Vector2 position, std::string toyName);
+    void OnFoodPickedUp(Vector2 position, std::string foodName);
+
+
+    // Return the robot's gaze to the forward position.
+    void LookForward();
+
+
+    // Return the start and end points of RobotBrain's
+    // current search ray.
+    Vector2 GetSearchRayOrigin();
+    Vector2 GetSearchRayEnd();
+
+
+    // Give RobotBrain access to the toys currently
+    // available in the game.
+    void SetToyPointers(std::vector<Toy*> toys);
+
 
 private:
-	Vector2 position;
-	
-	Head head;
-	RobotBrain robotBrain;
 
-	bool speaking = false;
+    // Current world position of the robot.
+    Vector2 position;
+
+    // Controls the robot's visual appearance and
+    // facial animations.
+    Head head;
+
+    // Controls the robot's behaviour and state.
+    RobotBrain robotBrain;
+
+    // True while the robot is currently speaking.
+    // The Head uses this to drive mouth/face animation.
+    bool speaking = false;
 };
 
 
@@ -593,37 +919,40 @@ public:
 #pragma once
 
 #include <string>
-#include <thread>
 #include <atomic>
+#include <thread>
 #include "raylib.h"
-
 class SpeechController
 {
 public:
+    enum class State
+    {
+        Idle,
+        Generating,
+        Playing
+    };
+
     void Update();
+    
     void Speak(const std::string& text);
-    bool IsSpeaking() const;
-    bool SoundLoaded();
+    
     ~SpeechController();
 
+    bool SoundLoaded();
+
+    bool SpeechFinished();
+
 private:
+    State state = State::Idle;
 
-    std::atomic<bool> stopRequested = false;
+    std::atomic<bool> stopRequested{false};
+    std::atomic<bool> wavReady{false};
 
-    // True while speech is being generated or played.
-    std::atomic<bool> speaking = false;
-
-    // Background thread used to generate speech with Piper.
     std::thread speechThread;
 
-    // Set by the worker thread when the WAV file is ready to play.
-    std::atomic<bool> wavReady = false;
-
-    // The currently loaded speech audio.
-    Sound speech{};
-
-    // True while the speech sound is loaded into memory.
-    bool soundLoaded = false;
+    Sound speechSound{};
+    bool soundLoaded = false; 
+    bool speechFinished = true;
 };
 
 
@@ -2209,6 +2538,7 @@ bool Input::LeftMouseButtonPressed() const
 
 int main ()
 {
+	// Create the game and hand control to the main game loop.
 	Game app;
 	app.Run();
 	
@@ -2227,118 +2557,169 @@ int main ()
 #include <string>
 #include "Emotion.h"
 
+
+// Initialise the robot's brain and place the robot
+// at the centre of the screen.
 Robot::Robot() : robotBrain(*this)
 {
-	position = 
+    position =
     {
-        SCREEN_WIDTH / 2, 
+        SCREEN_WIDTH / 2,
         SCREEN_HEIGHT / 2
     };
 }
 
+
+// Update the robot's behaviour through RobotBrain,
+// then update the head using the current speech state
+// and emotional state.
 void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
     head.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
+
+// Pass a speech request to RobotBrain.
+// RobotBrain is responsible for handling the speech behaviour.
 void Robot::Speak(const std::string& text)
 {
     robotBrain.Speak(text);
 }
 
+
+// Set whether the robot is currently speaking.
+// The head uses this state to drive facial animations.
 void Robot::SetSpeaking(bool state)
 {
     speaking = state;
 }
 
+
+// Set the robot's position and move the head to the
+// same position.
 void Robot::SetPosition(Vector2 position)
 {
     this->position = position;
     head.SetPosition(position);
 }
 
+
+// Return the robot's current position.
 Vector2 Robot::GetPosition() const
 {
     return position;
 }
 
+
+// Return the current position of the robot's head.
 Vector2 Robot::GetHeadPosition() const
 {
     return head.GetPosition();
 }
 
+
+// Draw the robot.
 void Robot::Draw() const
 {
-	head.Draw();
+    head.Draw();
 }
 
+
+// Initialise the robot's head and place it at the
+// robot's starting position.
 void Robot::Initialise()
 {
     head.Initialise();
     head.SetPosition(position);
 }
 
+
+// Release the resources owned by the robot's head.
 void Robot::Shutdown()
 {
     head.Shutdown();
 }
 
+
+// Rotate the head one step to the left.
 void Robot::RotateHeadLeft()
 {
     head.RotateLeft();
 }
 
+
+// Rotate the head one step to the right.
 void Robot::RotateHeadRight()
 {
     head.RotateRight();
 }
 
+
+// Return the head to its forward-facing position.
 void Robot::ReturnHeadToCentre()
 {
     head.ReturnToCentre();
 }
 
+
+// Make the robot look towards a specific point.
 void Robot::LookAt(Vector2 point)
 {
     head.LookAt(point);
 }
 
+
+// Return a reference to the robot's Head object.
 Head& Robot::GetHead()
 {
     return head;
 }
 
+
+// Change the robot's emotional state through RobotBrain.
 void Robot::SetEmotion(Emotion emotion)
 {
     robotBrain.SetEmotion(emotion);
 }
 
+
+// Tell RobotBrain that the robot has picked up a toy.
 void Robot::OnToyPickedUp(Vector2 position, std::string toyName)
 {
     robotBrain.ToyPickedUp(position, toyName);
 }
 
+
+// Tell RobotBrain that the robot has picked up food.
 void Robot::OnFoodPickedUp(Vector2 position, std::string foodName)
 {
     robotBrain.FoodPickedUp(position, foodName);
 }
 
+
+// Make the robot return its gaze to the forward position.
 void Robot::LookForward()
 {
     head.LookForward();
 }
 
+
+// Return the origin point of RobotBrain's search ray.
 Vector2 Robot::GetSearchRayOrigin()
 {
     return robotBrain.GetSearchRayOrigin();
 }
 
+
+// Return the end point of RobotBrain's search ray.
 Vector2 Robot::GetSearchRayEnd()
 {
     return robotBrain.GetSearchRayEnd();
 }
 
+
+// Give RobotBrain access to the toys available in the game.
 void Robot::SetToyPointers(std::vector<Toy*> toys)
 {
     robotBrain.SetToyPointers(toys);
@@ -2356,6 +2737,7 @@ void Robot::SetToyPointers(std::vector<Toy*> toys)
 #include <string>
 #include "Emotion.h"
 #include <cmath>
+#include <iostream>
 
 class Robot; // Forward declaration
 
@@ -2427,6 +2809,14 @@ void RobotBrain::SetEmotion(Emotion newEmotion)
 
 void RobotBrain::Update(float dt)
 {
+    std::cout << "Brain state: "
+          << static_cast<int>(state)
+          << " | Sound loaded: "
+          << speechController.SoundLoaded()
+          << " | Speech finished: "
+          << speechController.SpeechFinished()
+          << '\n';
+
     speechController.Update();
 
 
@@ -2436,8 +2826,10 @@ void RobotBrain::Update(float dt)
     // Speech audio has started playing.
     //================================================
 
-    if (state == State::Speaking &&
-        speechController.SoundLoaded())
+    if(state == State::Speaking &&
+        speechController.SoundLoaded() &&
+        !speechController.SpeechFinished() 
+      )
     {
         robot.SetSpeaking(true);
         SetEmotion(Emotion::Happy);
@@ -2452,8 +2844,10 @@ void RobotBrain::Update(float dt)
     //================================================
 
     if (state == State::Speaking &&
-        !speechController.IsSpeaking())
+        speechController.SpeechFinished())
     {
+        std::cout << "BRAIN DETECTED SPEECH FINISHED\n";
+
         SetState(State::Idle);
 
         robot.SetSpeaking(false);
@@ -2540,7 +2934,13 @@ void RobotBrain::Update(float dt)
 
 void RobotBrain::Speak(const std::string& text)
 {
+    std::cout << "ROBOT BRAIN SPEAK CALLED\n";
     SetState(State::Speaking);
+
+    std::cout << "Brain state after SetState: "
+              << static_cast<int>(state)
+              << '\n';
+
 
     speechController.Speak(text);
 }
@@ -3512,214 +3912,181 @@ bool Speech::Speak
 .\src\SpeechController.cpp
 =====================================
 
-//====================================================
-// SpeechController.cpp
-//
-// Controls asynchronous speech generation and playback.
-//
-// Speech is generated on a background thread so the
-// main game loop can continue updating and drawing.
-//
-// Once the WAV file is ready, it is loaded and played
-// from the main thread.
-//
-// SpeechController also owns the speech worker thread
-// and makes sure it is safely joined when it is finished
-// or when the controller is destroyed.
-//====================================================
-
 #include "SpeechController.h"
 #include "Speech.h"
-#include "Input.h"
+#include <iostream>
 
 
 //====================================================
 // Update
 //
-// Runs on the main game thread.
+// Runs on the main thread.
 //
-// Handles two stages of speech:
+// Handles communication between the worker thread
+// and the Raylib audio system.
 //
-// 1. Loading and starting playback once the worker
-//    has finished generating the WAV.
-//
-// 2. Unloading the sound once playback has finished.
+// The worker thread generates the WAV file.
+// The main thread detects when it is ready and
+// handles loading and playing the audio.
 //====================================================
 
 void SpeechController::Update()
 {
-    //================================================
-    // SPEECH READY
-    //================================================
-
     // The worker thread sets wavReady to true when
-    // Piper and FFmpeg have successfully generated
-    // the final speech.wav file.
+    // Speech::Speak() has successfully generated the WAV.
     //
-    // Sound loading and playback happen on the main
-    // thread because Raylib audio functions should be
-    // handled by the main game thread.
-    if (wavReady)
+    // Because wavReady is atomic, the worker thread
+    // can safely write to it while the main thread
+    // reads it here.
+    if(wavReady)
     {
-        // Load the generated WAV file into Raylib.
-        speech = LoadSound(
-            "assets/audio/voice/speech.wav"
-        );
+        std::cout << "WAV is ready\n";
 
-        // Begin playing the generated speech.
-        PlaySound(speech);
-
-        // The WAV has now been consumed by the main
-        // thread, so clear the ready flag.
+        // Reset the flag so we don't load and play
+        // the same WAV again on the next frame.
         wavReady = false;
 
-        // Remember that the Raylib Sound is currently
-        // loaded and being used for playback.
-        soundLoaded = true;
-    }
-
-
-    //================================================
-    // SPEECH FINISHED
-    //================================================
-
-    // Once the sound has finished playing, release
-    // the Raylib audio resource.
-    if (soundLoaded && !IsSoundPlaying(speech))
-    {
-        // Free the sound from memory.
-        UnloadSound(speech);
-
-        // Speech is now completely finished.
+        // Load the generated WAV into a Raylib Sound.
         //
-        // speaking stays true while Piper/FFmpeg are
-        // generating the WAV and while the audio is
-        // playing. It becomes false only after the
-        // actual audio playback has finished.
-        speaking = false;
+        // This happens on the main thread rather than
+        // the speech worker thread.
+        speechSound = LoadSound("./assets/audio/voice/speech.wav");
 
-        // The Sound is no longer loaded.
-        soundLoaded = false;
+        soundLoaded = true;
+
+        // Start playing the generated speech.
+        PlaySound(speechSound);
+
+        // Speech generation is finished and audio
+        // playback has now started.
+        state = State::Playing;
+        speechFinished = false;
     }
-}
 
 
-//====================================================
-// SoundLoaded
-//
-// Returns true when the generated speech sound has
-// been loaded into Raylib and playback has started.
-//====================================================
+    // Check whether we are currently playing speech
+    // and Raylib has finished playing the sound.
+    //
+    // IsSoundPlaying() returns false when playback
+    // has completed.
+    if(state == State::Playing && !IsSoundPlaying(speechSound))
+    {
+        std::cout << "PLAYBACK FINISHED\n";
 
-bool SpeechController::SoundLoaded()
-{
-    return soundLoaded;
-}
+        // The audio has finished, so we no longer
+        // need the Raylib Sound object.
+        UnloadSound(speechSound);
 
+        // Keep track of the fact that the sound is
+        // no longer loaded.
+        soundLoaded = false;
 
-//====================================================
-// IsSpeaking
-//
-// Returns true while speech is somewhere in its
-// lifecycle:
-//
-//     Generating → Playing → Finished
-//
-// The flag is therefore used by RobotBrain to know
-// whether the speech request is still active.
-//====================================================
-
-bool SpeechController::IsSpeaking() const
-{
-    return speaking;
+        // The complete speech lifecycle is finished.
+        //
+        // This is important because Speak() only
+        // accepts a new request when the state is Idle.
+        state = State::Idle;
+        speechFinished = true;
+    }
 }
 
 
 //====================================================
 // Speak
 //
-// Starts asynchronous speech generation.
+// Starts a new speech request.
 //
-// The expensive Piper and FFmpeg work is performed
-// on a background thread so the main Raylib game loop
-// does not freeze while speech is being generated.
+// The actual speech generation happens on a worker
+// thread so that Piper/FFmpeg do not block the
+// main game thread.
 //====================================================
 
 void SpeechController::Speak(const std::string& text)
 {
-    //================================================
-    // PREVENT OVERLAPPING SPEECH
-    //================================================
-
-    // Ignore a new speech request if Tingo is already
-    // generating or playing speech.
-    if (speaking)
+    // Only start speech if the controller is idle.
+    //
+    // This prevents another speech worker from being
+    // created while speech is already generating or
+    // playing.
+    if (state != State::Idle)
     {
         return;
     }
 
 
-    //================================================
-    // CLEAN UP PREVIOUS WORKER
-    //================================================
-
-    // A std::thread remains "joinable" even after its
-    // function has finished executing.
+    // A previous worker thread may have already finished.
+    //
+    // IMPORTANT:
+    // A finished std::thread is still "joinable" until
+    // it has been joined or detached.
     //
     // Join the previous worker before reusing the
-    // std::thread object.
-    if (speechThread.joinable())
+    // speechThread object.
+    if(speechThread.joinable())
     {
+        // Wait for the previous worker thread to finish
+        // and cleanly join it with the main thread.
         speechThread.join();
     }
 
 
-    //================================================
-    // START NEW SPEECH
-    //================================================
-
-    // Mark speech as active BEFORE starting the worker.
+    // Tell the rest of the program that speech generation
+    // is now in progress.
     //
-    // This is important because it prevents the main
-    // thread from seeing "not speaking" during the tiny
-    // period before the worker thread starts executing.
-    speaking = true;
-
-    // A new speech request does not have a WAV ready yet.
-    wavReady = false;
+    // This also prevents another Speak() call from
+    // starting another worker.
+    state = State::Generating;
 
 
-    // Create the background worker thread.
+    // Create and start the worker thread.
+    //
+    // The lambda is the function that the worker thread
+    // will execute.
+    //
+    // [this, text] means:
+    //
+    //     this -> give the lambda access to this
+    //             SpeechController object.
+    //
+    //     text -> make a copy of the speech text for
+    //             the worker thread.
     speechThread = std::thread([this, text]()
     {
-        // Generate the speech WAV using Piper and FFmpeg.
+        std::cout << "Worker started\n";
+
+        std::cout << "Before Speech::Speak()\n";
+
+
+        // Generate the speech on the worker thread.
         //
-        // stopRequested allows Speech::Speak() to
-        // terminate the external processes if the
-        // application is shutting down.
-        bool success = Speech::Speak(
-            text,
-            stopRequested
-        );
+        // Speech::Speak() handles Piper and FFmpeg.
+        //
+        // stopRequested is shared between the main
+        // thread and worker thread and allows the
+        // controller to request that generation stops.
+        bool success = Speech::Speak(text, stopRequested);
 
 
-        //================================================
-        // SPEECH GENERATION RESULT
-        //================================================
+        std::cout << "After Speech::Speak()\n";
 
-        // If Piper and FFmpeg succeeded, notify the
-        // main thread that speech.wav is ready.
+
+        // If speech generation succeeded, tell the
+        // main thread that the WAV is ready.
+        //
+        // The worker does NOT call LoadSound() or
+        // PlaySound() itself. Those Raylib operations
+        // are handled by Update() on the main thread.
         if (success)
         {
             wavReady = true;
         }
         else
         {
-            // Generation failed or shutdown was requested.
+            // Generation failed or was cancelled.
             //
-            // There will be no WAV for the main thread
-            // to play, so mark the speech request as finished.
-            speaking = false;
+            // No WAV will be played, so return the
+            // controller to the Idle state.
+            state = State::Idle;
         }
     });
 }
@@ -3728,34 +4095,53 @@ void SpeechController::Speak(const std::string& text)
 //====================================================
 // Destructor
 //
-// Safely shuts down the speech worker.
+// Called when the SpeechController is destroyed.
 //
-// The worker may still be inside Piper or FFmpeg when
-// the application is closing.
-//
-// stopRequested tells Speech::Speak() to terminate
-// the external process it is currently monitoring.
-//
-// join() then waits for the worker to completely exit
-// before SpeechController itself is destroyed.
+// The destructor makes sure the worker thread has
+// been safely stopped and joined before the
+// SpeechController object disappears.
 //====================================================
 
 SpeechController::~SpeechController()
 {
-    // Tell the speech worker that the application is
-    // shutting down.
+    std::cout << "SpeechController destructor\n";
+
+
+    // Tell Speech::Speak() that shutdown has been
+    // requested.
+    //
+    // Speech::Speak() receives this atomic flag and
+    // periodically checks it while Piper/FFmpeg
+    // are running.
     stopRequested = true;
 
 
-    // If the worker is still running, wait for it to
-    // finish before destroying SpeechController.
-    //
-    // This prevents the worker from continuing to access
-    // SpeechController after the object has been destroyed.
+    // Check whether the std::thread still represents
+    // a thread that has not been joined or detached.
     if (speechThread.joinable())
     {
+        std::cout << "Joining speech thread\n";
+
+
+        // Wait for the worker to finish.
+        //
+        // This prevents the SpeechController from being
+        // destroyed while the worker is still using it.
         speechThread.join();
+
+
+        std::cout << "Speech thread joined\n";
     }
+}
+
+bool SpeechController::SoundLoaded()
+{
+    return soundLoaded;
+}
+
+bool SpeechController::SpeechFinished()
+{
+    return speechFinished;
 }
 
 
@@ -3864,14 +4250,24 @@ void Sprite::SetRotation(float rotation)
 #include "raylib.h"
 #include <cmath>
 
+
 int FRAME_WIDTH;
 int FRAME_HEIGHT;
 
+
+//====================================================
+// Initialise
+//
+// Loads the toy's sprite and sets up its animation,
+// transform, starting position and collision box.
+//====================================================
+
 void Toy::Initialise()
 {
+    // Start the toy at the origin.
     position = Vector2(0, 0);
 
-    // Load the Toy sprite sheet.
+    // Load the toy sprite sheet.
     texture = LoadTexture(textureFilename.c_str());
 
     // Sprite sheet layout.
@@ -3901,14 +4297,26 @@ void Toy::Initialise()
     rotation = ROTATION;
     scale = 1;
 
+    // Create a collision rectangle centred on the toy.
+    //
+    // The rectangle is used by the interaction system
+    // to determine when the toy overlaps with other objects.
     collisionBox = Rectangle
-                        (
-                            position.x - FRAME_WIDTH/2.0f, 
-                            position.y - FRAME_HEIGHT/2.0f, 
-                            FRAME_WIDTH, 
-                            FRAME_HEIGHT
-                        );
+    (
+        position.x - FRAME_WIDTH / 2.0f,
+        position.y - FRAME_HEIGHT / 2.0f,
+        FRAME_WIDTH,
+        FRAME_HEIGHT
+    );
 }
+
+
+//====================================================
+// SetTextureFilename
+//
+// Sets the path to the image that will be loaded
+// when the toy is initialised.
+//====================================================
 
 void Toy::SetTextureFilename(std::string textureFileName)
 {
@@ -3916,60 +4324,112 @@ void Toy::SetTextureFilename(std::string textureFileName)
 }
 
 
-void Toy::UpdateToy(float dt, Vector2 mousePosition, bool mousePressed)
+//====================================================
+// UpdateToy
+//
+// Updates the toy's animation, mouse interaction,
+// dragging state and collision box.
+//====================================================
+
+void Toy::UpdateToy(
+    float dt,
+    Vector2 mousePosition,
+    bool mousePressed
+)
 {
+    // Update the underlying sprite animation.
     Sprite::Update(dt);
 
+
+    // Calculate the horizontal and vertical distance
+    // between the mouse and the centre of the toy.
     float dx = abs(position.x - mousePosition.x);
     float dy = abs(position.y - mousePosition.y);
 
+
+    // The mouse must be within 40 pixels of the toy
+    // on both axes to interact with it.
     bool xInRange = dx >= 0 && dx <= 40;
     bool yInrange = dy >= 0 && dy <= 40;
 
-    if(xInRange && yInrange)
+
+    // Toggle dragging when the mouse is pressed while
+    // the cursor is within the interaction range.
+    if (xInRange && yInrange)
     {
-        if(mousePressed)
+        if (mousePressed)
         {
             dragging = !dragging;
         }
     }
 
-    if(dragging)
+
+    // While dragging, make the toy follow the mouse.
+    if (dragging)
     {
         position = mousePosition;
     }
 
-    collisionBox.x = position.x - FRAME_WIDTH/2.0f;
-    collisionBox.y = position.y - FRAME_HEIGHT/2.0f;
+
+    // Keep the collision box centred on the toy's
+    // current position after it has moved.
+    collisionBox.x =
+        position.x - FRAME_WIDTH / 2.0f;
+
+    collisionBox.y =
+        position.y - FRAME_HEIGHT / 2.0f;
 }
+
+
+//====================================================
+// IsDragging
+//
+// Returns true while the toy is currently being
+// dragged by the mouse.
+//====================================================
 
 bool Toy::IsDragging() const
 {
     return dragging;
 }
 
+
+//====================================================
+// DrawCollisionBox
+//
+// Draws the toy's collision rectangle for debugging.
+// This can be useful when tuning interaction and
+// collision behaviour.
+//====================================================
+
 void Toy::DrawCollisionBox()
 {
     DrawRectangle
-        (
-            collisionBox.x, 
-            collisionBox.y, 
-            collisionBox.width, 
-            collisionBox.height,
-            RED
-        );
+    (
+        collisionBox.x,
+        collisionBox.y,
+        collisionBox.width,
+        collisionBox.height,
+        RED
+    );
 }
 
+
+// Return the toy's current collision rectangle.
 Rectangle Toy::GetCollisionBox()
 {
     return collisionBox;
 }
 
+
+// Set the name used to identify the toy.
 void Toy::SetName(std::string name)
 {
     toyName = name;
 }
 
+
+// Return the toy's name.
 std::string Toy::GetName()
 {
     return toyName;
