@@ -2,7 +2,7 @@
 
 #include "Robot.h"
 #include "Input.h"
-#include "Toy.h"
+#include "Object.h"
 class Game
 {
 public:
@@ -20,8 +20,8 @@ private:
 	
 	Robot robot;
 	Input input;
-	Toy ball;
-	Toy banana;
+	Object ball;
+	Object banana;
 	Texture2D background;
-	std::vector<Toy*> toys; 
+	std::vector<Object*> objects; 
 };

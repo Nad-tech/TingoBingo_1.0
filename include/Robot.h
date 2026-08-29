@@ -5,6 +5,7 @@
 #include "RobotBrain.h"
 #include <string>
 #include "Emotion.h"
+#include "Object.h"
 
 
 //====================================================
@@ -73,10 +74,8 @@ public:
 
     // Notify RobotBrain when the robot interacts with
     // toys or food.
-    void OnToyPickedUp(Vector2 position, std::string toyName);
-    void OnFoodPickedUp(Vector2 position, std::string foodName);
-
-
+    void OnObjectPickedUp(Object& object);
+    
     // Return the robot's gaze to the forward position.
     void LookForward();
 
@@ -89,7 +88,7 @@ public:
 
     // Give RobotBrain access to the toys currently
     // available in the game.
-    void SetToyPointers(std::vector<Toy*> toys);
+    void SetObjectPointers(std::vector<Object*> objects);
 
 
 private:

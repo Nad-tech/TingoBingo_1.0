@@ -4,7 +4,7 @@
 #include <string>
 #include "Emotion.h"
 #include <vector>
-#include "Toy.h"
+#include "Object.h"
 #include <string>
 
 class Robot;
@@ -30,14 +30,13 @@ class RobotBrain
         void SetEmotion(Emotion newEmotion);
         Emotion GetEmotion();
         
-        void ToyPickedUp(Vector2 position, std::string toyName);
-        void FoodPickedUp(Vector2 position, std::string foodName);
+        void OnObjectPickedUp(Object& object);
         
         void Search(float dt);
         Vector2 GetSearchRayOrigin();
         Vector2 GetSearchRayEnd();
 
-        void SetToyPointers(std::vector<Toy*> toys);
+        void SetObjectPointers(std::vector<Object*> objects);
 
         std::string DetectCollision
                         (
@@ -58,5 +57,7 @@ class RobotBrain
         float searchSpeed = 1.0f;
         Vector2 searchRayOrigin = {};
         Vector2 searchRayEnd = {};
-        std::vector<Toy*> toys;
+        std::vector<Object*> objects;
+        bool reactionCoolDown = false;
+        float reactionCoolDownTimer = 0.0f;
 };

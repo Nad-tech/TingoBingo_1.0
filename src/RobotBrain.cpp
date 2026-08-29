@@ -107,20 +107,8 @@ void RobotBrain::SetEmotion(Emotion newEmotion)
 
 void RobotBrain::Update(float dt)
 {
-    // Debug information used to monitor the speech
-    // lifecycle while developing the system.
-    std::cout << "Brain state: "
-              << static_cast<int>(state)
-              << " | Sound loaded: "
-              << speechController.SoundLoaded()
-              << " | Speech finished: "
-              << speechController.SpeechFinished()
-              << '\n';
-
-
     // Update the speech system before checking its state.
     speechController.Update();
-
 
     //================================================
     // SPEAKING
@@ -158,8 +146,6 @@ void RobotBrain::Update(float dt)
     if(state == State::Speaking &&
        speechController.SpeechFinished())
     {
-        std::cout << "BRAIN DETECTED SPEECH FINISHED\n";
-
         SetState(State::Idle);
 
         robot.SetSpeaking(false);
@@ -236,6 +222,17 @@ void RobotBrain::Update(float dt)
             state = State::Idle;
         }
     }
+
+    if(reactionCoolDown)
+    {
+        reactionCoolDownTimer += dt;
+    }
+
+    if(reactionCoolDownTimer >= 10.0)
+    {
+        reactionCoolDown = false;
+        reactionCoolDownTimer = 0;
+    }
 }
 
 
@@ -255,20 +252,8 @@ void RobotBrain::Speak(const std::string& text)
     // speech has completely finished.
     if(speechController.SpeechFinished())
     {
-        // Debug message used to confirm that the brain
-        // has received a speech request.
-        std::cout << "ROBOT BRAIN SPEAK CALLED\n";
-
-
         // Tell the brain that Tingo is now handling speech.
         SetState(State::Speaking);
-
-
-        // Debug message used to confirm the state change.
-        std::cout << "Brain state after SetState: "
-                << static_cast<int>(state)
-                << '\n';
-
 
         // Pass the speech request to the SpeechController.
         speechController.Speak(text);
@@ -289,46 +274,41 @@ Emotion RobotBrain::GetEmotion()
 
 
 //====================================================
-// ToyPickedUp
+// ObjectPickedUp
 //
-// Called when a toy is picked up.
+// Called when an object is picked up.
 //
-// Currently handles the ball.
+// Currently handles a ball and a banana.
 //====================================================
 
-void RobotBrain::ToyPickedUp(Vector2 position, std::string toyName)
+void RobotBrain::OnObjectPickedUp(Object& object)
 {
-    if(toyName == "ball")
+    if(object.GetName() == "ball")
     {
         SetEmotion(Emotion::Happy);
+     
+        if(!reactionCoolDown)
+        {
+            Speak("Ha ha ha ha, lets play with the ball");
+            reactionCoolDown = true;
+        }
 
-        Speak("Ha ha ha ha, lets play with the ball");
-
-        robot.LookAt(position);
+        robot.LookAt(object.GetPosition());
     }
-}
 
-
-//====================================================
-// FoodPickedUp
-//
-// Called when food is picked up.
-//
-// Currently handles the banana.
-//====================================================
-
-void RobotBrain::FoodPickedUp(Vector2 position, std::string foodName)
-{
-    if(foodName == "banana")
+    if(object.GetName() == "banana")
     {
         SetEmotion(Emotion::Happy);
+      
+        if(!reactionCoolDown)
+        {
+            Speak("Hey! A banana.");
+            reactionCoolDown = true;
+        }
 
-        Speak("Yummy, yummy banana. Can I eat it please?");
-
-        robot.LookAt(position);
+        robot.LookAt(object.GetPosition());
     }
 }
-
 
 //====================================================
 // Search
@@ -459,9 +439,9 @@ Vector2 RobotBrain::GetSearchRayEnd()
 // Game remains responsible for their lifetime.
 //====================================================
 
-void RobotBrain::SetToyPointers(std::vector<Toy*> toys)
+void RobotBrain::SetObjectPointers(std::vector<Object*> objects)
 {
-    this->toys = toys;
+    this->objects = objects;
 }
 
 
@@ -488,9 +468,9 @@ std::string RobotBrain::DetectCollision(
     Vector2 rayEnd)
 {
     // Check every toy registered with the brain.
-    for(Toy* toy : toys)
+    for(Object* object : objects)
     {
-        Rectangle box = toy->GetCollisionBox();
+        Rectangle box = object->GetCollisionBox();
 
 
         // Calculate the four corners of the
@@ -567,7 +547,7 @@ std::string RobotBrain::DetectCollision(
         )
         {
             // Return the name of the Toy that was hit.
-            return toy->GetName();
+            return object->GetName();
         }
     }
 

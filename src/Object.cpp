@@ -1,4 +1,4 @@
-#include "Toy.h"
+#include "Object.h"
 #include "raylib.h"
 #include <cmath>
 
@@ -14,7 +14,7 @@ int FRAME_HEIGHT;
 // transform, starting position and collision box.
 //====================================================
 
-void Toy::Initialise()
+void Object::Initialise()
 {
     // Start the toy at the origin.
     position = Vector2(0, 0);
@@ -70,7 +70,7 @@ void Toy::Initialise()
 // when the toy is initialised.
 //====================================================
 
-void Toy::SetTextureFilename(std::string textureFileName)
+void Object::SetTextureFilename(std::string textureFileName)
 {
     this->textureFilename = textureFileName;
 }
@@ -83,7 +83,7 @@ void Toy::SetTextureFilename(std::string textureFileName)
 // dragging state and collision box.
 //====================================================
 
-void Toy::UpdateToy(
+void Object::UpdateObject(
     float dt,
     Vector2 mousePosition,
     bool mousePressed
@@ -111,13 +111,13 @@ void Toy::UpdateToy(
     {
         if (mousePressed)
         {
-            dragging = !dragging;
+            heldByMouse = !heldByMouse;
         }
     }
 
 
     // While dragging, make the toy follow the mouse.
-    if (dragging)
+    if (heldByMouse)
     {
         position = mousePosition;
     }
@@ -140,9 +140,9 @@ void Toy::UpdateToy(
 // dragged by the mouse.
 //====================================================
 
-bool Toy::IsDragging() const
+bool Object::IsHeldByMouse() const
 {
-    return dragging;
+    return heldByMouse;
 }
 
 
@@ -154,7 +154,7 @@ bool Toy::IsDragging() const
 // collision behaviour.
 //====================================================
 
-void Toy::DrawCollisionBox()
+void Object::DrawCollisionBox()
 {
     DrawRectangle
     (
@@ -168,21 +168,21 @@ void Toy::DrawCollisionBox()
 
 
 // Return the toy's current collision rectangle.
-Rectangle Toy::GetCollisionBox()
+Rectangle Object::GetCollisionBox()
 {
     return collisionBox;
 }
 
 
 // Set the name used to identify the toy.
-void Toy::SetName(std::string name)
+void Object::SetName(std::string name)
 {
-    toyName = name;
+    objectName = name;
 }
 
 
 // Return the toy's name.
-std::string Toy::GetName()
+std::string Object::GetName()
 {
-    return toyName;
+    return objectName;
 }

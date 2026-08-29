@@ -132,19 +132,11 @@ void Robot::SetEmotion(Emotion emotion)
 }
 
 
-// Tell RobotBrain that the robot has picked up a toy.
-void Robot::OnToyPickedUp(Vector2 position, std::string toyName)
+// Tell RobotBrain that the robot has picked up an object.
+void Robot::OnObjectPickedUp(Object& object)
 {
-    robotBrain.ToyPickedUp(position, toyName);
+    robotBrain.OnObjectPickedUp(object);
 }
-
-
-// Tell RobotBrain that the robot has picked up food.
-void Robot::OnFoodPickedUp(Vector2 position, std::string foodName)
-{
-    robotBrain.FoodPickedUp(position, foodName);
-}
-
 
 // Make the robot return its gaze to the forward position.
 void Robot::LookForward()
@@ -168,7 +160,7 @@ Vector2 Robot::GetSearchRayEnd()
 
 
 // Give RobotBrain access to the toys available in the game.
-void Robot::SetToyPointers(std::vector<Toy*> toys)
+void Robot::SetObjectPointers(std::vector<Object*> toys)
 {
-    robotBrain.SetToyPointers(toys);
+    robotBrain.SetObjectPointers(toys);
 }

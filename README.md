@@ -397,13 +397,10 @@ currently part of the active behaviour.
 
 - `Sad`, `Angry`, and `Surprised` are currently enum values only.
 - They do not yet have distinct facial animations or behaviour.
-- There is no separate `EmotionController` in the current codebase.
-  Emotion handling currently lives in `RobotBrain`.
 
 ### Object Detection
 
 - Search currently returns the first intersected toy in registration order.
-- It does not yet select the closest intersected object.
 - Search and dragging can currently trigger their callbacks repeatedly while
   the same interaction remains active. Cooldowns/debouncing are future work.
 

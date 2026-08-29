@@ -53,9 +53,9 @@ void Game::Initialise()
 	banana.SetPosition({300, 300});
 	banana.SetName("banana");
 	
-	toys = {&ball, &banana};
+	objects = {&ball, &banana};
 
-	robot.SetToyPointers(toys);
+	robot.SetObjectPointers(objects);
 
 	SetTargetFPS(TARGET_FPS);
 
@@ -92,24 +92,24 @@ void Game::HandleInput()
 // Update the game state.
 void Game::Update(const float dt)
 {
-	ball.UpdateToy(
+	ball.UpdateObject(
 			dt, input.MousePosition(),
 			input.LeftMouseButtonPressed()
 		);
 
-	banana.UpdateToy(
+	banana.UpdateObject(
 			dt, input.MousePosition(), 
 			input.LeftMouseButtonPressed()
 		);
 
-	if(banana.IsDragging())
+	if(banana.IsHeldByMouse())
 	{
-		robot.OnFoodPickedUp(banana.GetPosition(), "banana");
+		robot.OnObjectPickedUp(banana);
 	}
 	
-	if(ball.IsDragging())
+	if(ball.IsHeldByMouse())
 	{
-		robot.OnToyPickedUp(ball.GetPosition(), "ball");
+		robot.OnObjectPickedUp(ball);
 	}
 	
 	robot.Update(dt);

@@ -8,27 +8,6 @@ High priority:
   and requests speech. Search detection has the same
   repeated-trigger issue and no detection cooldown.
 
-Important functional/documentation mismatches:
-
-- The README's "mouse-controlled pupil tracking" is not
-  implemented. Mouse input controls toy dragging; no
-  current call directs pupils to the mouse.
-
-- Arrow-key head orientation is effectively non-functional:
-  Headbase is configured as a one-frame sprite sheet, so
-  left/right frame changes wrap to frame zero. Only
-  transform-based idle wiggle visibly rotates the head.
-
-- The README describes an EmotionController, but the
-  codebase has only Emotion plus emotion handling in
-  RobotBrain.
-
-- Sad, Angry, and Surprised exist only as enum values.
-  There are no distinct animations or brain behaviours
-  for them.
-
-- Search returns the first intersected toy in registration
-  order, not the closest object.
 
 
 Engineering debt:

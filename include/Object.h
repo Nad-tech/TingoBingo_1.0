@@ -4,12 +4,12 @@
 #include "Sprite.h"
 #include <string>
 
-class Toy : public Sprite
+class Object : public Sprite
 {
     public:
         void Initialise() override;
-        void UpdateToy(float dt, Vector2 mousePosition, bool mousePressed);
-        bool IsDragging() const;
+        void UpdateObject(float dt, Vector2 mousePosition, bool mousePressed);
+        bool IsHeldByMouse() const;
         void SetTextureFilename(std::string textureFilename);
         void DrawCollisionBox();
         Rectangle GetCollisionBox();
@@ -17,8 +17,8 @@ class Toy : public Sprite
         std::string GetName();
 
     private:
-        bool dragging = false;
+        bool heldByMouse = false;
         std::string textureFilename;
         Rectangle collisionBox;
-        std::string toyName = "notSet";
+        std::string objectName = "notSet";
 };
