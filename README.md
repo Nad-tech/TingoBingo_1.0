@@ -1,706 +1,566 @@
-**# TingoBingo**
+# 🤖 TingoBingo
 
-TingoBingo is a modular C++20/Raylib virtual cardboard robot.
+**An interactive cardboard robot built with C++20 and Raylib.**
 
-The project started as a simple animated robot and is gradually becoming
+TingoBingo is an ongoing project to build a virtual interactive robot with its own behaviour, emotions, facial animation, speech, object interaction and eventually more autonomous decision-making.
 
-a small interactive character with its own behaviour, emotions, facial
+The project is deliberately modular. The robot's behaviour, head, facial features, animation, speech and objects are separate systems that communicate with each other.
 
-animation, speech, object interaction, and eventually more autonomous
+---
 
-behaviour.
+## Current Status
 
-The goal is not to build a generic game framework. The goal is to build
+🚧 **Active development**
+
+The core robot, animation system, speech system, object interaction and autonomous searching behaviour are currently being developed and expanded.
+
+---
+
+# ✨ Current Features
+
+## 🤖 Robot
+
+* Cardboard-style robot character.
+* Modular robot architecture.
+* Independent head and facial components.
+* Head rotation using sprite-sheet frames.
+* Automatic return to the forward-facing position.
+* Pupil tracking.
+* Looking at specific world positions.
+* Speaking state.
+* Emotional states.
 
-**\*\*Tingo\*\*** --- a character whose systems work together to make him feel
+---
+
+## 🧠 RobotBrain
+
+`RobotBrain` is Tingo's high-level behaviour coordinator.
+
+It decides what Tingo should be doing and communicates with the other systems responsible for actually performing those actions.
 
-alive.
+### Current Behaviour States
+
+```text
+                 ┌───────────┐
+                 │   IDLE    │
+                 └─────┬─────┘
+                       │
+                   10 seconds
+                       │
+                       ▼
+               ┌───────────────┐
+               │   SEARCHING   │
+               └───────┬───────┘
+                       │
+                 object detected
+                       │
+                       ▼
+               ┌───────────────┐
+               │   REACTING    │
+               └───────┬───────┘
+                       │
+                reaction complete
+                       │
+                       ▼
+                 ┌───────────┐
+                 │   IDLE    │
+                 └───────────┘
+```
 
-**------------------------------------------------------------------------**
+Current states:
 
-**## Current Features**
+* `Idle`
+* `Searching`
+* `Reacting`
 
-**### Robot Architecture**
+RobotBrain also manages:
 
-Tingo is split into several cooperating systems:
+* Emotions.
+* Speech requests.
+* Object interactions.
+* Object detection.
+* Search behaviour.
+* Reaction cooldowns.
+* Behaviour timers.
 
-\-   \`Robot\` --- the main interface for the robot.
+---
 
-\-   \`RobotBrain\` --- controls behaviour and high-level state.
+# 👁️ Searching & Object Detection
 
-\-   \`Head\` --- coordinates the visual components of the head.
+Tingo can autonomously search his environment for registered objects.
 
-\-   \`Animation\` --- provides reusable sprite-sheet animation.
+After remaining idle for 10 seconds, Tingo enters `Searching`.
 
-\-   \`Emotion\` --- defines Tingo's high-level emotional states.
+During searching:
 
-\-   \`SpeechController\` --- manages asynchronous speech generation and
+1. The search angle continuously changes.
+2. The angle is converted into a 2D direction vector.
+3. A 300-pixel search ray is projected from Tingo's head.
+4. Tingo's pupils look along the same direction as the ray.
+5. The ray is tested against registered object collision rectangles.
+6. The first object intersected by the ray becomes the detected object.
+7. Tingo stops searching and enters `Reacting`.
+
+```text
+             Search Angle
+                  │
+                  ▼
+            Direction Vector
+                  │
+          ┌───────┴────────┐
+          ▼                ▼
+       Eye Gaze         Search Ray
+                             │
+                             ▼
+                    Collision Testing
+                             │
+                       Object Found
+                             │
+                             ▼
+                         Reacting
+```
+
+The visual gaze and collision ray use the **same direction**, keeping what Tingo is looking at synchronised with what he is actually detecting.
+
+### Current Detectable Objects
+
+* 🟡 Ball
+* 🍌 Banana
+
+When an object is detected, Tingo can:
+
+* Look directly at it.
+* Change emotion.
+* Remain focused on it.
+* Deliver an object-specific speech reaction.
+
+The collision system tests the search ray against the object's complete rectangular boundary:
+
+```text
+       Top
+   ┌───────────┐
+   │           │
+Left│  Object   │Right
+   │           │
+   └───────────┘
+      Bottom
+```
 
-    playback.
+The system also handles the case where the ray begins inside the collision rectangle.
 
-\-   \`Speech\` --- handles Piper and FFmpeg speech generation.
+---
 
-\-   \`Toy\` --- provides interactive objects that Tingo can pick up and
+# 🖱️ Object Interaction
 
-    manipulate.
+Objects can be picked up and moved using the mouse.
 
-The general relationship is:
+The interaction system distinguishes between two types of object references:
+
+```text
+targetObject
+    │
+    └── Object currently being held/interacted with
+
+
+detectedObject
+    │
+    └── Object found by the autonomous search system
+```
+
+When an object is held:
+
+* Tingo looks at it.
+* Tingo enters `Reacting`.
+* Object-specific reactions can occur.
+* Speech can be triggered.
+* A reaction cooldown prevents repeated responses.
+
+---
+
+# 🗣️ Speech
+
+Speech is handled by `SpeechController` rather than directly by the robot.
+
+### Speech Pipeline
 
-\`\`\` text
+```text
+             Speech Request
+                    │
+                    ▼
+              RobotBrain
+                    │
+                    ▼
+           SpeechController
+                    │
+                    ▼
+              Generating
+                    │
+              Piper / FFmpeg
+                    │
+                    ▼
+                WAV Ready
+                    │
+                    ▼
+                Playing
+                    │
+                 Raylib
+                    │
+                    ▼
+                  Idle
+```
+
+Speech generation runs on a worker thread so that Piper/FFmpeg processing does not block the main game loop.
 
-                    Robot
+Raylib audio operations are handled on the main thread.
 
-                   /     \\
+The speech controller currently distinguishes between:
 
-                  /       \\
+* `Idle`
+* `Generating`
+* `Playing`
 
-         RobotBrain       Head
+This separation prevents speech generation from being confused with actual audio playback.
 
-             |              |
+---
 
-        Behaviour       Facial features
+# ❤️ Emotions
 
-             |              |
+Current emotional states:
 
-          Speech       Eyes / Mouth /
+* `Neutral`
+* `Happy`
+* `Sad`
+* `Angry`
+* `Surprised`
 
-                       Eyebrows / Pupils /
+Currently implemented behaviour primarily uses:
 
-                       Nose / Ears / Antenna
+* Neutral
+* Happy
 
-\`\`\`
+Emotions can affect Tingo's facial animation and behaviour.
 
-\`Robot\` acts as the bridge between the behaviour system and the visual
+---
 
-system.
+# 🎭 Facial Animation
+
+Tingo's head is constructed from independently controlled components.
+
+```text
+                    HEAD
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+     HeadBase       Face        Movement
+        │             │             │
+        │       ┌─────┼─────┐       │
+        │       │     │     │       │
+        │     Eyes  Mouth  Brows    │
+        │       │           │       │
+        │     Pupils        │       │
+        │                   │       │
+        └──── Ears / Nose / Antenna┘
+```
+
+Current components:
+
+* Head base.
+* Eyes.
+* Pupils.
+* Eyebrows.
+* Mouth.
+* Nose.
+* Ears.
+* Antenna.
+
+When the head is facing forward, the facial components are rendered independently.
+
+When the head is rotated, the head-base artwork is rendered on its own because the facial features are already included in the rotated head artwork.
+
+---
+
+# 🎞️ Animation System
+
+The project contains a reusable `Animation` class for sprite-sheet animation.
+
+It supports:
+
+* Sprite-sheet frame animation.
+* Configurable frame duration.
+* Animation ranges.
+* Play/stop control.
+* Direct frame control.
+* Previous/next frame movement.
+* Animation priorities.
+* Idle animations.
+* Emotion animations.
+
+Current priorities:
+
+```text
+Emotion
+   ▲
+   │
+   │ higher priority
+   │
+Idle
+```
 
-**------------------------------------------------------------------------**
+This allows an emotional animation to take control over a lower-priority idle animation.
 
-**## Behaviour**
+---
 
-\`RobotBrain\` uses a high-level state system to control what Tingo is
+# 😴 Idle Behaviour
 
-doing.
+Tingo has several independent idle behaviours designed to make the robot feel less mechanical.
 
-Current behaviour includes states for:
+Current idle animations include:
 
-\-   Idle
+* 👀 Eye blinking.
+* 👂 Ear movement.
+* 📡 Antenna movement.
+* 🤨 Eyebrow movement.
+* 👃 Nose movement.
+* 🤖 Head bobbing.
+* ↔️ Head wiggling.
 
-\-   Speaking
+Many of these behaviours use randomised timing so that they do not repeat at exactly the same intervals.
 
-\-   Happy
+---
 
-\-   Sad
+# 🏗️ Architecture
 
-\-   Angry
+The current high-level structure is:
 
-\-   Surprised
+```text
+Game
+ │
+ ├── Robot
+ │    │
+ │    ├── RobotBrain
+ │    │    │
+ │    │    ├── Behaviour
+ │    │    ├── Emotions
+ │    │    ├── Searching
+ │    │    ├── Object Detection
+ │    │    └── SpeechController
+ │    │
+ │    └── Head
+ │         │
+ │         ├── HeadBase
+ │         ├── Eyes
+ │         ├── Pupils
+ │         ├── Eyebrows
+ │         ├── Mouth
+ │         ├── Nose
+ │         ├── Ears
+ │         └── Antenna
+ │
+ └── Objects
+      │
+      ├── Ball
+      └── Banana
+```
 
-\-   Searching
+### Game
 
-\-   Interaction
+Controls the main application loop:
 
-The intention is for \`RobotBrain\` to become the central place where
+```text
+Initialise
+    ↓
+HandleInput
+    ↓
+Update
+    ↓
+Draw
+    ↓
+Repeat
+    ↓
+Shutdown
+```
 
-Tingo's behaviour is decided, while the lower-level systems remain
+### Robot
 
-responsible for carrying out that behaviour.
+Acts as the interface between `Game`, `RobotBrain` and `Head`.
 
-**------------------------------------------------------------------------**
+### RobotBrain
 
-**## Head and Facial Animation**
+Controls high-level behaviour and decisions.
 
-The head is composed of independently controlled visual components:
+### Head
 
-\-   Head base
+Coordinates the robot's visual head and facial components.
 
-\-   Eyes
+### Sprite
 
-\-   Mouth
+Provides common functionality for drawable and animated sprites.
 
-\-   Eyebrows
+### Object
 
-\-   Pupils
+Represents interactive objects that can be manipulated and detected.
 
-\-   Nose
+### SpeechController
 
-\-   Ears
+Manages speech generation and audio playback.
 
-\-   Antenna
+---
 
-This allows Tingo's facial features to animate independently rather than
+# 📁 Project Structure
 
-requiring every facial expression to be baked into a single sprite.
-
-For example:
-
-\`\`\` text
-
-Head rotation
-
-      +
-
-Eye animation
-
-      +
-
-Mouth animation
-
-      +
-
-Eyebrow animation
-
-      +
-
-Pupil movement
-
-      =
-
-Tingo's current expression
-
-\`\`\`
-
-When the head is facing forward, the facial components can be animated
-
-independently.
-
-During head rotation, the rotated head artwork provides the appropriate
-
-head appearance.
-
-**------------------------------------------------------------------------**
-
-**## Animation System**
-
-The project uses a reusable \`Animation\` class for sprite-sheet
-
-animation.
-
-Animations track:
-
-\-   Current frame
-
-\-   Frame dimensions
-
-\-   Frame timing
-
-\-   Start and end frames
-
-\-   Playback state
-
-\-   Animation priority
-
-Two animation priorities currently exist:
-
-\`\`\` cpp
-
-AnimationPriority::Idle
-
-AnimationPriority::Emotion
-
-\`\`\`
-
-This allows more important animations to interrupt lower-priority idle
-
-animations.
-
-For example:
-
-\`\`\` text
-
-Idle blink
-
-     ↓
-
-Emotion animation starts
-
-     ↓
-
-Emotion takes priority
-
-     ↓
-
-Emotion finishes
-
-     ↓
-
-Idle behaviour continues
-
-\`\`\`
-
-**------------------------------------------------------------------------**
-
-**## Emotion System**
-
-Tingo currently has the following high-level emotions:
-
-\`\`\` cpp
-
-Neutral
-
-Happy
-
-Sad
-
-Angry
-
-Surprised
-
-\`\`\`
-
-Emotions are represented separately from the individual facial
-
-animations.
-
-\`RobotBrain\` decides Tingo's emotional state, while the head and facial
-
-components use that state to determine how Tingo looks.
-
-This separation allows behaviour and presentation to evolve
-
-independently.
-
-**------------------------------------------------------------------------**
-
-**## Speech**
-
-Tingo can generate and play speech asynchronously.
-
-The speech pipeline is:
-
-\`\`\` text
-
-RobotBrain
-
-     ↓
-
-SpeechController
-
-     ↓
-
-Background worker thread
-
-     ↓
-
-Speech
-
-     ↓
-
-Piper
-
-     ↓
-
-speech\_raw\.wav
-
-     ↓
-
-FFmpeg
-
-     ↓
-
-speech.wav
-
-     ↓
-
-Main game thread
-
-     ↓
-
-Raylib playback
-
-\`\`\`
-
-**### Why speech is asynchronous**
-
-Piper and FFmpeg can take noticeable amounts of time to generate audio.
-
-They therefore run on a background thread so that the main Raylib loop
-
-can continue updating and drawing Tingo.
-
-The speech lifecycle is separated into distinct stages:
-
-\`\`\` text
-
-Generating
-
-    ↓
-
-WAV Ready
-
-    ↓
-
-Playing
-
-    ↓
-
-Finished
-
-\`\`\`
-
-\`SpeechController\` owns the worker thread and coordinates the hand-off
-
-between background speech generation and main-thread audio playback.
-
-The speech worker is joinable and supports shutdown through an atomic
-
-cancellation flag.
-
-**------------------------------------------------------------------------**
-
-**## Interaction**
-
-Tingo can interact with objects in the game world.
-
-The current toy system supports:
-
-\-   Loading toy sprites
-
-\-   Positioning toys
-
-\-   Mouse interaction
-
-\-   Dragging
-
-\-   Collision rectangles
-
-\-   Identifying toys by name
-
-The intention is for this system to become the foundation for more
-
-interesting object interaction.
-
-Eventually Tingo should be able to recognise an object, react to it, and
-
-incorporate it into his behaviour rather than simply treating it as a
-
-drawable object.
-
-**------------------------------------------------------------------------**
-
-**## Current Limitations
-
-The following items are known limitations of the current implementation.
-Related code may still exist in the project, but these features are not
-currently part of the active behaviour.
-
-### Input and Head Orientation
-
-- Mouse input currently controls toy dragging rather than pupil tracking.
-- Arrow-key head orientation is not currently functional as an active feature.
-  The current Headbase setup uses a one-frame sprite configuration, so
-  left/right frame changes do not provide the intended head rotation.
-- Transform-based idle head movement is currently the visible form of head
-  rotation.
-
-### Emotions
-
-- `Sad`, `Angry`, and `Surprised` are currently enum values only.
-- They do not yet have distinct facial animations or behaviour.
-
-### Object Detection
-
-- Search currently returns the first intersected toy in registration order.
-- Search and dragging can currently trigger their callbacks repeatedly while
-  the same interaction remains active. Cooldowns/debouncing are future work.
-
-### Speech
-
-- The speech lifecycle is separated into generation and playback, but further
-  lifecycle and cancellation hardening remains part of ongoing development.
-
-------------------------------------------------------------------------
-
-## Project Structure**
-
-The project is organised roughly as follows:
-
-\`\`\` text
-
+```text
 TingoBingo/
-
+│
 ├── assets/
-
-│   ├── audio/
-
-│   └── images/
-
+│   └── images/
 │
-
 ├── include/
-
-│   ├── head/
-
-│   └── ...
-
+│   ├── Animation.h
+│   ├── Constants.h
+│   ├── Emotion.h
+│   ├── Game.h
+│   ├── Input.h
+│   ├── Object.h
+│   ├── Robot.h
+│   ├── RobotBrain.h
+│   ├── Speech.h
+│   ├── SpeechController.h
+│   ├── Sprite.h
+│   └── head/
 │
-
 ├── src/
-
-│   ├── head/
-
-│   ├── Animation.cpp
-
-│   ├── Game.cpp
-
-│   ├── Input.cpp
-
-│   ├── Robot.cpp
-
-│   ├── RobotBrain.cpp
-
-│   ├── Speech.cpp
-
-│   ├── SpeechController.cpp
-
-│   ├── Sprite.cpp
-
-│   ├── Toy.cpp
-
-│   └── main.cpp
-
+│   ├── Animation.cpp
+│   ├── Game.cpp
+│   ├── Robot.cpp
+│   ├── RobotBrain.cpp
+│   ├── Speech.cpp
+│   ├── SpeechController.cpp
+│   ├── Sprite.cpp
+│   └── head/
 │
-
-├── tools/
-
-│   ├── piper/
-
-│   └── ffmpeg/
-
+├── utilities/
 │
+└── build/
+```
 
-├── build/
+---
 
-│
+# 🛠️ Technologies
 
-└── scripts/
+* **C++20**
+* **Raylib**
+* **Piper**
+* **FFmpeg**
+* **MSYS2 / MinGW**
+* **Visual Studio Code**
+* **Git**
 
-\`\`\`
+---
 
-**------------------------------------------------------------------------**
+# 🔮 Future Ideas
 
-**## Technology**
+These are planned ideas, not currently implemented features.
 
-TingoBingo is currently built with:
+## Behaviour
+
+* Expand RobotBrain behaviour states.
+* More autonomous behaviour.
+* Behaviour priorities.
+* More complex behaviour sequences.
+* More object-specific reactions.
+* Better separation between temporary reactions and long-running behaviour.
 
-\-   **\*\*C++20\*\***
+## 👁️ Vision
 
-\-   **\*\*Raylib\*\***
+* More detectable objects.
+* More sophisticated object detection.
+* Object recognition.
+* Improved search behaviour.
+* Interaction with objects beyond pickup and detection.
 
-\-   **\*\*MinGW / MSYS2\*\***
+## 🗣️ Voice
 
-\-   **\*\*VS Code\*\***
+* More speech reactions.
+* Speech driven by behaviour.
+* Speech recognition.
+* Voice commands.
+* Two-way voice interaction.
+* Improved speech cancellation and lifecycle handling.
 
-\-   **\*\*Piper\*\*** for text-to-speech generation
+## ❤️ Emotions
 
-\-   **\*\*FFmpeg\*\*** for speech processing
+* Fully implement Sad, Angry and Surprised.
+* Emotion transitions.
+* More expressive facial animations.
+* Emotion-driven behaviour.
+* Combining emotion, speech and interaction.
 
-The project is currently developed on Windows.
+## 🎭 Animation
 
-**------------------------------------------------------------------------**
+* More facial expressions.
+* More eye animations.
+* More mouth animations.
+* More eyebrow expressions.
+* More coordinated animations.
+* Improved animation blending and priorities.
 
-**## Design Philosophy**
+## 🧠 Personality
 
-The project is intentionally modular.
+The longer-term goal is for Tingo's personality to emerge from his behaviour rather than simply playing predefined responses.
 
-Systems should have clear responsibilities rather than one enormous
+Possible systems:
 
-\`Robot\` class containing everything.
+* Memory of previous interactions.
+* Context-dependent reactions.
+* Repeated-interaction responses.
+* More unpredictable behaviour.
+* Personality traits affecting decisions.
 
-For example:
+## 🎮 Activities
 
-\`\`\` text
+Possible future interactive features:
 
-Robot
+* Mini-games.
+* Learning activities.
+* Music interaction.
+* Dancing.
+* Guitar interaction.
+* More interactive toys.
 
-  → coordinates the robot
+## 🤖 AI / Behaviour Systems
 
-RobotBrain
+Longer-term possibilities include:
 
-  → decides what the robot should do
+* Memory systems.
+* Behaviour trees.
+* Context-aware decision making.
+* More autonomous decision making.
+* Object recognition.
+* AI-assisted conversation.
 
-Head
+---
 
-  → controls the robot's appearance
-
-Animation
-
-  → controls sprite animation
-
-SpeechController
-
-  → manages speech lifecycle
-
-Speech
-
-  → handles speech generation
-
-Toy
-
-  → represents interactive objects
-
-\`\`\`
-
-The aim is to keep these systems independent enough that they can be
-
-improved individually without rewriting the entire robot.
-
-**------------------------------------------------------------------------**
-
-**## Current Development Direction**
-
-The immediate goal is to continue making Tingo feel alive rather than
-
-simply adding isolated features.
-
-Planned areas include:
-
-**### Behaviour**
-
-\-   More autonomous idle behaviour
-
-\-   Better state transitions
-
-\-   Behaviour trees
-
-\-   Context-aware behaviour
-
-\-   More meaningful reactions to the environment
-
-**### Interaction**
-
-\-   More interactive objects
-
-\-   Object recognition
-
-\-   Picking up and using objects
-
-\-   Reactions to different objects
-
-\-   More sophisticated interaction sequences
-
-**### Vision**
-
-\-   Detecting objects in the environment
-
-\-   Understanding what Tingo is looking at
-
-\-   Using visual information as input to behaviour
-
-**### Memory**
-
-\-   Remembering interactions
-
-\-   Short-term contextual memory
-
-\-   Longer-term character memory
-
-**### Voice**
-
-\-   Speech recognition
-
-\-   Speech-to-text
-
-\-   Conversational interaction
-
-\-   More expressive speech behaviour
-
-**### Character**
-
-\-   More emotions
-
-\-   More facial expressions
-
-\-   Dancing
-
-\-   Music
-
-\-   Guitar-related behaviours
-
-\-   Mini-games
-
-\-   Customisation
-
-**### Learning**
-
-\-   Educational activities
-
-\-   Simple learning games
-
-\-   Interactive exercises
-
-**------------------------------------------------------------------------**
-
-**## Long-Term Goal**
-
-The long-term goal is for TingoBingo to become more than a collection of
-
-animations and scripted reactions.
-
-The intended progression is:
-
-\`\`\` text
-
-Animated robot
-
-      ↓
-
-Interactive robot
-
-      ↓
-
-Reactive robot
-
-      ↓
-
-Behaviour-driven robot
-
-      ↓
-
-Context-aware robot
-
-      ↓
-
-Character
-
-\`\`\`
-
-Tingo should eventually be able to observe what is happening, decide how
-
-he feels about it, choose an appropriate behaviour, and express that
-
-behaviour through movement, facial expression, interaction, and speech.
-
-**------------------------------------------------------------------------**
-
-**## Development Approach**
-
-TingoBingo is being developed incrementally.
-
-New systems are introduced in small pieces and tested before moving on
-
-to the next layer.
-
-The project deliberately favours understanding the underlying C++ and
-
-system architecture over hiding complexity behind large frameworks.
-
-When a system becomes complicated, the goal is to understand **\*\*why\*\*** it
-
-is complicated and then simplify its responsibilities where possible.
-
-**------------------------------------------------------------------------**
-
-**## Status**
-
-TingoBingo is an active development project.
-
-The core robot, head animation, emotion system, interaction foundations,
-
-and asynchronous speech pipeline are working foundations for the next
-
-stage of development.
-
-The project is still evolving rapidly, so this README describes the
-
-current architecture and direction rather than a finished product.
+# 🎯 Long-Term Goal
+
+The long-term goal of TingoBingo is to turn a simple Raylib robot into an interactive character with:
+
+```text
+          ┌──────────────────┐
+          │     TingoBingo   │
+          └────────┬─────────┘
+                   │
+       ┌───────────┼───────────┐
+       │           │           │
+   Behaviour    Perception   Interaction
+       │           │           │
+       ├───────┬───┴───────┬───┤
+       │       │           │   │
+    Emotion  Vision      Speech Memory
+       │       │           │   │
+       └───────┴───────────┴───┘
+                   │
+                   ▼
+              Personality
+```
+
+The project will continue to be developed incrementally, with each major system kept modular and understandable before adding more complexity.
