@@ -15,8 +15,8 @@ class RobotBrain
         enum class State
         {
             Idle,
-            Speaking,
-            Searching
+            Searching,
+            Reacting
         };
 
         RobotBrain(Robot& robot);
@@ -38,7 +38,7 @@ class RobotBrain
 
         void SetObjectPointers(std::vector<Object*> objects);
 
-        std::string DetectCollision
+        Object* DetectCollision
                         (
                             Vector2 rayOrigin, 
                             Vector2 rayEnd
@@ -60,4 +60,7 @@ class RobotBrain
         std::vector<Object*> objects;
         bool reactionCoolDown = false;
         float reactionCoolDownTimer = 0.0f;
+        Object* targetObject;
+        Object* detectedObject;
+        float detectedTimer = 0.0f;
 };
