@@ -42,9 +42,6 @@ void SpeechController::Update()
 
     if(wavReady)
     {
-        std::cout << "WAV is ready\n";
-
-
         // Reset the flag so the same WAV is not
         // loaded and played again on the next frame.
         wavReady = false;
@@ -91,9 +88,6 @@ void SpeechController::Update()
     if(state == State::Playing &&
        !IsSoundPlaying(speechSound))
     {
-        std::cout << "PLAYBACK FINISHED\n";
-
-
         // The audio has finished playing, so the
         // Raylib Sound resource can now be released.
         UnloadSound(speechSound);
@@ -211,11 +205,6 @@ void SpeechController::Speak(const std::string& text)
     //     worker has its own copy to use.
     speechThread = std::thread([this, text]()
     {
-        std::cout << "Worker started\n";
-
-        std::cout << "Before Speech::Speak()\n";
-
-
         //================================================
         // GENERATE SPEECH
         //
@@ -229,10 +218,6 @@ void SpeechController::Speak(const std::string& text)
 
         bool success =
             Speech::GenerateSpeech(text, stopRequested);
-
-
-        std::cout << "After Speech::Speak()\n";
-
 
         //================================================
         // GENERATION RESULT
@@ -269,9 +254,6 @@ void SpeechController::Speak(const std::string& text)
 
 SpeechController::~SpeechController()
 {
-    std::cout << "SpeechController destructor\n";
-
-
     //================================================
     // REQUEST WORKER SHUTDOWN
     //================================================
@@ -292,18 +274,12 @@ SpeechController::~SpeechController()
     // to be joined.
     if (speechThread.joinable())
     {
-        std::cout << "Joining speech thread\n";
-
-
         // Wait for the worker to finish before
         // destroying the SpeechController.
         //
         // This prevents the worker from accessing
         // the controller after it has been destroyed.
         speechThread.join();
-
-
-        std::cout << "Speech thread joined\n";
     }
 }
 

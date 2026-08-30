@@ -640,8 +640,6 @@ bool Speech::GenerateSpeech
     // SUCCESS
     //================================================
 
-    std::cout
-        << "Speech generation completed successfully.\n";
 
     return true;
 }

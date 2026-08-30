@@ -6,6 +6,7 @@
 #include <string>
 #include "Emotion.h"
 #include "Object.h"
+#include "SfxController.h"
 
 
 //====================================================
@@ -90,6 +91,7 @@ public:
     // available in the game.
     void SetObjectPointers(std::vector<Object*> objects);
 
+    void PlaySfx(std::string sound);
 
 private:
 
@@ -106,4 +108,6 @@ private:
     // True while the robot is currently speaking.
     // The Head uses this to drive mouth/face animation.
     bool speaking = false;
+
+    SfxController sfxController;
 };

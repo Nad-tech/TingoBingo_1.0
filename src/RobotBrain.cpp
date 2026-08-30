@@ -855,6 +855,7 @@ void RobotBrain::Search(float dt)
 
         if(detectedObject->GetName() == "banana")
         {
+            robot.PlaySfx("boing");
             Speak("I found a banana");
         }
 
@@ -868,6 +869,7 @@ void RobotBrain::Search(float dt)
 
         if(detectedObject->GetName() == "ball")
         {
+            robot.PlaySfx("boing");
             Speak("I found a ball");
         }
     }

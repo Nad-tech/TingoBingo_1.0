@@ -1,9 +1,0 @@
-3. Known issues / bugs
-
-Engineering debt:
- 
-  Speech is a thin static utility rather than a
-  resource-owning service.
-
-- Resource-loading and TTS/audio failures are not checked
-  or surfaced.

@@ -4,6 +4,7 @@
 #include "RobotBrain.h"
 #include <string>
 #include "Emotion.h"
+#include "SfxController.h"
 
 
 // Initialise the robot's brain and place the robot
@@ -80,6 +81,7 @@ void Robot::Initialise()
 {
     head.Initialise();
     head.SetPosition(position);
+    sfxController.Initialise();
 }
 
 
@@ -87,6 +89,7 @@ void Robot::Initialise()
 void Robot::Shutdown()
 {
     head.Shutdown();
+    sfxController.Shutdown();
 }
 
 
@@ -163,4 +166,9 @@ Vector2 Robot::GetSearchRayEnd()
 void Robot::SetObjectPointers(std::vector<Object*> toys)
 {
     robotBrain.SetObjectPointers(toys);
+}
+
+void Robot::PlaySfx(std::string sound)
+{
+    sfxController.PlaySfx(sound);
 }
