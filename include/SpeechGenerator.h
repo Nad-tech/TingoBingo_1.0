@@ -6,7 +6,7 @@
 class Speech
 {
 public:
-    static bool Speak
+    static bool GenerateSpeech
     (
         const std::string& text,  
         const std::atomic<bool>& stopRequested

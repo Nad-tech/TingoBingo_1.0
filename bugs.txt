@@ -1,16 +1,7 @@
 3. Known issues / bugs
 
 Engineering debt:
-
-- Pupils.cpp uses file-global state, explicitly noted in
-  its own comment; multiple robot instances would share
-  eye position and offsets.
-
-- Toy.cpp likewise uses shared global frame dimensions,
-  so toys with different image sizes would interfere
-  with each other's collision sizing.
-
-- 
+ 
   Speech is a thin static utility rather than a
   resource-owning service.
 

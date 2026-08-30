@@ -18,7 +18,7 @@
 // depend on a specific developer's machine path.
 //====================================================
 
-#include "Speech.h"
+#include "SpeechGenerator.h"
 
 #include <filesystem>
 #include <iostream>
@@ -65,7 +65,7 @@ static void CloseProcessHandles(PROCESS_INFORMATION& process)
 //             requested.
 //====================================================
 
-bool Speech::Speak
+bool Speech::GenerateSpeech
 (
     const std::string& text,
     const std::atomic<bool>& stopRequested

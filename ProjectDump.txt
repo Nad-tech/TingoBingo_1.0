@@ -182,13 +182,12 @@ private:
 
 constexpr int SCREEN_WIDTH = 700;
 constexpr int SCREEN_HEIGHT = 700;
-constexpr char WINDOW_TITLE[] = "TingoBingo";
+constexpr char WINDOW_TITLE[] = "Tingo Bingo";
 constexpr int TARGET_FPS = 60;
 
 constexpr int ROBOT_WIDTH = 256;
 constexpr int ROBOT_HEIGHT = 256;
 constexpr float SCALE = 2.0f;
-
 
 
 =====================================
@@ -680,12 +679,23 @@ public:
     // position.
     void LookForward();
 
-
 private:
-
     // The two independently rendered pupils.
     Pupil leftPupil;
     Pupil rightPupil;
+
+    // Maximum distance a pupil can move from the centre of the eye.
+    const float LOOK_DISTANCE = 15.0f;
+
+    Vector2 leftEyeOffset  = {-67.0f, 21.0f};
+    Vector2 rightEyeOffset = { 81.0f, 21.0f};
+
+    // Current position of the head in world space.
+    Vector2 headPosition = {0, 0};
+
+    // Current look offsets applied to each pupil.
+    Vector2 leftLookOffset  = {0.0f, 0.0f};
+    Vector2 rightLookOffset = {0.0f, 0.0f};
 };
 
 
@@ -735,6 +745,9 @@ class Object : public Sprite
         std::string textureFilename;
         Rectangle collisionBox;
         std::string objectName = "notSet";
+        int FRAME_WIDTH;
+        int FRAME_HEIGHT;
+
 };
 
 
@@ -908,7 +921,6 @@ class RobotBrain
         State state;
         SpeechController speechController;
         bool speaking = false;
-        float happyTimer = 0.0f;
         Emotion emotion;
         float searchTimer = 0;
         float idleTimer = 0;
@@ -2427,24 +2439,6 @@ void Pupil::Update(float dt)
 #include "cmath"
 #include "raymath.h"
 
-
-//These globals should be memeber variables in pupils.h
-//especially if im going to have more than one tingo 
-//keeping them here means they wont have their own eye positions they will share
-// Default pupil positions relative to the centre of the head.
-Vector2 leftEyeOffset  = {-67.0f, 21.0f};
-Vector2 rightEyeOffset = { 81.0f, 21.0f};
-
-// Current position of the head in world space.
-Vector2 headPosition = {0, 0};
-
-// Current look offsets applied to each pupil.
-Vector2 leftLookOffset  = {0.0f, 0.0f};
-Vector2 rightLookOffset = {0.0f, 0.0f};
-
-// Maximum distance a pupil can move from the centre of the eye.
-const float LOOK_DISTANCE = 15.0f;
-
 // Initialise both pupil sprites.
 void Pupils::Initialise()
 {
@@ -2680,11 +2674,6 @@ int main ()
 #include "Object.h"
 #include "raylib.h"
 #include <cmath>
-
-
-int FRAME_WIDTH;
-int FRAME_HEIGHT;
-
 
 //====================================================
 // Initialise
@@ -3043,7 +3032,6 @@ void Robot::SetObjectPointers(std::vector<Object*> toys)
 .\src\RobotBrain.cpp
 =====================================
 
-```cpp
 // ============================================================
 // ROBOTBRAIN OVERVIEW
 // ============================================================
@@ -3123,50 +3111,6 @@ void Robot::SetObjectPointers(std::vector<Object*> toys)
 #include <cmath>
 #include <iostream>
 
-// Forward declaration.
-//
-// RobotBrain stores a reference to a Robot object. The full Robot
-// definition is provided through Robot.h above, but the class name
-// is also declared here so Robot can be referred to as a type.
-class Robot;
-
-
-// ============================================================
-// RobotBrain Constructor
-// ============================================================
-//
-// RobotBrain is the high-level behaviour controller for Tingo.
-//
-// The brain does not directly draw the robot or perform the
-// physical work of the robot. Instead, it keeps track of what
-// Tingo is currently doing and tells other systems what should
-// happen.
-//
-// The main pieces of state managed by the brain are:
-//
-//     state
-//         Tingo's current high-level behaviour.
-//
-//     emotion
-//         Tingo's current emotional state.
-//
-//     targetObject
-//         The object Tingo is currently interacting with,
-//         normally the object being held by the mouse.
-//
-//     detectedObject
-//         The object most recently detected by the search ray.
-//
-// These are deliberately separate because an object being held
-// is a different interaction from an object found while Tingo
-// is searching.
-//
-// RobotBrain also owns/uses a SpeechController to manage the
-// speech lifecycle, while Robot is responsible for carrying out
-// visual/physical changes such as looking at something or
-// changing the speaking animation.
-// ============================================================
-
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
       state(State::Idle),
@@ -3234,11 +3178,6 @@ void RobotBrain::SetState(State state)
 void RobotBrain::SetEmotion(Emotion newEmotion)
 {
     emotion = newEmotion;
-
-    if(newEmotion == Emotion::Happy)
-    {
-        happyTimer = 0.0f;
-    }
 }
 
 

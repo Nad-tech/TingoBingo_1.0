@@ -1,5 +1,5 @@
 #include "SpeechController.h"
-#include "Speech.h"
+#include "SpeechGenerator.h"
 #include <iostream>
 
 
@@ -228,7 +228,7 @@ void SpeechController::Speak(const std::string& text)
         //================================================
 
         bool success =
-            Speech::Speak(text, stopRequested);
+            Speech::GenerateSpeech(text, stopRequested);
 
 
         std::cout << "After Speech::Speak()\n";
