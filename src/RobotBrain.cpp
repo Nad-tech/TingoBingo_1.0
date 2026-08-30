@@ -1,4 +1,3 @@
-```cpp
 // ============================================================
 // ROBOTBRAIN OVERVIEW
 // ============================================================
@@ -78,50 +77,6 @@
 #include <cmath>
 #include <iostream>
 
-// Forward declaration.
-//
-// RobotBrain stores a reference to a Robot object. The full Robot
-// definition is provided through Robot.h above, but the class name
-// is also declared here so Robot can be referred to as a type.
-class Robot;
-
-
-// ============================================================
-// RobotBrain Constructor
-// ============================================================
-//
-// RobotBrain is the high-level behaviour controller for Tingo.
-//
-// The brain does not directly draw the robot or perform the
-// physical work of the robot. Instead, it keeps track of what
-// Tingo is currently doing and tells other systems what should
-// happen.
-//
-// The main pieces of state managed by the brain are:
-//
-//     state
-//         Tingo's current high-level behaviour.
-//
-//     emotion
-//         Tingo's current emotional state.
-//
-//     targetObject
-//         The object Tingo is currently interacting with,
-//         normally the object being held by the mouse.
-//
-//     detectedObject
-//         The object most recently detected by the search ray.
-//
-// These are deliberately separate because an object being held
-// is a different interaction from an object found while Tingo
-// is searching.
-//
-// RobotBrain also owns/uses a SpeechController to manage the
-// speech lifecycle, while Robot is responsible for carrying out
-// visual/physical changes such as looking at something or
-// changing the speaking animation.
-// ============================================================
-
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
       state(State::Idle),
@@ -189,11 +144,6 @@ void RobotBrain::SetState(State state)
 void RobotBrain::SetEmotion(Emotion newEmotion)
 {
     emotion = newEmotion;
-
-    if(newEmotion == Emotion::Happy)
-    {
-        happyTimer = 0.0f;
-    }
 }
 
 

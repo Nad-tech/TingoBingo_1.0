@@ -13,24 +13,6 @@
 #include "cmath"
 #include "raymath.h"
 
-
-//These globals should be memeber variables in pupils.h
-//especially if im going to have more than one tingo 
-//keeping them here means they wont have their own eye positions they will share
-// Default pupil positions relative to the centre of the head.
-Vector2 leftEyeOffset  = {-67.0f, 21.0f};
-Vector2 rightEyeOffset = { 81.0f, 21.0f};
-
-// Current position of the head in world space.
-Vector2 headPosition = {0, 0};
-
-// Current look offsets applied to each pupil.
-Vector2 leftLookOffset  = {0.0f, 0.0f};
-Vector2 rightLookOffset = {0.0f, 0.0f};
-
-// Maximum distance a pupil can move from the centre of the eye.
-const float LOOK_DISTANCE = 15.0f;
-
 // Initialise both pupil sprites.
 void Pupils::Initialise()
 {

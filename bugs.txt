@@ -1,15 +1,5 @@
 3. Known issues / bugs
 
-
-High priority:
-
-- Dragging calls pickup callbacks every frame, not once when
-  the toy is picked up. This repeatedly resets happiness
-  and requests speech. Search detection has the same
-  repeated-trigger issue and no detection cooldown.
-
-
-
 Engineering debt:
 
 - Pupils.cpp uses file-global state, explicitly noted in

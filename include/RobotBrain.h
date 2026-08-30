@@ -49,7 +49,6 @@ class RobotBrain
         State state;
         SpeechController speechController;
         bool speaking = false;
-        float happyTimer = 0.0f;
         Emotion emotion;
         float searchTimer = 0;
         float idleTimer = 0;

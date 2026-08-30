@@ -21,4 +21,7 @@ class Object : public Sprite
         std::string textureFilename;
         Rectangle collisionBox;
         std::string objectName = "notSet";
+        int FRAME_WIDTH;
+        int FRAME_HEIGHT;
+
 };

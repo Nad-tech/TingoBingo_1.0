@@ -52,10 +52,21 @@ public:
     // position.
     void LookForward();
 
-
 private:
-
     // The two independently rendered pupils.
     Pupil leftPupil;
     Pupil rightPupil;
+
+    // Maximum distance a pupil can move from the centre of the eye.
+    const float LOOK_DISTANCE = 15.0f;
+
+    Vector2 leftEyeOffset  = {-67.0f, 21.0f};
+    Vector2 rightEyeOffset = { 81.0f, 21.0f};
+
+    // Current position of the head in world space.
+    Vector2 headPosition = {0, 0};
+
+    // Current look offsets applied to each pupil.
+    Vector2 leftLookOffset  = {0.0f, 0.0f};
+    Vector2 rightLookOffset = {0.0f, 0.0f};
 };

@@ -2,11 +2,6 @@
 #include "raylib.h"
 #include <cmath>
 
-
-int FRAME_WIDTH;
-int FRAME_HEIGHT;
-
-
 //====================================================
 // Initialise
 //
