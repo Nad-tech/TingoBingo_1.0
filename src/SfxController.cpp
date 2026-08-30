@@ -17,5 +17,4 @@ void SfxController::PlaySfx(std::string sound)
 void SfxController::Shutdown()
 {
     UnloadSound(boing);
-    std::cout << "boing called!!!!!\n";
 }
