@@ -33,11 +33,11 @@ public:
     bool IsFrontFacing() const;
 
 
-    void PlayIdleHeadTransform(float dt);
+    void PlayIdleBodyTransform(float dt);
 
-    void PlayHeadWiggle(float dt);
+    void PlayBodyWiggle(float dt);
 
-    void PlayHeadBob(float dt);
+    void PlayBodyBob(float dt);
 
 
 private:

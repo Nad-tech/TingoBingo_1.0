@@ -37,29 +37,34 @@
 // Initialise the game and load required resources.
 void Game::Initialise()
 {
-	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+    InitAudioDevice();
 
-	InitAudioDevice();
+    // Initialise robot
+    robot.Initialise();
+    robot.SetPosition(robotWorldPos);
 
-	robot.Initialise();
+    // Initialise ball
+    ball.SetTextureFilename("./assets/images/toys/ball.png");
+    ball.Initialise();
+    ball.SetPosition({100, 100});
+    ball.SetName("ball");
 
-	ball.SetTextureFilename("./assets/images/toys/ball.png");
-	ball.Initialise();
-	ball.SetPosition({100, 100});
-	ball.SetName("ball");
+    // Initialise banana
+    banana.SetTextureFilename("./assets/images/toys/banana.png");
+    banana.Initialise();
+    banana.SetPosition({300, 300});
+    banana.SetName("banana");
 
-	banana.SetTextureFilename("./assets/images/toys/banana.png");
-	banana.Initialise();
-	banana.SetPosition({300, 300});
-	banana.SetName("banana");
-	
-	objects = {&ball, &banana};
+    objects = {&ball, &banana};
 
-	robot.SetObjectPointers(objects);
+    robot.SetObjectPointers(objects);
 
-	SetTargetFPS(TARGET_FPS);
+    SetTargetFPS(TARGET_FPS);
 
-	background = LoadTexture("assets/images/background/space.jpg");
+    background = LoadTexture(
+        "assets/images/background/space.jpg"
+    );
 }
 
 // Process keyboard input.

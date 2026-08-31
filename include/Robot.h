@@ -113,4 +113,5 @@ private:
     SfxController sfxController;
 
     Body body;
+    Vector2 bodyOffset = {0.0f, 220.0f};
 };

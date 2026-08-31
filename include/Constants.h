@@ -18,4 +18,4 @@ constexpr int TARGET_FPS = 60;
 
 constexpr int ROBOT_WIDTH = 256;
 constexpr int ROBOT_HEIGHT = 256;
-constexpr float SCALE = 2.0f;
+constexpr float SCALE = 1.0f;

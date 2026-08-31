@@ -26,6 +26,10 @@ rm -f build/TingoBingo.exe
 
 echo src/*.cpp
 
+echo src/head/*.cpp
+
+echo src/body/*.cpp
+
 # Compile all project source files and link the
 # required Raylib and Windows libraries.
 g++ \
@@ -36,6 +40,7 @@ g++ \
     -Iinclude \
     src/*.cpp \
     src/head/*.cpp \
+    src/body/*.cpp \
     -o build/$EXE_NAME.exe \
     -lraylib \
     -lopengl32 \

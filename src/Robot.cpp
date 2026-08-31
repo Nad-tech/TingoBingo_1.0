@@ -6,18 +6,20 @@
 #include "Emotion.h"
 #include "SfxController.h"
 
+// Initialise the robot's brain 
+Robot::Robot() : robotBrain(*this){}
 
-// Initialise the robot's brain and place the robot
-// at the centre of the screen.
-Robot::Robot() : robotBrain(*this)
+// Initialise the robot's head and place it at the
+// robot's starting position.
+void Robot::Initialise()
 {
-    position =
-    {
-        SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT / 2
-    };
-}
+    head.Initialise();
+    head.SetPosition(position);
 
+    body.Initialise();
+
+    sfxController.Initialise();
+}
 
 // Update the robot's behaviour through RobotBrain,
 // then update the head using the current speech state
@@ -26,6 +28,7 @@ void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
     head.Update(dt, speaking, robotBrain.GetEmotion());
+    body.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
 
@@ -51,6 +54,11 @@ void Robot::SetPosition(Vector2 position)
 {
     this->position = position;
     head.SetPosition(position);
+    body.SetPosition(
+            {
+                position.x + bodyOffset.x,
+                position.y + bodyOffset.y
+            });
 }
 
 
@@ -71,24 +79,15 @@ Vector2 Robot::GetHeadPosition() const
 // Draw the robot.
 void Robot::Draw() const
 {
+    body.Draw();
     head.Draw();
 }
-
-
-// Initialise the robot's head and place it at the
-// robot's starting position.
-void Robot::Initialise()
-{
-    head.Initialise();
-    head.SetPosition(position);
-    sfxController.Initialise();
-}
-
 
 // Release the resources owned by the robot's head.
 void Robot::Shutdown()
 {
     head.Shutdown();
+    body.Shutdown();
     sfxController.Shutdown();
 }
 
@@ -104,6 +103,7 @@ void Robot::RotateHeadLeft()
 void Robot::RotateHeadRight()
 {
     head.RotateRight();
+    body.RotateRight();
 }
 
 
@@ -111,6 +111,7 @@ void Robot::RotateHeadRight()
 void Robot::ReturnHeadToCentre()
 {
     head.ReturnToCentre();
+    body.ReturnToCentre();
 }
 
 

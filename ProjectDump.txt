@@ -164,6 +164,130 @@ private:
 
 
 =====================================
+.\include\body\Body.h
+=====================================
+
+#pragma once
+
+#include "raylib.h"
+#include "Emotion.h"
+#include "BodyBase.h"
+
+class Body
+{
+public:
+
+    Body();
+
+    void Initialise();
+    void Shutdown();
+    void Update(float dt, bool speaking, Emotion emotion);
+
+    void Draw() const;
+    void SetPosition(Vector2 position);
+    void ApplyPosition(Vector2 position);
+
+    Vector2 GetPosition() const;
+
+    void SetRotation(float rotation);
+
+    void ApplyRotation(float rotation);
+
+    float GetRotation();
+
+    void RotateLeft();
+    void RotateRight();
+    void ReturnToCentre();
+
+    bool IsFrontFacing() const;
+
+
+    void PlayIdleBodyTransform(float dt);
+
+    void PlayBodyWiggle(float dt);
+
+    void PlayBodyBob(float dt);
+
+
+private:
+    Vector2 position;
+
+    float rotation;
+    float scale;
+    float homeRotation;
+
+    // Tracks the progress of the current wiggle.
+    float bodyWiggleTimer;
+
+    // Current strength of the wiggle.
+    float bodyWiggleAmplitude;
+
+    // True while a wiggle animation is active.
+    bool bodyWiggling;
+
+    // Time remaining before another wiggle can begin.
+    float nextBodyWiggle;
+
+    // Controls how quickly the wiggle oscillates.
+    float bodyWiggleFrequency;
+
+
+    //================================================
+    // Body Bob State
+    //================================================
+
+    // Current positional offset produced by the bob.
+    Vector2 bodyBobOffset;
+
+    // Controls the scale of the bob movement.
+    float bodyBobScale;
+
+    // Current position within the bob's movement cycle.
+    float bodyBobAngle;
+
+    // Direction of the bobbing motion.
+    float bodyBobDirection;
+
+    // Time remaining before the bobbing direction
+    // and movement parameters are randomised.
+    float randomBodyBobSignTimer;
+
+    // Horizontal and vertical size of the bob movement.
+    float bodyBobRadiusX;
+    float bodyBobRadiusY;
+
+    // Speed of the bobbing motion.
+    float bodyBobSpeed;
+
+    // Position the body returns to after applying
+    // its idle movement.
+    Vector2 homePosition;
+
+    BodyBase bodyBase;
+};
+
+
+=====================================
+.\include\body\BodyBase.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class BodyBase : public Sprite 
+{
+    public:
+        void Initialise() override;
+        void RotateLeft();
+        void RotateRight();
+        void ReturnToCentre();
+        int GetFrame() const;
+        void SetRotation(float rotation);
+};
+
+
+=====================================
 .\include\Constants.h
 =====================================
 
@@ -187,7 +311,7 @@ constexpr int TARGET_FPS = 60;
 
 constexpr int ROBOT_WIDTH = 256;
 constexpr int ROBOT_HEIGHT = 256;
-constexpr float SCALE = 2.0f;
+constexpr float SCALE = 1.0f;
 
 
 =====================================
@@ -763,6 +887,8 @@ class Object : public Sprite
 #include <string>
 #include "Emotion.h"
 #include "Object.h"
+#include "SfxController.h"
+#include "body/Body.h"
 
 
 //====================================================
@@ -847,6 +973,7 @@ public:
     // available in the game.
     void SetObjectPointers(std::vector<Object*> objects);
 
+    void PlaySfx(std::string sound);
 
 private:
 
@@ -863,6 +990,11 @@ private:
     // True while the robot is currently speaking.
     // The Head uses this to drive mouth/face animation.
     bool speaking = false;
+
+    SfxController sfxController;
+
+    Body body;
+    Vector2 bodyOffset = {0.0f, 500.0f};
 };
 
 
@@ -944,11 +1076,12 @@ class RobotBrain
 #pragma once
 #include "raylib.h"
 #include <string>
-class SfxCotroller
+class SfxController
 {
     public:
         void Initialise();
-        void PlaySound(std::string sound);
+        void Shutdown();
+        void PlaySfx(std::string sound);
 
     private:
         Sound boing;
@@ -1374,6 +1507,281 @@ void Animation::Stop()
 
 
 =====================================
+.\src\body\Body.cpp
+=====================================
+
+#include "body/Body.h"
+#include <cmath>
+#include "Emotion.h"
+
+// Initialise the body's transform and idle animation state.
+Body::Body() :
+    rotation(0.0f),
+    scale(0.0f),
+
+    homeRotation(rotation),
+    bodyWiggleTimer(0.0f),
+    bodyWiggleAmplitude(0.0f),
+    bodyWiggling(false),
+    nextBodyWiggle((float)GetRandomValue(5, 7)),
+    bodyWiggleFrequency(0.0f),
+
+    bodyBobOffset({0.0f, 0.0f}),
+    bodyBobScale(7.0f),
+    bodyBobAngle(0.0f),
+    bodyBobDirection(1.0f),
+    randomBodyBobSignTimer((float)GetRandomValue(5, 10)),
+    bodyBobRadiusX(GetRandomValue(3, 8)),
+    bodyBobRadiusY(GetRandomValue(2, 6)),
+    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f)
+{
+}
+
+// Initialise every component that makes up the robot's body.
+void Body::Initialise()
+{
+    bodyBase.Initialise();
+    bodyBase.SetPosition(position);
+}
+
+// Release resources used by each body component.
+void Body::Shutdown()
+{
+    bodyBase.Shutdown();
+}
+
+// Update every animated body component.
+void Body::Update(float dt, bool speaking, Emotion emotion)
+{
+    //gets rid of warnings does nothing
+    if(speaking)
+    if(emotion == Emotion::Angry)
+
+    bodyBase.Update(dt);
+    
+    PlayIdleBodyTransform(dt);
+}
+
+void Body::Draw() const
+{
+    if (IsFrontFacing())
+    {
+        bodyBase.Draw();
+    }
+    else
+    {
+        bodyBase.Draw();
+    }
+}
+
+void Body::SetPosition(Vector2 position)
+{
+    this->homePosition = position;
+    ApplyPosition(position);
+}
+
+void Body::ApplyPosition(Vector2 position)
+{
+    this->position = position;
+
+    bodyBase.SetPosition(position);
+}
+
+Vector2 Body::GetPosition() const
+{
+    return position;
+}
+
+void Body::RotateLeft()
+{
+    bodyBase.RotateLeft();
+}
+
+void Body::RotateRight()
+{
+    bodyBase.RotateRight();
+}
+
+void Body::ReturnToCentre()
+{
+    bodyBase.ReturnToCentre();
+}
+
+bool Body::IsFrontFacing() const
+{
+    return bodyBase.GetFrame() == 0;
+}
+
+void Body::SetRotation(float rotation)
+{
+    homeRotation = rotation;
+    ApplyRotation(rotation);
+}
+
+void Body::ApplyRotation(float rotation)
+{
+    this->rotation = rotation;
+
+    bodyBase.SetRotation(rotation);
+}
+
+float Body::GetRotation()
+{
+    return rotation;
+}
+
+void Body::PlayIdleBodyTransform(float dt)
+{
+    PlayBodyBob(dt);
+    ApplyPosition(position);
+
+    PlayBodyWiggle(dt);
+    ApplyRotation(rotation);
+}
+
+void Body::PlayBodyWiggle(float dt)
+{
+    nextBodyWiggle -= dt;
+
+    if (nextBodyWiggle <= 0.0f && !bodyWiggling)
+    {
+        bodyWiggling = true;
+        bodyWiggleTimer = 0.0f;
+        bodyWiggleAmplitude = (float)GetRandomValue(10, 20);
+        nextBodyWiggle = (float)GetRandomValue(5, 7);
+        bodyWiggleFrequency = (float)GetRandomValue(10, 40);
+    }
+
+    if (bodyWiggling)
+    {
+        bodyWiggleTimer += dt;
+
+        rotation = sin(bodyWiggleTimer * bodyWiggleFrequency) * bodyWiggleAmplitude;
+
+        // Gradually reduce the wiggle until the body settles.
+        bodyWiggleAmplitude -= 8.0f * dt;
+
+        if (bodyWiggleAmplitude <= 0.0f)
+        {
+            bodyWiggling = false;
+            rotation = homeRotation;
+        }
+    }
+}
+
+// Move the body in a slow, organic elliptical motion.
+void Body::PlayBodyBob(float dt)
+{
+    bodyBobAngle += dt * bodyBobSpeed * bodyBobDirection;
+
+    randomBodyBobSignTimer -= dt;
+
+    // Periodically randomise the bobbing direction and movement.
+    if (randomBodyBobSignTimer <= 0)
+    {
+        bodyBobDirection *= -1;
+        randomBodyBobSignTimer = (float)GetRandomValue(5, 10);
+        bodyBobRadiusX = GetRandomValue(3, 8);
+        bodyBobRadiusY = GetRandomValue(2, 6);
+        bodyBobSpeed = GetRandomValue(6, 14) / 10.0f;
+    }
+
+    bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
+    bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
+
+    position.x = homePosition.x + bodyBobOffset.x;
+    position.y = homePosition.y + bodyBobOffset.y;
+}
+
+
+=====================================
+.\src\body\BodyBase.cpp
+=====================================
+
+#include "body/BodyBase.h"
+
+#include "Constants.h"
+
+// Load the head sprite and initialise its animation.
+void BodyBase::Initialise()
+{
+    texture = LoadTexture("assets/images/TingoBingo/body/BodyBase.png");
+
+    // Sprite sheet layout.
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+
+    // Calculate the size of a single animation frame.
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+
+    // Animation settings.
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.02f;
+
+    // Initialise the animation using the sprite sheet information.
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+// Return the current head animation frame.
+int BodyBase::GetFrame() const
+{
+    return animation.GetFrame();
+}
+
+// Rotate the head one frame to the left.
+void BodyBase::RotateLeft()
+{
+    animation.PreviousFrame();
+}
+
+// Rotate the head one frame to the right.
+void BodyBase::RotateRight()
+{
+    animation.NextFrame();
+}
+
+// Gradually return the head to its forward-facing position
+// using the shortest rotation direction.
+void BodyBase::ReturnToCentre()
+{
+    int frame = animation.GetFrame();
+    int halfTurn = animation.GetTotalFrames() / 2;
+
+    if (frame == 0)
+        return;
+
+    // Decide which direction requires the fewest frames.
+    if (frame < halfTurn)
+    {
+        animation.PreviousFrame();
+    }
+    else
+    {
+        animation.NextFrame();
+    }
+}
+
+// Apply a rotation transform to the head sprite.
+void BodyBase::SetRotation(float rotation)
+{
+    Sprite::SetRotation(rotation);
+}
+
+
+=====================================
 .\src\Game.cpp
 =====================================
 
@@ -1416,29 +1824,37 @@ void Animation::Stop()
 // Initialise the game and load required resources.
 void Game::Initialise()
 {
-	InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
+    InitAudioDevice();
 
-	InitAudioDevice();
+    // Initialise robot
+    robot.Initialise();
+    robot.SetPosition({
+        SCREEN_WIDTH / 2.0f,
+        SCREEN_HEIGHT / 2.0f
+    });
 
-	robot.Initialise();
+    // Initialise ball
+    ball.SetTextureFilename("./assets/images/toys/ball.png");
+    ball.Initialise();
+    ball.SetPosition({100, 100});
+    ball.SetName("ball");
 
-	ball.SetTextureFilename("./assets/images/toys/ball.png");
-	ball.Initialise();
-	ball.SetPosition({100, 100});
-	ball.SetName("ball");
+    // Initialise banana
+    banana.SetTextureFilename("./assets/images/toys/banana.png");
+    banana.Initialise();
+    banana.SetPosition({300, 300});
+    banana.SetName("banana");
 
-	banana.SetTextureFilename("./assets/images/toys/banana.png");
-	banana.Initialise();
-	banana.SetPosition({300, 300});
-	banana.SetName("banana");
-	
-	objects = {&ball, &banana};
+    objects = {&ball, &banana};
 
-	robot.SetObjectPointers(objects);
+    robot.SetObjectPointers(objects);
 
-	SetTargetFPS(TARGET_FPS);
+    SetTargetFPS(TARGET_FPS);
 
-	background = LoadTexture("assets/images/background/space.jpg");
+    background = LoadTexture(
+        "assets/images/background/space.jpg"
+    );
 }
 
 // Process keyboard input.
@@ -2884,19 +3300,27 @@ std::string Object::GetName()
 #include "RobotBrain.h"
 #include <string>
 #include "Emotion.h"
+#include "SfxController.h"
 
+// Initialise the robot's brain 
+Robot::Robot() : robotBrain(*this){}
 
-// Initialise the robot's brain and place the robot
-// at the centre of the screen.
-Robot::Robot() : robotBrain(*this)
+// Initialise the robot's head and place it at the
+// robot's starting position.
+void Robot::Initialise()
 {
-    position =
-    {
-        SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT / 2
-    };
-}
+    head.Initialise();
+    head.SetPosition(position);
 
+    body.Initialise();
+    body.SetPosition(
+        {
+            position.x + bodyOffset.x,
+            position.y + bodyOffset.y
+        });
+
+    sfxController.Initialise();
+}
 
 // Update the robot's behaviour through RobotBrain,
 // then update the head using the current speech state
@@ -2905,6 +3329,7 @@ void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
     head.Update(dt, speaking, robotBrain.GetEmotion());
+    body.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
 
@@ -2930,6 +3355,7 @@ void Robot::SetPosition(Vector2 position)
 {
     this->position = position;
     head.SetPosition(position);
+    body.SetPosition(position);
 }
 
 
@@ -2951,22 +3377,15 @@ Vector2 Robot::GetHeadPosition() const
 void Robot::Draw() const
 {
     head.Draw();
+    body.Draw();
 }
-
-
-// Initialise the robot's head and place it at the
-// robot's starting position.
-void Robot::Initialise()
-{
-    head.Initialise();
-    head.SetPosition(position);
-}
-
 
 // Release the resources owned by the robot's head.
 void Robot::Shutdown()
 {
     head.Shutdown();
+    body.Shutdown();
+    sfxController.Shutdown();
 }
 
 
@@ -2981,6 +3400,7 @@ void Robot::RotateHeadLeft()
 void Robot::RotateHeadRight()
 {
     head.RotateRight();
+    body.RotateRight();
 }
 
 
@@ -2988,6 +3408,7 @@ void Robot::RotateHeadRight()
 void Robot::ReturnHeadToCentre()
 {
     head.ReturnToCentre();
+    body.ReturnToCentre();
 }
 
 
@@ -3043,6 +3464,11 @@ Vector2 Robot::GetSearchRayEnd()
 void Robot::SetObjectPointers(std::vector<Object*> toys)
 {
     robotBrain.SetObjectPointers(toys);
+}
+
+void Robot::PlaySfx(std::string sound)
+{
+    sfxController.PlaySfx(sound);
 }
 
 
@@ -3907,6 +4333,7 @@ void RobotBrain::Search(float dt)
 
         if(detectedObject->GetName() == "banana")
         {
+            robot.PlaySfx("boing");
             Speak("I found a banana");
         }
 
@@ -3920,6 +4347,7 @@ void RobotBrain::Search(float dt)
 
         if(detectedObject->GetName() == "ball")
         {
+            robot.PlaySfx("boing");
             Speak("I found a ball");
         }
     }
@@ -4195,10 +4623,24 @@ Object* RobotBrain::DetectCollision(
 =====================================
 
 #include "SfxController.h"
+#include <iostream>
 
 void SfxController::Initialise()
 {
-    boing = LoadSound("./assets/audio/sfx/boing.wav");
+    boing = LoadSound("./assets/audio/sfx/boing.mp3");
+}
+
+void SfxController::PlaySfx(std::string sound)
+{
+    if(sound == "boing")
+    {
+        PlaySound(boing);
+    }
+}
+
+void SfxController::Shutdown()
+{
+    UnloadSound(boing);
 }
 
 
@@ -4250,9 +4692,6 @@ void SpeechController::Update()
 
     if(wavReady)
     {
-        std::cout << "WAV is ready\n";
-
-
         // Reset the flag so the same WAV is not
         // loaded and played again on the next frame.
         wavReady = false;
@@ -4299,9 +4738,6 @@ void SpeechController::Update()
     if(state == State::Playing &&
        !IsSoundPlaying(speechSound))
     {
-        std::cout << "PLAYBACK FINISHED\n";
-
-
         // The audio has finished playing, so the
         // Raylib Sound resource can now be released.
         UnloadSound(speechSound);
@@ -4419,11 +4855,6 @@ void SpeechController::Speak(const std::string& text)
     //     worker has its own copy to use.
     speechThread = std::thread([this, text]()
     {
-        std::cout << "Worker started\n";
-
-        std::cout << "Before Speech::Speak()\n";
-
-
         //================================================
         // GENERATE SPEECH
         //
@@ -4437,10 +4868,6 @@ void SpeechController::Speak(const std::string& text)
 
         bool success =
             Speech::GenerateSpeech(text, stopRequested);
-
-
-        std::cout << "After Speech::Speak()\n";
-
 
         //================================================
         // GENERATION RESULT
@@ -4477,9 +4904,6 @@ void SpeechController::Speak(const std::string& text)
 
 SpeechController::~SpeechController()
 {
-    std::cout << "SpeechController destructor\n";
-
-
     //================================================
     // REQUEST WORKER SHUTDOWN
     //================================================
@@ -4500,18 +4924,12 @@ SpeechController::~SpeechController()
     // to be joined.
     if (speechThread.joinable())
     {
-        std::cout << "Joining speech thread\n";
-
-
         // Wait for the worker to finish before
         // destroying the SpeechController.
         //
         // This prevents the worker from accessing
         // the controller after it has been destroyed.
         speechThread.join();
-
-
-        std::cout << "Speech thread joined\n";
     }
 }
 
@@ -5199,8 +5617,6 @@ bool Speech::GenerateSpeech
     // SUCCESS
     //================================================
 
-    std::cout
-        << "Speech generation completed successfully.\n";
 
     return true;
 }

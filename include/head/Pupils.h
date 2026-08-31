@@ -2,6 +2,7 @@
 
 #include "head/Pupil.h"
 #include "raylib.h"
+#include "Constants.h"
 
 
 //====================================================
@@ -58,10 +59,10 @@ private:
     Pupil rightPupil;
 
     // Maximum distance a pupil can move from the centre of the eye.
-    const float LOOK_DISTANCE = 15.0f;
+    const float LOOK_DISTANCE = 10.0f;
 
-    Vector2 leftEyeOffset  = {-67.0f, 21.0f};
-    Vector2 rightEyeOffset = { 81.0f, 21.0f};
+    Vector2 leftEyeOffset  = {-33.5f * SCALE, 10.5f * SCALE};
+    Vector2 rightEyeOffset = { 40.5f * SCALE, 10.5f * SCALE};
 
     // Current position of the head in world space.
     Vector2 headPosition = {0, 0};
