@@ -7,6 +7,7 @@
 #include "Emotion.h"
 #include "Object.h"
 #include "SfxController.h"
+#include "body/Body.h"
 
 
 //====================================================
@@ -110,4 +111,6 @@ private:
     bool speaking = false;
 
     SfxController sfxController;
+
+    Body body;
 };
