@@ -164,6 +164,22 @@ private:
 
 
 =====================================
+.\include\body\Arm.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+class Arm : public Sprite
+{
+    public:
+    void Initialise() override;
+    int GetFrame() const;
+    void SetRotation(float rotation);
+};
+
+
+=====================================
 .\include\body\Body.h
 =====================================
 
@@ -172,6 +188,8 @@ private:
 #include "raylib.h"
 #include "Emotion.h"
 #include "BodyBase.h"
+#include "Arm.h"
+#include "Leg.h"
 
 class Body
 {
@@ -194,13 +212,6 @@ public:
     void ApplyRotation(float rotation);
 
     float GetRotation();
-
-    void RotateLeft();
-    void RotateRight();
-    void ReturnToCentre();
-
-    bool IsFrontFacing() const;
-
 
     void PlayIdleBodyTransform(float dt);
 
@@ -264,6 +275,12 @@ private:
     Vector2 homePosition;
 
     BodyBase bodyBase;
+    Leg rightLeg;
+    Leg leftLeg;
+    Arm rightArm;
+    Arm leftArm;
+
+
 };
 
 
@@ -279,11 +296,24 @@ class BodyBase : public Sprite
 {
     public:
         void Initialise() override;
-        void RotateLeft();
-        void RotateRight();
-        void ReturnToCentre();
         int GetFrame() const;
         void SetRotation(float rotation);
+};
+
+
+=====================================
+.\include\body\Leg.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+class Leg : public Sprite
+{
+    public:
+    void Initialise() override;
+    int GetFrame() const;
+    void SetRotation(float rotation);
 };
 
 
@@ -363,6 +393,7 @@ private:
 	void Draw();
 	
 	Robot robot;
+	Vector2 robotWorldPos = {SCREEN_WIDTH / 2.0f, 200.0f};
 	Input input;
 	Object ball;
 	Object banana;
@@ -540,24 +571,6 @@ public:
     // Return the current head rotation.
     float GetRotation();
 
-
-    //================================================
-    // Head Orientation
-    //================================================
-
-    // Rotate the head one frame left or right.
-    void RotateLeft();
-    void RotateRight();
-
-    // Gradually return the head to its forward-facing
-    // position.
-    void ReturnToCentre();
-
-    // Return true when the front-facing head sprite
-    // is currently active.
-    bool IsFrontFacing() const;
-
-
     //================================================
     // Idle Animation
     //================================================
@@ -679,9 +692,6 @@ class Headbase : public Sprite
 {
     public:
         void Initialise() override;
-        void RotateLeft();
-        void RotateRight();
-        void ReturnToCentre();
         int GetFrame() const;
         void SetRotation(float rotation);
 };
@@ -753,6 +763,7 @@ class Pupil : public Sprite
 
 #include "head/Pupil.h"
 #include "raylib.h"
+#include "Constants.h"
 
 
 //====================================================
@@ -809,10 +820,10 @@ private:
     Pupil rightPupil;
 
     // Maximum distance a pupil can move from the centre of the eye.
-    const float LOOK_DISTANCE = 15.0f;
+    const float LOOK_DISTANCE = 10.0f;
 
-    Vector2 leftEyeOffset  = {-67.0f, 21.0f};
-    Vector2 rightEyeOffset = { 81.0f, 21.0f};
+    Vector2 leftEyeOffset  = {-33.5f * SCALE, 10.5f * SCALE};
+    Vector2 rightEyeOffset = { 40.5f * SCALE, 10.5f * SCALE};
 
     // Current position of the head in world space.
     Vector2 headPosition = {0, 0};
@@ -925,13 +936,6 @@ public:
     // Set the robot's world position.
     void SetPosition(Vector2 position);
 
-
-    // Control the head's rotation.
-    void RotateHeadLeft();
-    void RotateHeadRight();
-    void ReturnHeadToCentre();
-
-
     // Make the robot look towards a specific point.
     void LookAt(Vector2 point);
 
@@ -994,7 +998,7 @@ private:
     SfxController sfxController;
 
     Body body;
-    Vector2 bodyOffset = {0.0f, 500.0f};
+    Vector2 bodyOffset = {0.0f, 220.0f};
 };
 
 
@@ -1507,6 +1511,59 @@ void Animation::Stop()
 
 
 =====================================
+.\src\body\Arm.cpp
+=====================================
+
+#include "body/Arm.h"
+#include "Constants.h"
+
+// Load the head sprite and initialise its animation.
+void Arm::Initialise()
+{
+    texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
+
+    // Sprite sheet layout.
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+
+    // Calculate the size of a single animation frame.
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+
+    // Animation settings.
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.02f;
+
+    // Initialise the animation using the sprite sheet information.
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+}
+
+// Return the current head animation frame.
+int Arm::GetFrame() const
+{
+    return animation.GetFrame();
+}
+
+// Apply a rotation transform to the head sprite.
+void Arm::SetRotation(float rotation)
+{
+    Sprite::SetRotation(rotation);
+}
+
+
+=====================================
 .\src\body\Body.cpp
 =====================================
 
@@ -1542,12 +1599,25 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     bodyBase.SetPosition(position);
+    leftArm.Initialise();
+    leftArm.SetPosition(position);
+    rightArm.Initialise();
+    rightArm.SetPosition(position);
+    leftLeg.Initialise();
+    leftLeg.SetPosition(position);
+    rightLeg.Initialise();
+    rightLeg.SetPosition(position);
+
 }
 
 // Release resources used by each body component.
 void Body::Shutdown()
 {
     bodyBase.Shutdown();
+    leftArm.Shutdown();
+    rightArm.Shutdown();
+    leftLeg.Shutdown();
+    rightLeg.Shutdown();
 }
 
 // Update every animated body component.
@@ -1558,20 +1628,21 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     if(emotion == Emotion::Angry)
 
     bodyBase.Update(dt);
+    leftArm.Update(dt);
+    rightArm.Update(dt);
+    leftLeg.Update(dt);
+    rightLeg.Update(dt);
     
     PlayIdleBodyTransform(dt);
 }
 
 void Body::Draw() const
 {
-    if (IsFrontFacing())
-    {
-        bodyBase.Draw();
-    }
-    else
-    {
-        bodyBase.Draw();
-    }
+    bodyBase.Draw();
+    leftArm.Draw();
+    rightArm.Draw();
+    leftLeg.Draw();
+    rightLeg.Draw();
 }
 
 void Body::SetPosition(Vector2 position)
@@ -1585,31 +1656,15 @@ void Body::ApplyPosition(Vector2 position)
     this->position = position;
 
     bodyBase.SetPosition(position);
+    leftArm.SetPosition(position);
+    rightArm.SetPosition(position);
+    leftLeg.SetPosition(position);
+    rightLeg.SetPosition(position);
 }
 
 Vector2 Body::GetPosition() const
 {
     return position;
-}
-
-void Body::RotateLeft()
-{
-    bodyBase.RotateLeft();
-}
-
-void Body::RotateRight()
-{
-    bodyBase.RotateRight();
-}
-
-void Body::ReturnToCentre()
-{
-    bodyBase.ReturnToCentre();
-}
-
-bool Body::IsFrontFacing() const
-{
-    return bodyBase.GetFrame() == 0;
 }
 
 void Body::SetRotation(float rotation)
@@ -1623,6 +1678,10 @@ void Body::ApplyRotation(float rotation)
     this->rotation = rotation;
 
     bodyBase.SetRotation(rotation);
+    leftArm.SetRotation(rotation);
+    rightArm.SetRotation(rotation);
+    leftLeg.SetRotation(rotation);
+    rightLeg.SetRotation(rotation);
 }
 
 float Body::GetRotation()
@@ -1741,41 +1800,61 @@ int BodyBase::GetFrame() const
     return animation.GetFrame();
 }
 
-// Rotate the head one frame to the left.
-void BodyBase::RotateLeft()
+// Apply a rotation transform to the head sprite.
+void BodyBase::SetRotation(float rotation)
 {
-    animation.PreviousFrame();
+    Sprite::SetRotation(rotation);
 }
 
-// Rotate the head one frame to the right.
-void BodyBase::RotateRight()
+
+=====================================
+.\src\body\Leg.cpp
+=====================================
+
+#include "body/Leg.h"
+#include "Constants.h"
+
+// Load the head sprite and initialise its animation.
+void Leg::Initialise()
 {
-    animation.NextFrame();
+    texture = LoadTexture("assets/images/TingoBingo/body/Leg.png");
+
+    // Sprite sheet layout.
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+
+    // Calculate the size of a single animation frame.
+    const int FRAME_WIDTH = texture.width / COLUMNS;
+    const int FRAME_HEIGHT = texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+
+    // Animation settings.
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.02f;
+
+    // Initialise the animation using the sprite sheet information.
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
 }
 
-// Gradually return the head to its forward-facing position
-// using the shortest rotation direction.
-void BodyBase::ReturnToCentre()
+// Return the current head animation frame.
+int Leg::GetFrame() const
 {
-    int frame = animation.GetFrame();
-    int halfTurn = animation.GetTotalFrames() / 2;
-
-    if (frame == 0)
-        return;
-
-    // Decide which direction requires the fewest frames.
-    if (frame < halfTurn)
-    {
-        animation.PreviousFrame();
-    }
-    else
-    {
-        animation.NextFrame();
-    }
+    return animation.GetFrame();
 }
 
 // Apply a rotation transform to the head sprite.
-void BodyBase::SetRotation(float rotation)
+void Leg::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
@@ -1829,10 +1908,7 @@ void Game::Initialise()
 
     // Initialise robot
     robot.Initialise();
-    robot.SetPosition({
-        SCREEN_WIDTH / 2.0f,
-        SCREEN_HEIGHT / 2.0f
-    });
+    robot.SetPosition(robotWorldPos);
 
     // Initialise ball
     ball.SetTextureFilename("./assets/images/toys/ball.png");
@@ -1860,19 +1936,6 @@ void Game::Initialise()
 // Process keyboard input.
 void Game::HandleInput()
 {
-	if (input.LeftPressed())
-	{
-		robot.RotateHeadLeft();
-	}
-	else if (input.RightPressed())
-	{
-		robot.RotateHeadRight();
-	}
-	else
-	{
-		robot.ReturnHeadToCentre();
-	}
-
 	if (input.SpacePressed())
 	{
 		robot.Speak("Hello Alby, my name is tingo bingo");
@@ -2377,24 +2440,14 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
 
 void Head::Draw() const
 {
-    // Draw the full face only when the head is facing forward.
-    // During head rotation the facial features are already
-    // baked into the head sprite.
-    if (IsFrontFacing())
-    {
-        ears.Draw();
-        headBase.Draw();
-        eyes.Draw();
-        mouth.Draw();
-        nose.Draw();
-        eyebrows.Draw();
-        antenna.Draw();
-        pupils.Draw();
-    }
-    else
-    {
-        headBase.Draw();
-    }
+    ears.Draw();
+    headBase.Draw();
+    eyes.Draw();
+    mouth.Draw();
+    nose.Draw();
+    eyebrows.Draw();
+    antenna.Draw();
+    pupils.Draw();
 }
 
 // Set the head's home position and apply it to every component.
@@ -2422,30 +2475,6 @@ void Head::ApplyPosition(Vector2 position)
 Vector2 Head::GetPosition() const
 {
     return position;
-}
-
-// Rotate the head one frame to the left.
-void Head::RotateLeft()
-{
-    headBase.RotateLeft();
-}
-
-// Rotate the head one frame to the right.
-void Head::RotateRight()
-{
-    headBase.RotateRight();
-}
-
-// Return the head to its forward-facing position.
-void Head::ReturnToCentre()
-{
-    headBase.ReturnToCentre();
-}
-
-// Returns true when the front-facing head sprite is active.
-bool Head::IsFrontFacing() const
-{
-    return headBase.GetFrame() == 0;
 }
 
 // Set the head's home rotation.
@@ -2607,39 +2636,6 @@ void Headbase::Initialise()
 int Headbase::GetFrame() const
 {
     return animation.GetFrame();
-}
-
-// Rotate the head one frame to the left.
-void Headbase::RotateLeft()
-{
-    animation.PreviousFrame();
-}
-
-// Rotate the head one frame to the right.
-void Headbase::RotateRight()
-{
-    animation.NextFrame();
-}
-
-// Gradually return the head to its forward-facing position
-// using the shortest rotation direction.
-void Headbase::ReturnToCentre()
-{
-    int frame = animation.GetFrame();
-    int halfTurn = animation.GetTotalFrames() / 2;
-
-    if (frame == 0)
-        return;
-
-    // Decide which direction requires the fewest frames.
-    if (frame < halfTurn)
-    {
-        animation.PreviousFrame();
-    }
-    else
-    {
-        animation.NextFrame();
-    }
 }
 
 // Apply a rotation transform to the head sprite.
@@ -3313,11 +3309,6 @@ void Robot::Initialise()
     head.SetPosition(position);
 
     body.Initialise();
-    body.SetPosition(
-        {
-            position.x + bodyOffset.x,
-            position.y + bodyOffset.y
-        });
 
     sfxController.Initialise();
 }
@@ -3355,7 +3346,11 @@ void Robot::SetPosition(Vector2 position)
 {
     this->position = position;
     head.SetPosition(position);
-    body.SetPosition(position);
+    body.SetPosition(
+            {
+                position.x + bodyOffset.x,
+                position.y + bodyOffset.y
+            });
 }
 
 
@@ -3376,8 +3371,8 @@ Vector2 Robot::GetHeadPosition() const
 // Draw the robot.
 void Robot::Draw() const
 {
-    head.Draw();
     body.Draw();
+    head.Draw();
 }
 
 // Release the resources owned by the robot's head.
@@ -3386,29 +3381,6 @@ void Robot::Shutdown()
     head.Shutdown();
     body.Shutdown();
     sfxController.Shutdown();
-}
-
-
-// Rotate the head one step to the left.
-void Robot::RotateHeadLeft()
-{
-    head.RotateLeft();
-}
-
-
-// Rotate the head one step to the right.
-void Robot::RotateHeadRight()
-{
-    head.RotateRight();
-    body.RotateRight();
-}
-
-
-// Return the head to its forward-facing position.
-void Robot::ReturnHeadToCentre()
-{
-    head.ReturnToCentre();
-    body.ReturnToCentre();
 }
 
 

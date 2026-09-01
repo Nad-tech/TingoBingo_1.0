@@ -20,23 +20,7 @@
 // Initialise the head's transform and idle animation state.
 Head::Head() :
     rotation(0.0f),
-    scale(0.0f),
-
-    homeRotation(rotation),
-    headWiggleTimer(0.0f),
-    headWiggleAmplitude(0.0f),
-    headWiggling(false),
-    nextHeadWiggle((float)GetRandomValue(5, 7)),
-    headWiggleFrequency(0.0f),
-
-    headBobOffset({0.0f, 0.0f}),
-    headBobScale(7.0f),
-    headBobAngle(0.0f),
-    headBobDirection(1.0f),
-    randomHeadBobSignTimer((float)GetRandomValue(5, 10)),
-    headBobRadiusX(GetRandomValue(3, 8)),
-    headBobRadiusY(GetRandomValue(2, 6)),
-    headBobSpeed(GetRandomValue(6, 14) / 10.0f)
+    scale(0.0f)
 {
 }
 
@@ -78,7 +62,7 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
     nose.Update(dt);
     pupils.Update(dt);
 
-    PlayIdleHeadTransform(dt);
+    //PlayIdleHeadTransform(dt);
 }
 
 void Head::Draw() const
@@ -96,7 +80,7 @@ void Head::Draw() const
 // Set the head's home position and apply it to every component.
 void Head::SetPosition(Vector2 position)
 {
-    this->homePosition = position;
+    //this->homePosition = position;
     ApplyPosition(position);
 }
 
@@ -115,7 +99,7 @@ void Head::ApplyPosition(Vector2 position)
     pupils.SetPosition(position);
 }
 
-Vector2 Head::GetPosition() const
+Vector2 Head::GetPosition()
 {
     return position;
 }
@@ -123,7 +107,6 @@ Vector2 Head::GetPosition() const
 // Set the head's home rotation.
 void Head::SetRotation(float rotation)
 {
-    homeRotation = rotation;
     ApplyRotation(rotation);
 }
 
@@ -145,72 +128,6 @@ void Head::ApplyRotation(float rotation)
 float Head::GetRotation()
 {
     return rotation;
-}
-
-// Play the head's idle movement by combining
-// bobbing and rotation animations.
-void Head::PlayIdleHeadTransform(float dt)
-{
-    PlayHeadBob(dt);
-    ApplyPosition(position);
-
-    PlayHeadWiggle(dt);
-    ApplyRotation(rotation);
-}
-
-// Randomly play a damped side-to-side wiggle.
-void Head::PlayHeadWiggle(float dt)
-{
-    nextHeadWiggle -= dt;
-
-    if (nextHeadWiggle <= 0.0f && !headWiggling)
-    {
-        headWiggling = true;
-        headWiggleTimer = 0.0f;
-        headWiggleAmplitude = (float)GetRandomValue(10, 20);
-        nextHeadWiggle = (float)GetRandomValue(5, 7);
-        headWiggleFrequency = (float)GetRandomValue(10, 40);
-    }
-
-    if (headWiggling)
-    {
-        headWiggleTimer += dt;
-
-        rotation = sin(headWiggleTimer * headWiggleFrequency) * headWiggleAmplitude;
-
-        // Gradually reduce the wiggle until the head settles.
-        headWiggleAmplitude -= 8.0f * dt;
-
-        if (headWiggleAmplitude <= 0.0f)
-        {
-            headWiggling = false;
-            rotation = homeRotation;
-        }
-    }
-}
-
-// Move the head in a slow, organic elliptical motion.
-void Head::PlayHeadBob(float dt)
-{
-    headBobAngle += dt * headBobSpeed * headBobDirection;
-
-    randomHeadBobSignTimer -= dt;
-
-    // Periodically randomise the bobbing direction and movement.
-    if (randomHeadBobSignTimer <= 0)
-    {
-        headBobDirection *= -1;
-        randomHeadBobSignTimer = (float)GetRandomValue(5, 10);
-        headBobRadiusX = GetRandomValue(3, 8);
-        headBobRadiusY = GetRandomValue(2, 6);
-        headBobSpeed = GetRandomValue(6, 14) / 10.0f;
-    }
-
-    headBobOffset.x = cos(headBobAngle) * headBobRadiusX;
-    headBobOffset.y = sin(headBobAngle) * headBobRadiusY;
-
-    position.x = homePosition.x + headBobOffset.x;
-    position.y = homePosition.y + headBobOffset.y;
 }
 
 // Rotate the pupils to look towards the given point.

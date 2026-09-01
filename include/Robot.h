@@ -1,7 +1,6 @@
 #pragma once
 
 #include "raylib.h"
-#include "head/Head.h"
 #include "RobotBrain.h"
 #include <string>
 #include "Emotion.h"
@@ -50,7 +49,7 @@ public:
 
     // Return the robot and head positions.
     Vector2 GetPosition() const;
-    Vector2 GetHeadPosition() const;
+    Vector2 GetHeadPosition();
 
 
     // Send a speech request to RobotBrain and update
@@ -62,11 +61,6 @@ public:
     // Change the robot's emotional state.
     void SetEmotion(Emotion emotion);
 
-
-    // Access the robot's Head object.
-    Head& GetHead();
-
-
     // Notify RobotBrain when the robot interacts with
     // toys or food.
     void OnObjectPickedUp(Object& object);
@@ -74,12 +68,10 @@ public:
     // Return the robot's gaze to the forward position.
     void LookForward();
 
-
     // Return the start and end points of RobotBrain's
     // current search ray.
     Vector2 GetSearchRayOrigin();
     Vector2 GetSearchRayEnd();
-
 
     // Give RobotBrain access to the toys currently
     // available in the game.
@@ -91,10 +83,6 @@ private:
 
     // Current world position of the robot.
     Vector2 position;
-
-    // Controls the robot's visual appearance and
-    // facial animations.
-    Head head;
 
     // Controls the robot's behaviour and state.
     RobotBrain robotBrain;

@@ -28,31 +28,52 @@ Body::Body() :
 // Initialise every component that makes up the robot's body.
 void Body::Initialise()
 {
+    head.Initialise();
+    head.SetPosition(position);
     bodyBase.Initialise();
     bodyBase.SetPosition(position);
+    leftArm.Initialise();
+    leftArm.SetPosition(position);
+    rightArm.Initialise();
+    rightArm.SetPosition(position);
+    leftLeg.Initialise();
+    leftLeg.SetPosition(position);
+    rightLeg.Initialise();
+    rightLeg.SetPosition(position);
 }
 
 // Release resources used by each body component.
 void Body::Shutdown()
 {
+    head.Shutdown();
     bodyBase.Shutdown();
+    leftArm.Shutdown();
+    rightArm.Shutdown();
+    leftLeg.Shutdown();
+    rightLeg.Shutdown();
 }
 
 // Update every animated body component.
 void Body::Update(float dt, bool speaking, Emotion emotion)
 {
-    //gets rid of warnings does nothing
-    if(speaking)
-    if(emotion == Emotion::Angry)
-
+    head.Update(dt, speaking, emotion);
     bodyBase.Update(dt);
+    leftArm.Update(dt);
+    rightArm.Update(dt);
+    leftLeg.Update(dt);
+    rightLeg.Update(dt);
     
     PlayIdleBodyTransform(dt);
 }
 
 void Body::Draw() const
 {
+    leftArm.Draw();
+    rightArm.Draw();
+    leftLeg.Draw();
+    rightLeg.Draw();
     bodyBase.Draw();
+    head.Draw();
 }
 
 void Body::SetPosition(Vector2 position)
@@ -65,7 +86,37 @@ void Body::ApplyPosition(Vector2 position)
 {
     this->position = position;
 
+    head.SetPosition(
+            {
+                position.x + headOffset.x,
+                position.y + headOffset.y
+            });
+
     bodyBase.SetPosition(position);
+
+    leftArm.SetPosition(
+            {
+                position.x + leftArmOffset.x,
+                position.y + leftArmOffset.y
+            });
+    
+    rightArm.SetPosition(
+            {
+                position.x + rightArmOffset.x,
+                position.y + rightArmOffset.y
+            });
+
+    leftLeg.SetPosition(
+            {
+                position.x + leftLegOffset.x,
+                position.y + leftLegOffset.y
+            });
+    
+    rightLeg.SetPosition(
+            {
+                position.x + rightLegOffset.x,
+                position.y + rightLegOffset.y
+            });
 }
 
 Vector2 Body::GetPosition() const
@@ -84,6 +135,11 @@ void Body::ApplyRotation(float rotation)
     this->rotation = rotation;
 
     bodyBase.SetRotation(rotation);
+    leftArm.SetRotation(rotation);
+    rightArm.SetRotation(rotation);
+    leftLeg.SetRotation(rotation);
+    rightLeg.SetRotation(rotation);
+    head.SetRotation(rotation);
 }
 
 float Body::GetRotation()
@@ -152,4 +208,9 @@ void Body::PlayBodyBob(float dt)
 
     position.x = homePosition.x + bodyBobOffset.x;
     position.y = homePosition.y + bodyBobOffset.y;
+}
+
+Head& Body::GetHead()
+{
+    return head;
 }

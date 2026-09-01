@@ -13,21 +13,18 @@ Robot::Robot() : robotBrain(*this){}
 // robot's starting position.
 void Robot::Initialise()
 {
-    head.Initialise();
-    head.SetPosition(position);
-
+    //head.Initialise();
     body.Initialise();
 
     sfxController.Initialise();
 }
 
 // Update the robot's behaviour through RobotBrain,
-// then update the head using the current speech state
+// then update the body using the current speech state
 // and emotional state.
 void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
-    head.Update(dt, speaking, robotBrain.GetEmotion());
     body.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
@@ -53,12 +50,15 @@ void Robot::SetSpeaking(bool state)
 void Robot::SetPosition(Vector2 position)
 {
     this->position = position;
-    head.SetPosition(position);
+    
+    //head.SetPosition(position);
+    
     body.SetPosition(
             {
                 position.x + bodyOffset.x,
                 position.y + bodyOffset.y
             });
+    
 }
 
 
@@ -70,9 +70,9 @@ Vector2 Robot::GetPosition() const
 
 
 // Return the current position of the robot's head.
-Vector2 Robot::GetHeadPosition() const
+Vector2 Robot::GetHeadPosition()
 {
-    return head.GetPosition();
+    return body.GetHead().GetPosition();
 }
 
 
@@ -80,13 +80,11 @@ Vector2 Robot::GetHeadPosition() const
 void Robot::Draw() const
 {
     body.Draw();
-    head.Draw();
 }
 
 // Release the resources owned by the robot's head.
 void Robot::Shutdown()
 {
-    head.Shutdown();
     body.Shutdown();
     sfxController.Shutdown();
 }
@@ -95,16 +93,8 @@ void Robot::Shutdown()
 // Make the robot look towards a specific point.
 void Robot::LookAt(Vector2 point)
 {
-    head.LookAt(point);
+    body.GetHead().LookAt(point);
 }
-
-
-// Return a reference to the robot's Head object.
-Head& Robot::GetHead()
-{
-    return head;
-}
-
 
 // Change the robot's emotional state through RobotBrain.
 void Robot::SetEmotion(Emotion emotion)
@@ -122,7 +112,7 @@ void Robot::OnObjectPickedUp(Object& object)
 // Make the robot return its gaze to the forward position.
 void Robot::LookForward()
 {
-    head.LookForward();
+    body.GetHead().LookForward();
 }
 
 

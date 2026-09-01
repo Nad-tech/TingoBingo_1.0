@@ -61,7 +61,7 @@ public:
     void ApplyPosition(Vector2 position);
 
     // Return the head's current position.
-    Vector2 GetPosition() const;
+    Vector2 GetPosition();
 
 
     //================================================
@@ -82,13 +82,13 @@ public:
     //================================================
 
     // Update the combined idle head movement.
-    void PlayIdleHeadTransform(float dt);
+    //void PlayIdleHeadTransform(float dt);
 
     // Play the random side-to-side head wiggle.
-    void PlayHeadWiggle(float dt);
+    //void PlayHeadWiggle(float dt);
 
     // Play the slow, organic head bob.
-    void PlayHeadBob(float dt);
+    //void PlayHeadBob(float dt);
 
 
     //================================================
@@ -110,62 +110,6 @@ private:
     // Current visual rotation and scale of the head.
     float rotation;
     float scale;
-
-
-    //================================================
-    // Head Wiggle State
-    //================================================
-
-    // Rotation used as the head's normal resting position.
-    float homeRotation;
-
-    // Tracks the progress of the current wiggle.
-    float headWiggleTimer;
-
-    // Current strength of the wiggle.
-    float headWiggleAmplitude;
-
-    // True while a wiggle animation is active.
-    bool headWiggling;
-
-    // Time remaining before another wiggle can begin.
-    float nextHeadWiggle;
-
-    // Controls how quickly the wiggle oscillates.
-    float headWiggleFrequency;
-
-
-    //================================================
-    // Head Bob State
-    //================================================
-
-    // Current positional offset produced by the bob.
-    Vector2 headBobOffset;
-
-    // Controls the scale of the bob movement.
-    float headBobScale;
-
-    // Current position within the bob's movement cycle.
-    float headBobAngle;
-
-    // Direction of the bobbing motion.
-    float headBobDirection;
-
-    // Time remaining before the bobbing direction
-    // and movement parameters are randomised.
-    float randomHeadBobSignTimer;
-
-    // Horizontal and vertical size of the bob movement.
-    float headBobRadiusX;
-    float headBobRadiusY;
-
-    // Speed of the bobbing motion.
-    float headBobSpeed;
-
-    // Position the head returns to after applying
-    // its idle movement.
-    Vector2 homePosition;
-
 
     //================================================
     // Head Components

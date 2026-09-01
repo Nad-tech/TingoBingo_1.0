@@ -5,6 +5,7 @@
 #include "BodyBase.h"
 #include "Arm.h"
 #include "Leg.h"
+#include "head/Head.h"
 
 class Body
 {
@@ -13,11 +14,15 @@ public:
     Body();
 
     void Initialise();
+    
     void Shutdown();
+    
     void Update(float dt, bool speaking, Emotion emotion);
 
     void Draw() const;
+    
     void SetPosition(Vector2 position);
+    
     void ApplyPosition(Vector2 position);
 
     Vector2 GetPosition() const;
@@ -34,6 +39,12 @@ public:
 
     void PlayBodyBob(float dt);
 
+    Head& GetHead();
+    
+    Leg rightLeg;
+    Leg leftLeg;
+    Arm rightArm;
+    Arm leftArm;
 
 private:
     Vector2 position;
@@ -89,11 +100,18 @@ private:
     // its idle movement.
     Vector2 homePosition;
 
+    Head head;
+
     BodyBase bodyBase;
-    Leg rightLeg;
-    Leg leftLeg;
-    Arm rightArm;
-    Arm leftArm;
 
+    float armX = 165.0f; 
+    float legX = 40.0f;
+    float legY = 200.0f;
+    
+    Vector2 leftArmOffset = {-armX, 0};
+    Vector2 rightArmOffset = {armX, 0};
+    Vector2 leftLegOffset = {-legX, legY};
+    Vector2 rightLegOffset = {legX, legY};
 
+    Vector2 headOffset = {0.0f, -200.0f};
 };
