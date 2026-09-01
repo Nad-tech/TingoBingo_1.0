@@ -70,19 +70,6 @@ void Game::Initialise()
 // Process keyboard input.
 void Game::HandleInput()
 {
-	if (input.LeftPressed())
-	{
-		robot.RotateHeadLeft();
-	}
-	else if (input.RightPressed())
-	{
-		robot.RotateHeadRight();
-	}
-	else
-	{
-		robot.ReturnHeadToCentre();
-	}
-
 	if (input.SpacePressed())
 	{
 		robot.Speak("Hello Alby, my name is tingo bingo");

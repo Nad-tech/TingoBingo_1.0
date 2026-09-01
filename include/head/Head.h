@@ -77,24 +77,6 @@ public:
     // Return the current head rotation.
     float GetRotation();
 
-
-    //================================================
-    // Head Orientation
-    //================================================
-
-    // Rotate the head one frame left or right.
-    void RotateLeft();
-    void RotateRight();
-
-    // Gradually return the head to its forward-facing
-    // position.
-    void ReturnToCentre();
-
-    // Return true when the front-facing head sprite
-    // is currently active.
-    bool IsFrontFacing() const;
-
-
     //================================================
     // Idle Animation
     //================================================

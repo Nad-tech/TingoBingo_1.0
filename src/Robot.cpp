@@ -92,29 +92,6 @@ void Robot::Shutdown()
 }
 
 
-// Rotate the head one step to the left.
-void Robot::RotateHeadLeft()
-{
-    head.RotateLeft();
-}
-
-
-// Rotate the head one step to the right.
-void Robot::RotateHeadRight()
-{
-    head.RotateRight();
-    body.RotateRight();
-}
-
-
-// Return the head to its forward-facing position.
-void Robot::ReturnHeadToCentre()
-{
-    head.ReturnToCentre();
-    body.ReturnToCentre();
-}
-
-
 // Make the robot look towards a specific point.
 void Robot::LookAt(Vector2 point)
 {

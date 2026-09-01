@@ -50,39 +50,6 @@ int Headbase::GetFrame() const
     return animation.GetFrame();
 }
 
-// Rotate the head one frame to the left.
-void Headbase::RotateLeft()
-{
-    animation.PreviousFrame();
-}
-
-// Rotate the head one frame to the right.
-void Headbase::RotateRight()
-{
-    animation.NextFrame();
-}
-
-// Gradually return the head to its forward-facing position
-// using the shortest rotation direction.
-void Headbase::ReturnToCentre()
-{
-    int frame = animation.GetFrame();
-    int halfTurn = animation.GetTotalFrames() / 2;
-
-    if (frame == 0)
-        return;
-
-    // Decide which direction requires the fewest frames.
-    if (frame < halfTurn)
-    {
-        animation.PreviousFrame();
-    }
-    else
-    {
-        animation.NextFrame();
-    }
-}
-
 // Apply a rotation transform to the head sprite.
 void Headbase::SetRotation(float rotation)
 {

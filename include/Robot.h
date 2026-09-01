@@ -44,13 +44,6 @@ public:
     // Set the robot's world position.
     void SetPosition(Vector2 position);
 
-
-    // Control the head's rotation.
-    void RotateHeadLeft();
-    void RotateHeadRight();
-    void ReturnHeadToCentre();
-
-
     // Make the robot look towards a specific point.
     void LookAt(Vector2 point);
 

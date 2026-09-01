@@ -3,6 +3,8 @@
 #include "raylib.h"
 #include "Emotion.h"
 #include "BodyBase.h"
+#include "Arm.h"
+#include "Leg.h"
 
 class Body
 {
@@ -25,13 +27,6 @@ public:
     void ApplyRotation(float rotation);
 
     float GetRotation();
-
-    void RotateLeft();
-    void RotateRight();
-    void ReturnToCentre();
-
-    bool IsFrontFacing() const;
-
 
     void PlayIdleBodyTransform(float dt);
 
@@ -95,4 +90,10 @@ private:
     Vector2 homePosition;
 
     BodyBase bodyBase;
+    Leg rightLeg;
+    Leg leftLeg;
+    Arm rightArm;
+    Arm leftArm;
+
+
 };

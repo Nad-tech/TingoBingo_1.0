@@ -83,24 +83,14 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
 
 void Head::Draw() const
 {
-    // Draw the full face only when the head is facing forward.
-    // During head rotation the facial features are already
-    // baked into the head sprite.
-    if (IsFrontFacing())
-    {
-        ears.Draw();
-        headBase.Draw();
-        eyes.Draw();
-        mouth.Draw();
-        nose.Draw();
-        eyebrows.Draw();
-        antenna.Draw();
-        pupils.Draw();
-    }
-    else
-    {
-        headBase.Draw();
-    }
+    ears.Draw();
+    headBase.Draw();
+    eyes.Draw();
+    mouth.Draw();
+    nose.Draw();
+    eyebrows.Draw();
+    antenna.Draw();
+    pupils.Draw();
 }
 
 // Set the head's home position and apply it to every component.
@@ -128,30 +118,6 @@ void Head::ApplyPosition(Vector2 position)
 Vector2 Head::GetPosition() const
 {
     return position;
-}
-
-// Rotate the head one frame to the left.
-void Head::RotateLeft()
-{
-    headBase.RotateLeft();
-}
-
-// Rotate the head one frame to the right.
-void Head::RotateRight()
-{
-    headBase.RotateRight();
-}
-
-// Return the head to its forward-facing position.
-void Head::ReturnToCentre()
-{
-    headBase.ReturnToCentre();
-}
-
-// Returns true when the front-facing head sprite is active.
-bool Head::IsFrontFacing() const
-{
-    return headBase.GetFrame() == 0;
 }
 
 // Set the head's home rotation.

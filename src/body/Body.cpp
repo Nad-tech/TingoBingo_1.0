@@ -52,14 +52,7 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    if (IsFrontFacing())
-    {
-        bodyBase.Draw();
-    }
-    else
-    {
-        bodyBase.Draw();
-    }
+    bodyBase.Draw();
 }
 
 void Body::SetPosition(Vector2 position)
@@ -78,26 +71,6 @@ void Body::ApplyPosition(Vector2 position)
 Vector2 Body::GetPosition() const
 {
     return position;
-}
-
-void Body::RotateLeft()
-{
-    bodyBase.RotateLeft();
-}
-
-void Body::RotateRight()
-{
-    bodyBase.RotateRight();
-}
-
-void Body::ReturnToCentre()
-{
-    bodyBase.ReturnToCentre();
-}
-
-bool Body::IsFrontFacing() const
-{
-    return bodyBase.GetFrame() == 0;
 }
 
 void Body::SetRotation(float rotation)
