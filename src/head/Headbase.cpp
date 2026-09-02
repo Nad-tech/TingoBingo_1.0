@@ -42,6 +42,8 @@ void Headbase::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    origin = {50,235};
 }
 
 // Return the current head animation frame.

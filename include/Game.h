@@ -19,7 +19,9 @@ private:
 	void Draw();
 	
 	Robot robot;
-	Vector2 robotWorldPos = {SCREEN_WIDTH / 2.0f, 130.0f};
+	Vector2 robotWorldPos = {
+		SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f
+	};
 	Input input;
 	Object ball;
 	Object banana;

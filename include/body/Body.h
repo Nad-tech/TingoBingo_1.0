@@ -113,5 +113,5 @@ private:
     Vector2 leftLegOffset = {-legX, legY};
     Vector2 rightLegOffset = {legX, legY};
 
-    Vector2 headOffset = {0.0f, -200.0f};
+    Vector2 headOffset = {0.0f, 0.0f};
 };

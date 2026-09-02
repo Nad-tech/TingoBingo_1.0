@@ -13,7 +13,6 @@ Robot::Robot() : robotBrain(*this){}
 // robot's starting position.
 void Robot::Initialise()
 {
-    //head.Initialise();
     body.Initialise();
 
     sfxController.Initialise();
@@ -50,15 +49,7 @@ void Robot::SetSpeaking(bool state)
 void Robot::SetPosition(Vector2 position)
 {
     this->position = position;
-    
-    //head.SetPosition(position);
-    
-    body.SetPosition(
-            {
-                position.x + bodyOffset.x,
-                position.y + bodyOffset.y
-            });
-    
+    body.SetPosition(position);
 }
 
 

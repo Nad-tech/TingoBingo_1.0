@@ -28,10 +28,10 @@ Body::Body() :
 // Initialise every component that makes up the robot's body.
 void Body::Initialise()
 {
-    head.Initialise();
-    head.SetPosition(position);
     bodyBase.Initialise();
     bodyBase.SetPosition(position);
+    head.Initialise();
+    head.SetPosition(position);
     leftArm.Initialise();
     leftArm.SetPosition(position);
     rightArm.Initialise();
@@ -68,11 +68,15 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    leftArm.Draw();
-    rightArm.Draw();
-    leftLeg.Draw();
-    rightLeg.Draw();
+    //leftArm.Draw();
+    //rightArm.Draw();
+    //leftLeg.Draw();
+    //rightLeg.Draw();
+    
     bodyBase.Draw();
+
+    DrawCircleV(position, 5.0f, RED);
+  
     head.Draw();
 }
 
@@ -86,13 +90,13 @@ void Body::ApplyPosition(Vector2 position)
 {
     this->position = position;
 
+    bodyBase.SetPosition(position);
+
     head.SetPosition(
             {
                 position.x + headOffset.x,
                 position.y + headOffset.y
             });
-
-    bodyBase.SetPosition(position);
 
     leftArm.SetPosition(
             {

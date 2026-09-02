@@ -117,10 +117,10 @@ void Game::Draw()
 	robot.Draw();
 	
 	//ball.DrawCollisionBox();
-	ball.Draw();
+	//ball.Draw();
 	
 	//banana.DrawCollisionBox();
-	banana.Draw();
+	//banana.Draw();
 	
 	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 }

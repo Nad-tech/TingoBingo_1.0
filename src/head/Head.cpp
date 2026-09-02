@@ -67,20 +67,22 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
 
 void Head::Draw() const
 {
-    ears.Draw();
+    //ears.Draw();
     headBase.Draw();
-    eyes.Draw();
-    mouth.Draw();
-    nose.Draw();
-    eyebrows.Draw();
-    antenna.Draw();
-    pupils.Draw();
+
+    DrawCircleV(position, 5.0f, GREEN);
+
+    //eyes.Draw();
+    //mouth.Draw();
+    //nose.Draw();
+    //eyebrows.Draw();
+    //antenna.Draw();
+    //pupils.Draw();
 }
 
 // Set the head's home position and apply it to every component.
 void Head::SetPosition(Vector2 position)
 {
-    //this->homePosition = position;
     ApplyPosition(position);
 }
 

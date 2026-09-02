@@ -190,6 +190,7 @@ class Arm : public Sprite
 #include "BodyBase.h"
 #include "Arm.h"
 #include "Leg.h"
+#include "head/Head.h"
 
 class Body
 {
@@ -198,11 +199,15 @@ public:
     Body();
 
     void Initialise();
+    
     void Shutdown();
+    
     void Update(float dt, bool speaking, Emotion emotion);
 
     void Draw() const;
+    
     void SetPosition(Vector2 position);
+    
     void ApplyPosition(Vector2 position);
 
     Vector2 GetPosition() const;
@@ -219,6 +224,12 @@ public:
 
     void PlayBodyBob(float dt);
 
+    Head& GetHead();
+    
+    Leg rightLeg;
+    Leg leftLeg;
+    Arm rightArm;
+    Arm leftArm;
 
 private:
     Vector2 position;
@@ -274,13 +285,20 @@ private:
     // its idle movement.
     Vector2 homePosition;
 
+    Head head;
+
     BodyBase bodyBase;
-    Leg rightLeg;
-    Leg leftLeg;
-    Arm rightArm;
-    Arm leftArm;
 
+    float armX = 165.0f; 
+    float legX = 40.0f;
+    float legY = 200.0f;
+    
+    Vector2 leftArmOffset = {-armX, 0};
+    Vector2 rightArmOffset = {armX, 0};
+    Vector2 leftLegOffset = {-legX, legY};
+    Vector2 rightLegOffset = {legX, legY};
 
+    Vector2 headOffset = {0.0f, -185.0f};
 };
 
 
@@ -393,7 +411,9 @@ private:
 	void Draw();
 	
 	Robot robot;
-	Vector2 robotWorldPos = {SCREEN_WIDTH / 2.0f, 200.0f};
+	Vector2 robotWorldPos = {
+		SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f
+	};
 	Input input;
 	Object ball;
 	Object banana;
@@ -555,7 +575,7 @@ public:
     void ApplyPosition(Vector2 position);
 
     // Return the head's current position.
-    Vector2 GetPosition() const;
+    Vector2 GetPosition();
 
 
     //================================================
@@ -576,13 +596,13 @@ public:
     //================================================
 
     // Update the combined idle head movement.
-    void PlayIdleHeadTransform(float dt);
+    //void PlayIdleHeadTransform(float dt);
 
     // Play the random side-to-side head wiggle.
-    void PlayHeadWiggle(float dt);
+    //void PlayHeadWiggle(float dt);
 
     // Play the slow, organic head bob.
-    void PlayHeadBob(float dt);
+    //void PlayHeadBob(float dt);
 
 
     //================================================
@@ -594,8 +614,6 @@ public:
 
     // Return the pupils to their forward-facing position.
     void LookForward();
-
-
 private:
 
     // Current world position of the head.
@@ -604,62 +622,6 @@ private:
     // Current visual rotation and scale of the head.
     float rotation;
     float scale;
-
-
-    //================================================
-    // Head Wiggle State
-    //================================================
-
-    // Rotation used as the head's normal resting position.
-    float homeRotation;
-
-    // Tracks the progress of the current wiggle.
-    float headWiggleTimer;
-
-    // Current strength of the wiggle.
-    float headWiggleAmplitude;
-
-    // True while a wiggle animation is active.
-    bool headWiggling;
-
-    // Time remaining before another wiggle can begin.
-    float nextHeadWiggle;
-
-    // Controls how quickly the wiggle oscillates.
-    float headWiggleFrequency;
-
-
-    //================================================
-    // Head Bob State
-    //================================================
-
-    // Current positional offset produced by the bob.
-    Vector2 headBobOffset;
-
-    // Controls the scale of the bob movement.
-    float headBobScale;
-
-    // Current position within the bob's movement cycle.
-    float headBobAngle;
-
-    // Direction of the bobbing motion.
-    float headBobDirection;
-
-    // Time remaining before the bobbing direction
-    // and movement parameters are randomised.
-    float randomHeadBobSignTimer;
-
-    // Horizontal and vertical size of the bob movement.
-    float headBobRadiusX;
-    float headBobRadiusY;
-
-    // Speed of the bobbing motion.
-    float headBobSpeed;
-
-    // Position the head returns to after applying
-    // its idle movement.
-    Vector2 homePosition;
-
 
     //================================================
     // Head Components
@@ -893,7 +855,6 @@ class Object : public Sprite
 #pragma once
 
 #include "raylib.h"
-#include "head/Head.h"
 #include "RobotBrain.h"
 #include <string>
 #include "Emotion.h"
@@ -942,7 +903,7 @@ public:
 
     // Return the robot and head positions.
     Vector2 GetPosition() const;
-    Vector2 GetHeadPosition() const;
+    Vector2 GetHeadPosition();
 
 
     // Send a speech request to RobotBrain and update
@@ -954,11 +915,6 @@ public:
     // Change the robot's emotional state.
     void SetEmotion(Emotion emotion);
 
-
-    // Access the robot's Head object.
-    Head& GetHead();
-
-
     // Notify RobotBrain when the robot interacts with
     // toys or food.
     void OnObjectPickedUp(Object& object);
@@ -966,12 +922,10 @@ public:
     // Return the robot's gaze to the forward position.
     void LookForward();
 
-
     // Return the start and end points of RobotBrain's
     // current search ray.
     Vector2 GetSearchRayOrigin();
     Vector2 GetSearchRayEnd();
-
 
     // Give RobotBrain access to the toys currently
     // available in the game.
@@ -984,10 +938,6 @@ private:
     // Current world position of the robot.
     Vector2 position;
 
-    // Controls the robot's visual appearance and
-    // facial animations.
-    Head head;
-
     // Controls the robot's behaviour and state.
     RobotBrain robotBrain;
 
@@ -998,7 +948,6 @@ private:
     SfxController sfxController;
 
     Body body;
-    Vector2 bodyOffset = {0.0f, 220.0f};
 };
 
 
@@ -1288,6 +1237,7 @@ public:
 
 #include "raylib.h"
 #include "Animation.h"
+#include "Constants.h"
 
 class Sprite
 {
@@ -1311,9 +1261,6 @@ public:
     Vector2 GetPosition() const;
 
     void SetRotation(float rotation);
-
-    void MoveSpriteUp();
-    void MoveSpriteDown();
 
     virtual ~Sprite() = default;
 };
@@ -1599,6 +1546,8 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     bodyBase.SetPosition(position);
+    head.Initialise();
+    head.SetPosition(position);
     leftArm.Initialise();
     leftArm.SetPosition(position);
     rightArm.Initialise();
@@ -1607,12 +1556,12 @@ void Body::Initialise()
     leftLeg.SetPosition(position);
     rightLeg.Initialise();
     rightLeg.SetPosition(position);
-
 }
 
 // Release resources used by each body component.
 void Body::Shutdown()
 {
+    head.Shutdown();
     bodyBase.Shutdown();
     leftArm.Shutdown();
     rightArm.Shutdown();
@@ -1623,10 +1572,7 @@ void Body::Shutdown()
 // Update every animated body component.
 void Body::Update(float dt, bool speaking, Emotion emotion)
 {
-    //gets rid of warnings does nothing
-    if(speaking)
-    if(emotion == Emotion::Angry)
-
+    head.Update(dt, speaking, emotion);
     bodyBase.Update(dt);
     leftArm.Update(dt);
     rightArm.Update(dt);
@@ -1638,11 +1584,16 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
+    //leftArm.Draw();
+    //rightArm.Draw();
+    //leftLeg.Draw();
+    //rightLeg.Draw();
+    
     bodyBase.Draw();
-    leftArm.Draw();
-    rightArm.Draw();
-    leftLeg.Draw();
-    rightLeg.Draw();
+
+    DrawCircleV(position, 5.0f, RED);
+  
+    head.Draw();
 }
 
 void Body::SetPosition(Vector2 position)
@@ -1656,10 +1607,36 @@ void Body::ApplyPosition(Vector2 position)
     this->position = position;
 
     bodyBase.SetPosition(position);
-    leftArm.SetPosition(position);
-    rightArm.SetPosition(position);
-    leftLeg.SetPosition(position);
-    rightLeg.SetPosition(position);
+
+    head.SetPosition(
+            {
+                position.x + headOffset.x,
+                position.y + headOffset.y
+            });
+
+    leftArm.SetPosition(
+            {
+                position.x + leftArmOffset.x,
+                position.y + leftArmOffset.y
+            });
+    
+    rightArm.SetPosition(
+            {
+                position.x + rightArmOffset.x,
+                position.y + rightArmOffset.y
+            });
+
+    leftLeg.SetPosition(
+            {
+                position.x + leftLegOffset.x,
+                position.y + leftLegOffset.y
+            });
+    
+    rightLeg.SetPosition(
+            {
+                position.x + rightLegOffset.x,
+                position.y + rightLegOffset.y
+            });
 }
 
 Vector2 Body::GetPosition() const
@@ -1682,6 +1659,7 @@ void Body::ApplyRotation(float rotation)
     rightArm.SetRotation(rotation);
     leftLeg.SetRotation(rotation);
     rightLeg.SetRotation(rotation);
+    head.SetRotation(rotation);
 }
 
 float Body::GetRotation()
@@ -1750,6 +1728,11 @@ void Body::PlayBodyBob(float dt)
 
     position.x = homePosition.x + bodyBobOffset.x;
     position.y = homePosition.y + bodyBobOffset.y;
+}
+
+Head& Body::GetHead()
+{
+    return head;
 }
 
 
@@ -1983,10 +1966,10 @@ void Game::Draw()
 	robot.Draw();
 	
 	//ball.DrawCollisionBox();
-	ball.Draw();
+	//ball.Draw();
 	
 	//banana.DrawCollisionBox();
-	banana.Draw();
+	//banana.Draw();
 	
 	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 }
@@ -2377,23 +2360,7 @@ void Eyes::Update(float dt)
 // Initialise the head's transform and idle animation state.
 Head::Head() :
     rotation(0.0f),
-    scale(0.0f),
-
-    homeRotation(rotation),
-    headWiggleTimer(0.0f),
-    headWiggleAmplitude(0.0f),
-    headWiggling(false),
-    nextHeadWiggle((float)GetRandomValue(5, 7)),
-    headWiggleFrequency(0.0f),
-
-    headBobOffset({0.0f, 0.0f}),
-    headBobScale(7.0f),
-    headBobAngle(0.0f),
-    headBobDirection(1.0f),
-    randomHeadBobSignTimer((float)GetRandomValue(5, 10)),
-    headBobRadiusX(GetRandomValue(3, 8)),
-    headBobRadiusY(GetRandomValue(2, 6)),
-    headBobSpeed(GetRandomValue(6, 14) / 10.0f)
+    scale(0.0f)
 {
 }
 
@@ -2435,25 +2402,27 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
     nose.Update(dt);
     pupils.Update(dt);
 
-    PlayIdleHeadTransform(dt);
+    //PlayIdleHeadTransform(dt);
 }
 
 void Head::Draw() const
 {
-    ears.Draw();
+    //ears.Draw();
     headBase.Draw();
-    eyes.Draw();
-    mouth.Draw();
-    nose.Draw();
-    eyebrows.Draw();
-    antenna.Draw();
-    pupils.Draw();
+
+    DrawCircleV(position, 5.0f, GREEN);
+
+    //eyes.Draw();
+    //mouth.Draw();
+    //nose.Draw();
+    //eyebrows.Draw();
+    //antenna.Draw();
+    //pupils.Draw();
 }
 
 // Set the head's home position and apply it to every component.
 void Head::SetPosition(Vector2 position)
 {
-    this->homePosition = position;
     ApplyPosition(position);
 }
 
@@ -2472,7 +2441,7 @@ void Head::ApplyPosition(Vector2 position)
     pupils.SetPosition(position);
 }
 
-Vector2 Head::GetPosition() const
+Vector2 Head::GetPosition()
 {
     return position;
 }
@@ -2480,7 +2449,6 @@ Vector2 Head::GetPosition() const
 // Set the head's home rotation.
 void Head::SetRotation(float rotation)
 {
-    homeRotation = rotation;
     ApplyRotation(rotation);
 }
 
@@ -2502,72 +2470,6 @@ void Head::ApplyRotation(float rotation)
 float Head::GetRotation()
 {
     return rotation;
-}
-
-// Play the head's idle movement by combining
-// bobbing and rotation animations.
-void Head::PlayIdleHeadTransform(float dt)
-{
-    PlayHeadBob(dt);
-    ApplyPosition(position);
-
-    PlayHeadWiggle(dt);
-    ApplyRotation(rotation);
-}
-
-// Randomly play a damped side-to-side wiggle.
-void Head::PlayHeadWiggle(float dt)
-{
-    nextHeadWiggle -= dt;
-
-    if (nextHeadWiggle <= 0.0f && !headWiggling)
-    {
-        headWiggling = true;
-        headWiggleTimer = 0.0f;
-        headWiggleAmplitude = (float)GetRandomValue(10, 20);
-        nextHeadWiggle = (float)GetRandomValue(5, 7);
-        headWiggleFrequency = (float)GetRandomValue(10, 40);
-    }
-
-    if (headWiggling)
-    {
-        headWiggleTimer += dt;
-
-        rotation = sin(headWiggleTimer * headWiggleFrequency) * headWiggleAmplitude;
-
-        // Gradually reduce the wiggle until the head settles.
-        headWiggleAmplitude -= 8.0f * dt;
-
-        if (headWiggleAmplitude <= 0.0f)
-        {
-            headWiggling = false;
-            rotation = homeRotation;
-        }
-    }
-}
-
-// Move the head in a slow, organic elliptical motion.
-void Head::PlayHeadBob(float dt)
-{
-    headBobAngle += dt * headBobSpeed * headBobDirection;
-
-    randomHeadBobSignTimer -= dt;
-
-    // Periodically randomise the bobbing direction and movement.
-    if (randomHeadBobSignTimer <= 0)
-    {
-        headBobDirection *= -1;
-        randomHeadBobSignTimer = (float)GetRandomValue(5, 10);
-        headBobRadiusX = GetRandomValue(3, 8);
-        headBobRadiusY = GetRandomValue(2, 6);
-        headBobSpeed = GetRandomValue(6, 14) / 10.0f;
-    }
-
-    headBobOffset.x = cos(headBobAngle) * headBobRadiusX;
-    headBobOffset.y = sin(headBobAngle) * headBobRadiusY;
-
-    position.x = homePosition.x + headBobOffset.x;
-    position.y = homePosition.y + headBobOffset.y;
 }
 
 // Rotate the pupils to look towards the given point.
@@ -3305,21 +3207,17 @@ Robot::Robot() : robotBrain(*this){}
 // robot's starting position.
 void Robot::Initialise()
 {
-    head.Initialise();
-    head.SetPosition(position);
-
     body.Initialise();
 
     sfxController.Initialise();
 }
 
 // Update the robot's behaviour through RobotBrain,
-// then update the head using the current speech state
+// then update the body using the current speech state
 // and emotional state.
 void Robot::Update(float dt)
 {
     robotBrain.Update(dt);
-    head.Update(dt, speaking, robotBrain.GetEmotion());
     body.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
@@ -3345,12 +3243,7 @@ void Robot::SetSpeaking(bool state)
 void Robot::SetPosition(Vector2 position)
 {
     this->position = position;
-    head.SetPosition(position);
-    body.SetPosition(
-            {
-                position.x + bodyOffset.x,
-                position.y + bodyOffset.y
-            });
+    body.SetPosition(position);
 }
 
 
@@ -3362,9 +3255,9 @@ Vector2 Robot::GetPosition() const
 
 
 // Return the current position of the robot's head.
-Vector2 Robot::GetHeadPosition() const
+Vector2 Robot::GetHeadPosition()
 {
-    return head.GetPosition();
+    return body.GetHead().GetPosition();
 }
 
 
@@ -3372,13 +3265,11 @@ Vector2 Robot::GetHeadPosition() const
 void Robot::Draw() const
 {
     body.Draw();
-    head.Draw();
 }
 
 // Release the resources owned by the robot's head.
 void Robot::Shutdown()
 {
-    head.Shutdown();
     body.Shutdown();
     sfxController.Shutdown();
 }
@@ -3387,16 +3278,8 @@ void Robot::Shutdown()
 // Make the robot look towards a specific point.
 void Robot::LookAt(Vector2 point)
 {
-    head.LookAt(point);
+    body.GetHead().LookAt(point);
 }
-
-
-// Return a reference to the robot's Head object.
-Head& Robot::GetHead()
-{
-    return head;
-}
-
 
 // Change the robot's emotional state through RobotBrain.
 void Robot::SetEmotion(Emotion emotion)
@@ -3414,7 +3297,7 @@ void Robot::OnObjectPickedUp(Object& object)
 // Make the robot return its gaze to the forward position.
 void Robot::LookForward()
 {
-    head.LookForward();
+    body.GetHead().LookForward();
 }
 
 
@@ -5629,18 +5512,16 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * scale
     };
 
-    // Rotate around the centre of the sprite.
-    Vector2 origin =
-    {
-        destination.width / 2.0f,
-        destination.height / 2.0f
+    Vector2 origin = { 
+        animation.GetFrameWidth() * scale / 2.0f, 
+        animation.GetFrameHeight() * scale / 2.0f
     };
 
     DrawTexturePro(
         texture,
         source,
         destination,
-        origin,
+        {origin.x * scale, origin.y * scale}, 
         rotation,
         WHITE
     );
@@ -5662,26 +5543,6 @@ void Sprite::SetPosition(Vector2 position)
 Vector2 Sprite::GetPosition() const
 {
     return position;
-}
-
-// Move the sprite up by one pixel.
-void Sprite::MoveSpriteUp()
-{
-    this->SetPosition(
-    {
-        this->GetPosition().x,
-        this->GetPosition().y - 1.0f
-    });
-}
-
-// Move the sprite down by one pixel.
-void Sprite::MoveSpriteDown()
-{
-    this->SetPosition(
-    {
-        this->GetPosition().x,
-        this->GetPosition().y + 1.0f
-    });
 }
 
 // Set the sprite's rotation in degrees.

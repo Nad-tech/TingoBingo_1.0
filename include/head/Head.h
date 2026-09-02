@@ -100,8 +100,6 @@ public:
 
     // Return the pupils to their forward-facing position.
     void LookForward();
-
-
 private:
 
     // Current world position of the head.

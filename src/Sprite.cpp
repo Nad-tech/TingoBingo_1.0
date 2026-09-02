@@ -29,18 +29,16 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * scale
     };
 
-    // Rotate around the centre of the sprite.
-    Vector2 origin =
-    {
-        destination.width / 2.0f,
-        destination.height / 2.0f
+    Vector2 drawOrigin = { 
+        origin.x * scale,
+        origin.y * scale
     };
 
     DrawTexturePro(
         texture,
         source,
         destination,
-        origin,
+        drawOrigin, 
         rotation,
         WHITE
     );
@@ -62,26 +60,6 @@ void Sprite::SetPosition(Vector2 position)
 Vector2 Sprite::GetPosition() const
 {
     return position;
-}
-
-// Move the sprite up by one pixel.
-void Sprite::MoveSpriteUp()
-{
-    this->SetPosition(
-    {
-        this->GetPosition().x,
-        this->GetPosition().y - 1.0f
-    });
-}
-
-// Move the sprite down by one pixel.
-void Sprite::MoveSpriteDown()
-{
-    this->SetPosition(
-    {
-        this->GetPosition().x,
-        this->GetPosition().y + 1.0f
-    });
 }
 
 // Set the sprite's rotation in degrees.
