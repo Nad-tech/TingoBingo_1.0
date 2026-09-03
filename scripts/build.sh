@@ -3,52 +3,23 @@
 #====================================================
 # build.sh
 #
-# Builds the TingoBingo project using g++ and Raylib,
-# then launches the executable.
+# Builds and runs TingoBingo using Make.
 #====================================================
 
-# Exit immediately if any command fails.
 set -e
-
-EXE_NAME="TingoBingo"
 
 # Move to the project root regardless of where the
 # script was launched from.
 cd "$(dirname "$0")/.."
 
-echo "Building $EXE_NAME..."
+echo "Building TingoBingo..."
 
-# Create the build folder if it doesn't already exist.
-mkdir -p build
+mingw32-make
 
-# Remove any previous executable to ensure a clean build.
-rm -f build/TingoBingo.exe
+echo
+echo "Build successful."
+echo "Running TingoBingo..."
+echo
 
-echo src/*.cpp
+./build/TingoBingo.exe &
 
-echo src/head/*.cpp
-
-echo src/body/*.cpp
-
-# Compile all project source files and link the
-# required Raylib and Windows libraries.
-g++ \
-    -g \
-    -Wall \
-    -Wextra \
-    -std=c++23 \
-    -Iinclude \
-    src/*.cpp \
-    src/head/*.cpp \
-    src/body/*.cpp \
-    -o build/$EXE_NAME.exe \
-    -lraylib \
-    -lopengl32 \
-    -lgdi32 \
-    -lwinmm
-
-echo "Build successful"
-echo "Running $EXE_NAME..."
-
-# Launch the application in the background.
-./build/$EXE_NAME.exe &
