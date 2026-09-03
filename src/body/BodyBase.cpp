@@ -48,3 +48,14 @@ void BodyBase::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
+
+float BodyBase::GetFrameWidth() const
+{
+    return animation.GetFrameWidth();
+}
+
+float BodyBase::GetFrameHeight() const
+{
+    return animation.GetFrameHeight();
+}
+

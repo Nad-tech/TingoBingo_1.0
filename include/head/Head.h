@@ -32,8 +32,7 @@ public:
     // Initialise the head's transform and idle
     // animation state.
     Head();
-
-
+    
     // Load and release all head component resources.
     void Initialise();
     void Shutdown();
@@ -100,6 +99,9 @@ public:
 
     // Return the pupils to their forward-facing position.
     void LookForward();
+
+    void SetBodyDimensions(float width, float height);
+    
 private:
 
     // Current world position of the head.
@@ -125,4 +127,7 @@ private:
     Mouth mouth;
     Nose nose;
     Pupils pupils;
+
+    float bodyWidth;
+    float bodyHeight;
 };

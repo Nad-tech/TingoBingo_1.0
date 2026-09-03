@@ -43,7 +43,10 @@ void Headbase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    origin = {50,235};
+    origin = {
+        FRAME_WIDTH / 2.0f, 
+        (FRAME_HEIGHT / 1.0f) + (bodyHeight / 2.0f)
+    };
 }
 
 // Return the current head animation frame.
@@ -56,4 +59,10 @@ int Headbase::GetFrame() const
 void Headbase::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+}
+
+void Headbase::SetBodyDimensions(float width, float height)
+{
+    bodyWidth = width;
+    bodyHeight = height;
 }

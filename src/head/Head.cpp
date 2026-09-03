@@ -20,7 +20,9 @@
 // Initialise the head's transform and idle animation state.
 Head::Head() :
     rotation(0.0f),
-    scale(0.0f)
+    scale(0.0f),
+    bodyWidth(0.0f),
+    bodyHeight(0.0f)
 {
 }
 
@@ -69,9 +71,6 @@ void Head::Draw() const
 {
     //ears.Draw();
     headBase.Draw();
-
-    DrawCircleV(position, 5.0f, GREEN);
-
     //eyes.Draw();
     //mouth.Draw();
     //nose.Draw();
@@ -141,4 +140,12 @@ void Head::LookAt(Vector2 point)
 void Head::LookForward()
 {
     pupils.LookForward();
+}
+
+void Head::SetBodyDimensions(float width, float height)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+
+    headBase.SetBodyDimensions(width, height);
 }

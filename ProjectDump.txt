@@ -285,9 +285,9 @@ private:
     // its idle movement.
     Vector2 homePosition;
 
-    Head head;
-
     BodyBase bodyBase;
+
+    Head head;
 
     float armX = 165.0f; 
     float legX = 40.0f;
@@ -298,7 +298,7 @@ private:
     Vector2 leftLegOffset = {-legX, legY};
     Vector2 rightLegOffset = {legX, legY};
 
-    Vector2 headOffset = {0.0f, -185.0f};
+    Vector2 headOffset = {0.0f, 0.0f};
 };
 
 
@@ -316,6 +316,8 @@ class BodyBase : public Sprite
         void Initialise() override;
         int GetFrame() const;
         void SetRotation(float rotation);
+        float GetFrameWidth() const;
+        float GetFrameHeight() const;
 };
 
 
@@ -546,8 +548,7 @@ public:
     // Initialise the head's transform and idle
     // animation state.
     Head();
-
-
+    
     // Load and release all head component resources.
     void Initialise();
     void Shutdown();
@@ -614,6 +615,9 @@ public:
 
     // Return the pupils to their forward-facing position.
     void LookForward();
+
+    void SetBodyDimensions(float width, float height);
+    
 private:
 
     // Current world position of the head.
@@ -639,6 +643,9 @@ private:
     Mouth mouth;
     Nose nose;
     Pupils pupils;
+
+    float bodyWidth;
+    float bodyHeight;
 };
 
 
@@ -656,6 +663,11 @@ class Headbase : public Sprite
         void Initialise() override;
         int GetFrame() const;
         void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height);
+
+    private:
+        float bodyWidth;
+        float bodyHeight;
 };
 
 
@@ -1248,6 +1260,7 @@ protected:
     Vector2 position = {0,0};
     float rotation = 0.0f;
     float scale = 1.0f;
+    Vector2 origin = {0,0};
 
 public:
     virtual void Initialise() = 0;
@@ -1546,6 +1559,11 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     bodyBase.SetPosition(position);
+    head.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight()
+    );
+
     head.Initialise();
     head.SetPosition(position);
     leftArm.Initialise();
@@ -1775,6 +1793,8 @@ void BodyBase::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    origin = {FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f}; 
 }
 
 // Return the current head animation frame.
@@ -1788,6 +1808,17 @@ void BodyBase::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
+
+float BodyBase::GetFrameWidth() const
+{
+    return animation.GetFrameWidth();
+}
+
+float BodyBase::GetFrameHeight() const
+{
+    return animation.GetFrameHeight();
+}
+
 
 
 =====================================
@@ -2360,7 +2391,9 @@ void Eyes::Update(float dt)
 // Initialise the head's transform and idle animation state.
 Head::Head() :
     rotation(0.0f),
-    scale(0.0f)
+    scale(0.0f),
+    bodyWidth(0.0f),
+    bodyHeight(0.0f)
 {
 }
 
@@ -2483,6 +2516,14 @@ void Head::LookForward()
     pupils.LookForward();
 }
 
+void Head::SetBodyDimensions(float width, float height)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+
+    headBase.SetBodyDimensions(width, height);
+}
+
 
 =====================================
 .\src\head\Headbase.cpp
@@ -2532,6 +2573,8 @@ void Headbase::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    origin = {bodyWidth / 2, bodyHeight / 2};
 }
 
 // Return the current head animation frame.
@@ -2544,6 +2587,12 @@ int Headbase::GetFrame() const
 void Headbase::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+}
+
+void Headbase::SetBodyDimensions(float width, float height)
+{
+    bodyWidth = width;
+    bodyHeight = height;
 }
 
 
@@ -5512,16 +5561,16 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * scale
     };
 
-    Vector2 origin = { 
-        animation.GetFrameWidth() * scale / 2.0f, 
-        animation.GetFrameHeight() * scale / 2.0f
+    Vector2 drawOrigin = { 
+        origin.x * scale,
+        origin.y * scale
     };
 
     DrawTexturePro(
         texture,
         source,
         destination,
-        {origin.x * scale, origin.y * scale}, 
+        drawOrigin, 
         rotation,
         WHITE
     );

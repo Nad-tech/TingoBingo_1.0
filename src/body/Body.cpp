@@ -30,6 +30,11 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     bodyBase.SetPosition(position);
+    head.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight()
+    );
+
     head.Initialise();
     head.SetPosition(position);
     leftArm.Initialise();

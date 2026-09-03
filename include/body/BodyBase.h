@@ -8,4 +8,6 @@ class BodyBase : public Sprite
         void Initialise() override;
         int GetFrame() const;
         void SetRotation(float rotation);
+        float GetFrameWidth() const;
+        float GetFrameHeight() const;
 };

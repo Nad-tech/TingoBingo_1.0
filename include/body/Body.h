@@ -41,11 +41,6 @@ public:
 
     Head& GetHead();
     
-    Leg rightLeg;
-    Leg leftLeg;
-    Arm rightArm;
-    Arm leftArm;
-
 private:
     Vector2 position;
 
@@ -100,18 +95,19 @@ private:
     // its idle movement.
     Vector2 homePosition;
 
-    Head head;
-
     BodyBase bodyBase;
 
-    float armX = 165.0f; 
-    float legX = 40.0f;
-    float legY = 200.0f;
-    
-    Vector2 leftArmOffset = {-armX, 0};
-    Vector2 rightArmOffset = {armX, 0};
-    Vector2 leftLegOffset = {-legX, legY};
-    Vector2 rightLegOffset = {legX, legY};
+    Head head;
+    Leg rightLeg;
+    Leg leftLeg;
+    Arm rightArm;
+    Arm leftArm;
+
+
+    Vector2 leftArmOffset = {0, 0};
+    Vector2 rightArmOffset = {0, 0};
+    Vector2 leftLegOffset = {0, 0};
+    Vector2 rightLegOffset = {0, 0};
 
     Vector2 headOffset = {0.0f, 0.0f};
 };
