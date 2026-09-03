@@ -54,7 +54,18 @@ void Body::Initialise()
     );
     rightArm.Initialise();
     
+    leftLeg.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "left"
+    );
     leftLeg.Initialise();
+
+    rightLeg.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "right"
+    );
     rightLeg.Initialise();
 }
 
@@ -86,8 +97,8 @@ void Body::Draw() const
 {
     leftArm.Draw();
     rightArm.Draw();
-    //leftLeg.Draw();
-    //rightLeg.Draw();
+    leftLeg.Draw();
+    rightLeg.Draw();
     
     bodyBase.Draw();
 

@@ -1,5 +1,6 @@
 #include "body/Leg.h"
 #include "Constants.h"
+#include <string>
 
 // Load the head sprite and initialise its animation.
 void Leg::Initialise()
@@ -32,6 +33,21 @@ void Leg::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    if(side == "left")
+    {
+        origin = {
+            bodyWidth / 2, 
+            -bodyHeight / 2
+        };
+    }
+    else if(side == "right")
+    {
+        origin = {
+            -bodyWidth / 2 + FRAME_WIDTH, 
+            -bodyHeight / 2
+        };
+    }
 }
 
 // Return the current head animation frame.
@@ -44,4 +60,11 @@ int Leg::GetFrame() const
 void Leg::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+}
+
+void Leg::SetBodyDimensions(float width, float height, const std::string& side)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+    this->side = side;
 }

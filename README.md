@@ -117,11 +117,16 @@ Game
 │   │   ├── Searching and object detection
 │   │   └── SpeechController
 │   └── Head
-│       ├── HeadBase
-│       ├── Eyes and Pupils
+│   |    ├── HeadBase
+│   |    ├── Eyes and Pupils
 │       ├── Eyebrows and Mouth
 │       ├── Nose and Ears
-│       └── Antenna
+│
+|-------
+
+
+
+       └── Antenna
 └── Objects
     ├── Ball
     └── Banana
