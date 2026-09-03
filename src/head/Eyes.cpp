@@ -42,7 +42,7 @@ void Eyes::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    origin = {
+    anchorOffset = {
         FRAME_WIDTH / 2.0f,
         FRAME_HEIGHT / 2.0f + 
         bodyHeight / 2.0f + 

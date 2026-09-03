@@ -34,7 +34,7 @@ void BodyBase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    origin = {FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f}; 
+    anchorOffset = {FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f};
 }
 
 // Return the current head animation frame.

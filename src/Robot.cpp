@@ -10,7 +10,7 @@
 Robot::Robot() : robotBrain(*this){}
 
 // Initialise the robot's head and place it at the
-// robot's starting position.
+// robot's starting anchor point.
 void Robot::Initialise()
 {
     body.Initialise();
@@ -44,26 +44,26 @@ void Robot::SetSpeaking(bool state)
 }
 
 
-// Set the robot's position and move the head to the
-// same position.
-void Robot::SetPosition(Vector2 position)
+// Set the robot's anchor point and move the head to the
+// same anchor point.
+void Robot::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
-    body.SetPosition(position);
+    this->anchorPoint = anchorPoint;
+    body.SetAnchorPoint(anchorPoint);
 }
 
 
-// Return the robot's current position.
-Vector2 Robot::GetPosition() const
+// Return the robot's current anchor point.
+Vector2 Robot::GetAnchorPoint() const
 {
-    return position;
+    return anchorPoint;
 }
 
 
-// Return the current position of the robot's head.
-Vector2 Robot::GetHeadPosition()
+// Return the current anchor point of the robot's head.
+Vector2 Robot::GetHeadAnchorPoint()
 {
-    return body.GetHead().GetPosition();
+    return body.GetHead().GetAnchorPoint();
 }
 
 

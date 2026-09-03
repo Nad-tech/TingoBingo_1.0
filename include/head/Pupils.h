@@ -32,14 +32,14 @@ public:
     void Draw() const;
 
 
-    // Set the position of both pupils.
-    void SetPosition(Vector2 position);
+    // Set the anchor point of both pupils.
+    void SetAnchorPoint(Vector2 anchorPoint);
 
     // Set the rotation of both pupils.
     void SetRotation(float rotation);
 
 
-    // Rotate a vector around the origin.
+    // Rotate a vector around the anchor point.
     //
     // Used when calculating pupil positions relative
     // to the head's rotation.
@@ -50,7 +50,7 @@ public:
     void LookAt(Vector2 point);
 
     // Return both pupils to their normal forward-facing
-    // position.
+    // anchor point.
     void LookForward();
 
 private:
@@ -64,8 +64,8 @@ private:
     Vector2 leftEyeOffset  = {-33.5f * SCALE, 10.5f * SCALE};
     Vector2 rightEyeOffset = { 40.5f * SCALE, 10.5f * SCALE};
 
-    // Current position of the head in world space.
-    Vector2 headPosition = {0, 0};
+    // Current anchor point of the head in world space.
+    Vector2 headAnchorPoint = {0, 0};
 
     // Current look offsets applied to each pupil.
     Vector2 leftLookOffset  = {0.0f, 0.0f};

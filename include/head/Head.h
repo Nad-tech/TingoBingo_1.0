@@ -50,17 +50,17 @@ public:
 
 
     //================================================
-    // Position
+    // Anchor Point
     //================================================
 
-    // Set the head's world position.
-    void SetPosition(Vector2 position);
+    // Set the head's world-space anchor point.
+    void SetAnchorPoint(Vector2 anchorPoint);
 
-    // Apply a position to all head components.
-    void ApplyPosition(Vector2 position);
+    // Apply an anchor point to all head components.
+    void ApplyAnchorPoint(Vector2 anchorPoint);
 
-    // Return the head's current position.
-    Vector2 GetPosition();
+    // Return the head's current anchor point.
+    Vector2 GetAnchorPoint();
 
 
     //================================================
@@ -97,15 +97,15 @@ public:
     // Make the pupils look towards a specific point.
     void LookAt(Vector2 point);
 
-    // Return the pupils to their forward-facing position.
+    // Return the pupils to their forward-facing anchor position.
     void LookForward();
 
     void SetBodyDimensions(float width, float height);
     
 private:
 
-    // Current world position of the head.
-    Vector2 position;
+    // Current world-space anchor point of the head.
+    Vector2 anchorPoint;
 
     // Current visual rotation and scale of the head.
     float rotation;

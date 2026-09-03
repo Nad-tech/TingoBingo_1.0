@@ -31,7 +31,7 @@ void Body::Initialise()
     bodyBase.Initialise();
     
     //head.SetBodyDimensions() must be called before head.Initialise() 
-    //so that the head can position itself correctly relative to the body
+    // so that the head can anchor itself correctly relative to the body
     head.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
@@ -105,52 +105,52 @@ void Body::Draw() const
     head.Draw();
 }
 
-void Body::SetPosition(Vector2 position)
+void Body::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->homePosition = position;
-    ApplyPosition(position);
+    this->homeAnchorPoint = anchorPoint;
+    ApplyAnchorPoint(anchorPoint);
 }
 
-void Body::ApplyPosition(Vector2 position)
+void Body::ApplyAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
+    this->anchorPoint = anchorPoint;
 
-    bodyBase.SetPosition(position);
+    bodyBase.SetAnchorPoint(anchorPoint);
 
-    head.SetPosition(
+    head.SetAnchorPoint(
             {
-                position.x + headOffset.x,
-                position.y + headOffset.y
+                anchorPoint.x + headOffset.x,
+                anchorPoint.y + headOffset.y
             });
 
-    leftArm.SetPosition(
+    leftArm.SetAnchorPoint(
             {
-                position.x + leftArmOffset.x,
-                position.y + leftArmOffset.y
-            });
-    
-    rightArm.SetPosition(
-            {
-                position.x + rightArmOffset.x,
-                position.y + rightArmOffset.y
-            });
-
-    leftLeg.SetPosition(
-            {
-                position.x + leftLegOffset.x,
-                position.y + leftLegOffset.y
+                anchorPoint.x + leftArmOffset.x,
+                anchorPoint.y + leftArmOffset.y
             });
     
-    rightLeg.SetPosition(
+    rightArm.SetAnchorPoint(
             {
-                position.x + rightLegOffset.x,
-                position.y + rightLegOffset.y
+                anchorPoint.x + rightArmOffset.x,
+                anchorPoint.y + rightArmOffset.y
+            });
+
+    leftLeg.SetAnchorPoint(
+            {
+                anchorPoint.x + leftLegOffset.x,
+                anchorPoint.y + leftLegOffset.y
+            });
+    
+    rightLeg.SetAnchorPoint(
+            {
+                anchorPoint.x + rightLegOffset.x,
+                anchorPoint.y + rightLegOffset.y
             });
 }
 
-Vector2 Body::GetPosition() const
+Vector2 Body::GetAnchorPoint() const
 {
-    return position;
+    return anchorPoint;
 }
 
 void Body::SetRotation(float rotation)
@@ -179,7 +179,7 @@ float Body::GetRotation()
 void Body::PlayIdleBodyTransform(float dt)
 {
     PlayBodyBob(dt);
-    ApplyPosition(position);
+    ApplyAnchorPoint(anchorPoint);
 
     PlayBodyWiggle(dt);
     ApplyRotation(rotation);
@@ -235,8 +235,8 @@ void Body::PlayBodyBob(float dt)
     bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
     bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
 
-    position.x = homePosition.x + bodyBobOffset.x;
-    position.y = homePosition.y + bodyBobOffset.y;
+    anchorPoint.x = homeAnchorPoint.x + bodyBobOffset.x;
+    anchorPoint.y = homeAnchorPoint.y + bodyBobOffset.y;
 }
 
 Head& Body::GetHead()

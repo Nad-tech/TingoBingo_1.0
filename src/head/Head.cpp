@@ -34,7 +34,7 @@ void Head::Initialise()
     ears.Initialise();
     eyebrows.Initialise();
     
-    //Set the head dimensions for the eyes so they can position 
+    // Set the head dimensions for the eyes so they can anchor correctly.
     //themselves correctly relative to the head base.
     //This must be done before eyes.Initialise() is called.
     eyes.SetHeadDimensions(
@@ -92,30 +92,30 @@ void Head::Draw() const
     //pupils.Draw();
 }
 
-// Set the head's home position and apply it to every component.
-void Head::SetPosition(Vector2 position)
+// Set the head's home anchor point and apply it to every component.
+void Head::SetAnchorPoint(Vector2 anchorPoint)
 {
-    ApplyPosition(position);
+    ApplyAnchorPoint(anchorPoint);
 }
 
-// Move every head component to the same world position.
-void Head::ApplyPosition(Vector2 position)
+// Move every head component to the same world-space anchor point.
+void Head::ApplyAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
+    this->anchorPoint = anchorPoint;
 
-    headBase.SetPosition(position);
-    antenna.SetPosition(position);
-    ears.SetPosition(position);
-    eyebrows.SetPosition(position);
-    eyes.SetPosition(position);
-    mouth.SetPosition(position);
-    nose.SetPosition(position);
-    pupils.SetPosition(position);
+    headBase.SetAnchorPoint(anchorPoint);
+    antenna.SetAnchorPoint(anchorPoint);
+    ears.SetAnchorPoint(anchorPoint);
+    eyebrows.SetAnchorPoint(anchorPoint);
+    eyes.SetAnchorPoint(anchorPoint);
+    mouth.SetAnchorPoint(anchorPoint);
+    nose.SetAnchorPoint(anchorPoint);
+    pupils.SetAnchorPoint(anchorPoint);
 }
 
-Vector2 Head::GetPosition()
+Vector2 Head::GetAnchorPoint()
 {
-    return position;
+    return anchorPoint;
 }
 
 // Set the head's home rotation.

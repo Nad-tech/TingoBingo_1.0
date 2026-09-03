@@ -10,10 +10,10 @@ protected:
     Texture2D texture;
     Animation animation;
 
-    Vector2 position = {0,0};
+    Vector2 anchorPoint = {0,0};
     float rotation = 0.0f;
     float scale = 1.0f;
-    Vector2 origin = {0,0};
+    Vector2 anchorOffset = {0,0};
 
 public:
     virtual void Initialise() = 0;
@@ -23,8 +23,8 @@ public:
 
     void Shutdown();
     
-    void SetPosition(Vector2 position);
-    Vector2 GetPosition() const;
+    void SetAnchorPoint(Vector2 anchorPoint);
+    Vector2 GetAnchorPoint() const;
 
     void SetRotation(float rotation);
 

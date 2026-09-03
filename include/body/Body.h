@@ -21,11 +21,11 @@ public:
 
     void Draw() const;
     
-    void SetPosition(Vector2 position);
+    void SetAnchorPoint(Vector2 anchorPoint);
     
-    void ApplyPosition(Vector2 position);
+    void ApplyAnchorPoint(Vector2 anchorPoint);
 
-    Vector2 GetPosition() const;
+    Vector2 GetAnchorPoint() const;
 
     void SetRotation(float rotation);
 
@@ -42,7 +42,7 @@ public:
     Head& GetHead();
     
 private:
-    Vector2 position;
+    Vector2 anchorPoint;
 
     float rotation;
     float scale;
@@ -74,7 +74,7 @@ private:
     // Controls the scale of the bob movement.
     float bodyBobScale;
 
-    // Current position within the bob's movement cycle.
+    // Current anchor-point position within the bob's movement cycle.
     float bodyBobAngle;
 
     // Direction of the bobbing motion.
@@ -91,9 +91,9 @@ private:
     // Speed of the bobbing motion.
     float bodyBobSpeed;
 
-    // Position the body returns to after applying
+    // Anchor point the body returns to after applying
     // its idle movement.
-    Vector2 homePosition;
+    Vector2 homeAnchorPoint;
 
     BodyBase bodyBase;
 

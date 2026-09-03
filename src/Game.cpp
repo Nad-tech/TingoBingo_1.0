@@ -42,18 +42,18 @@ void Game::Initialise()
 
     // Initialise robot
     robot.Initialise();
-    robot.SetPosition(robotWorldPos);
+	robot.SetAnchorPoint(robotWorldPos);
 
     // Initialise ball
     ball.SetTextureFilename("./assets/images/toys/ball.png");
     ball.Initialise();
-    ball.SetPosition({100, 100});
+	ball.SetAnchorPoint({100, 100});
     ball.SetName("ball");
 
     // Initialise banana
     banana.SetTextureFilename("./assets/images/toys/banana.png");
     banana.Initialise();
-    banana.SetPosition({300, 300});
+	banana.SetAnchorPoint({300, 300});
     banana.SetName("banana");
 
     objects = {&ball, &banana};

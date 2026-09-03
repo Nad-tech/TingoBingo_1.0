@@ -417,7 +417,7 @@ void RobotBrain::Update(float dt)
 
         if(targetObject->IsHeldByMouse())
         {
-            robot.LookAt(targetObject->GetPosition());
+            robot.LookAt(targetObject->GetAnchorPoint());
             SetState(State::Reacting);
 
 
@@ -502,7 +502,7 @@ void RobotBrain::Update(float dt)
         //
         // Instead, Tingo looks directly at the object's current
         // position.
-        robot.LookAt(detectedObject->GetPosition());
+            robot.LookAt(detectedObject->GetAnchorPoint());
 
         // The object has become the focus of Tingo's behaviour.
         SetState(State::Reacting);
@@ -768,7 +768,7 @@ void RobotBrain::Search(float dt)
     // that visually represents where Tingo is looking from.
     // --------------------------------------------------------
 
-    searchRayOrigin = robot.GetHeadPosition();
+    searchRayOrigin = robot.GetHeadAnchorPoint();
 
 
     // --------------------------------------------------------

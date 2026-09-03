@@ -6,13 +6,13 @@
 // Initialise
 //
 // Loads the toy's sprite and sets up its animation,
-// transform, starting position and collision box.
+// transform, starting anchor point and collision box.
 //====================================================
 
 void Object::Initialise()
 {
-    // Start the toy at the origin.
-    position = Vector2(0, 0);
+    // Start the toy at the default anchor point.
+    anchorPoint = Vector2(0, 0);
 
     // Load the toy sprite sheet.
     texture = LoadTexture(textureFilename.c_str());
@@ -50,8 +50,8 @@ void Object::Initialise()
     // to determine when the toy overlaps with other objects.
     collisionBox = Rectangle
     (
-        position.x - FRAME_WIDTH / 2.0f,
-        position.y - FRAME_HEIGHT / 2.0f,
+        anchorPoint.x - FRAME_WIDTH / 2.0f,
+        anchorPoint.y - FRAME_HEIGHT / 2.0f,
         FRAME_WIDTH,
         FRAME_HEIGHT
     );
@@ -90,8 +90,8 @@ void Object::UpdateObject(
 
     // Calculate the horizontal and vertical distance
     // between the mouse and the centre of the toy.
-    float dx = abs(position.x - mousePosition.x);
-    float dy = abs(position.y - mousePosition.y);
+    float dx = abs(anchorPoint.x - mousePosition.x);
+    float dy = abs(anchorPoint.y - mousePosition.y);
 
 
     // The mouse must be within 40 pixels of the toy
@@ -114,17 +114,17 @@ void Object::UpdateObject(
     // While dragging, make the toy follow the mouse.
     if (heldByMouse)
     {
-        position = mousePosition;
+        anchorPoint = mousePosition;
     }
 
 
     // Keep the collision box centred on the toy's
-    // current position after it has moved.
+    // current anchor point after it has moved.
     collisionBox.x =
-        position.x - FRAME_WIDTH / 2.0f;
+        anchorPoint.x - FRAME_WIDTH / 2.0f;
 
     collisionBox.y =
-        position.y - FRAME_HEIGHT / 2.0f;
+        anchorPoint.y - FRAME_HEIGHT / 2.0f;
 }
 
 

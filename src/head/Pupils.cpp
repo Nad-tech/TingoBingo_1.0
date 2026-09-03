@@ -41,25 +41,25 @@ void Pupils::Draw() const
     rightPupil.Draw();
 }
 
-// Position both pupils relative to the head.
-void Pupils::SetPosition(Vector2 position)
+// Set both pupil anchor points relative to the head.
+void Pupils::SetAnchorPoint(Vector2 anchorPoint)
 {
-    headPosition = position;
+    headAnchorPoint = anchorPoint;
 
-    leftPupil.SetPosition(
+    leftPupil.SetAnchorPoint(
     {
-        position.x + leftEyeOffset.x,
-        position.y + leftEyeOffset.y
+        anchorPoint.x + leftEyeOffset.x,
+        anchorPoint.y + leftEyeOffset.y
     });
 
-    rightPupil.SetPosition(
+    rightPupil.SetAnchorPoint(
     {
-        position.x + rightEyeOffset.x,
-        position.y + rightEyeOffset.y
+        anchorPoint.x + rightEyeOffset.x,
+        anchorPoint.y + rightEyeOffset.y
     });
 }
 
-// Rotate a vector around the origin.
+// Rotate an anchor offset around the anchor point.
 Vector2 Pupils::RotateVector(Vector2 v, float rotation)
 {
     float r = rotation * DEG2RAD;
@@ -80,16 +80,16 @@ void Pupils::SetRotation(float rotation)
     Vector2 rotatedRight =
         RotateVector(Vector2Add(rightEyeOffset, rightLookOffset), rotation);
 
-    leftPupil.SetPosition(
+    leftPupil.SetAnchorPoint(
     {
-        headPosition.x + rotatedLeft.x,
-        headPosition.y + rotatedLeft.y
+        headAnchorPoint.x + rotatedLeft.x,
+        headAnchorPoint.y + rotatedLeft.y
     });
 
-    rightPupil.SetPosition(
+    rightPupil.SetAnchorPoint(
     {
-        headPosition.x + rotatedRight.x,
-        headPosition.y + rotatedRight.y
+        headAnchorPoint.x + rotatedRight.x,
+        headAnchorPoint.y + rotatedRight.y
     });
 
     leftPupil.SetRotation(rotation);
@@ -102,14 +102,14 @@ void Pupils::LookAt(Vector2 point)
 {
     Vector2 leftEyeCentre =
     {
-        headPosition.x + leftEyeOffset.x,
-        headPosition.y + leftEyeOffset.y
+        headAnchorPoint.x + leftEyeOffset.x,
+        headAnchorPoint.y + leftEyeOffset.y
     };
 
     Vector2 rightEyeCentre =
     {
-        headPosition.x + rightEyeOffset.x,
-        headPosition.y + rightEyeOffset.y
+        headAnchorPoint.x + rightEyeOffset.x,
+        headAnchorPoint.y + rightEyeOffset.y
     };
 
     // Calculate the direction from each eye to the target.
@@ -147,15 +147,15 @@ void Pupils::LookForward()
     leftLookOffset = {0.0f, 0.0f};
     rightLookOffset = {0.0f, 0.0f};
 
-    leftPupil.SetPosition(
+    leftPupil.SetAnchorPoint(
     {
-        headPosition.x + leftEyeOffset.x,
-        headPosition.y + leftEyeOffset.y
+        headAnchorPoint.x + leftEyeOffset.x,
+        headAnchorPoint.y + leftEyeOffset.y
     });
 
-    rightPupil.SetPosition(
+    rightPupil.SetAnchorPoint(
     {
-        headPosition.x + rightEyeOffset.x,
-        headPosition.y + rightEyeOffset.y
+        headAnchorPoint.x + rightEyeOffset.x,
+        headAnchorPoint.y + rightEyeOffset.y
     });
 }

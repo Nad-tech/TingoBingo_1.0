@@ -170,12 +170,19 @@ private:
 #pragma once
 
 #include "Sprite.h"
+#include <string>
 class Arm : public Sprite
 {
     public:
-    void Initialise() override;
-    int GetFrame() const;
-    void SetRotation(float rotation);
+        void Initialise() override;
+        int GetFrame() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height, std::string side);
+
+    private:
+        float bodyWidth;
+        float bodyHeight;
+        std::string side;
 };
 
 
@@ -206,11 +213,11 @@ public:
 
     void Draw() const;
     
-    void SetPosition(Vector2 position);
+    void SetAnchorPoint(Vector2 anchorPoint);
     
-    void ApplyPosition(Vector2 position);
+    void ApplyAnchorPoint(Vector2 anchorPoint);
 
-    Vector2 GetPosition() const;
+    Vector2 GetAnchorPoint() const;
 
     void SetRotation(float rotation);
 
@@ -226,13 +233,8 @@ public:
 
     Head& GetHead();
     
-    Leg rightLeg;
-    Leg leftLeg;
-    Arm rightArm;
-    Arm leftArm;
-
 private:
-    Vector2 position;
+    Vector2 anchorPoint;
 
     float rotation;
     float scale;
@@ -264,7 +266,7 @@ private:
     // Controls the scale of the bob movement.
     float bodyBobScale;
 
-    // Current position within the bob's movement cycle.
+    // Current anchor-point position within the bob's movement cycle.
     float bodyBobAngle;
 
     // Direction of the bobbing motion.
@@ -281,22 +283,22 @@ private:
     // Speed of the bobbing motion.
     float bodyBobSpeed;
 
-    // Position the body returns to after applying
+    // Anchor point the body returns to after applying
     // its idle movement.
-    Vector2 homePosition;
+    Vector2 homeAnchorPoint;
 
     BodyBase bodyBase;
 
     Head head;
+    Leg rightLeg;
+    Leg leftLeg;
+    Arm rightArm;
+    Arm leftArm;
 
-    float armX = 165.0f; 
-    float legX = 40.0f;
-    float legY = 200.0f;
-    
-    Vector2 leftArmOffset = {-armX, 0};
-    Vector2 rightArmOffset = {armX, 0};
-    Vector2 leftLegOffset = {-legX, legY};
-    Vector2 rightLegOffset = {legX, legY};
+    Vector2 leftArmOffset = {0, 0};
+    Vector2 rightArmOffset = {0, 0};
+    Vector2 leftLegOffset = {0, 0};
+    Vector2 rightLegOffset = {0, 0};
 
     Vector2 headOffset = {0.0f, 0.0f};
 };
@@ -328,12 +330,19 @@ class BodyBase : public Sprite
 #pragma once
 
 #include "Sprite.h"
+#include <string>
 class Leg : public Sprite
 {
     public:
-    void Initialise() override;
-    int GetFrame() const;
-    void SetRotation(float rotation);
+        void Initialise() override;
+        int GetFrame() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height, const std::string& side);
+
+    private:
+        float bodyWidth;
+        float bodyHeight;
+        std::string side;
 };
 
 
@@ -359,9 +368,9 @@ constexpr int SCREEN_HEIGHT = 700;
 constexpr char WINDOW_TITLE[] = "Tingo Bingo";
 constexpr int TARGET_FPS = 60;
 
-constexpr int ROBOT_WIDTH = 256;
-constexpr int ROBOT_HEIGHT = 256;
-constexpr float SCALE = 1.0f;
+constexpr int ROBOT_WIDTH = 0;
+constexpr int ROBOT_HEIGHT = 0;
+constexpr float SCALE = 0.8f;
 
 
 =====================================
@@ -503,10 +512,17 @@ class Eyes : public Sprite
     public:
         void Initialise() override;
         void Update(float dt) override;
+        void SetHeadDimensions(float width, float height);
+        void SetBodyDimensions(float width, float height);
 
     private:
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0f;
+        float headWidth;
+        float headHeight;
+        float bodyWidth;
+        float bodyHeight;
+        Vector2 eyesOffset = {0, -30.0f};
 }; 
 
 
@@ -566,17 +582,17 @@ public:
 
 
     //================================================
-    // Position
+    // Anchor Point
     //================================================
 
-    // Set the head's world position.
-    void SetPosition(Vector2 position);
+    // Set the head's world-space anchor point.
+    void SetAnchorPoint(Vector2 anchorPoint);
 
-    // Apply a position to all head components.
-    void ApplyPosition(Vector2 position);
+    // Apply an anchor point to all head components.
+    void ApplyAnchorPoint(Vector2 anchorPoint);
 
-    // Return the head's current position.
-    Vector2 GetPosition();
+    // Return the head's current anchor point.
+    Vector2 GetAnchorPoint();
 
 
     //================================================
@@ -613,15 +629,15 @@ public:
     // Make the pupils look towards a specific point.
     void LookAt(Vector2 point);
 
-    // Return the pupils to their forward-facing position.
+    // Return the pupils to their forward-facing anchor position.
     void LookForward();
 
     void SetBodyDimensions(float width, float height);
     
 private:
 
-    // Current world position of the head.
-    Vector2 position;
+    // Current world-space anchor point of the head.
+    Vector2 anchorPoint;
 
     // Current visual rotation and scale of the head.
     float rotation;
@@ -664,6 +680,8 @@ class Headbase : public Sprite
         int GetFrame() const;
         void SetRotation(float rotation);
         void SetBodyDimensions(float width, float height);
+        float GetFrameWidth() const;
+        float GetFrameHeight() const;
 
     private:
         float bodyWidth;
@@ -767,14 +785,14 @@ public:
     void Draw() const;
 
 
-    // Set the position of both pupils.
-    void SetPosition(Vector2 position);
+    // Set the anchor point of both pupils.
+    void SetAnchorPoint(Vector2 anchorPoint);
 
     // Set the rotation of both pupils.
     void SetRotation(float rotation);
 
 
-    // Rotate a vector around the origin.
+    // Rotate a vector around the anchor point.
     //
     // Used when calculating pupil positions relative
     // to the head's rotation.
@@ -785,7 +803,7 @@ public:
     void LookAt(Vector2 point);
 
     // Return both pupils to their normal forward-facing
-    // position.
+    // anchor point.
     void LookForward();
 
 private:
@@ -799,8 +817,8 @@ private:
     Vector2 leftEyeOffset  = {-33.5f * SCALE, 10.5f * SCALE};
     Vector2 rightEyeOffset = { 40.5f * SCALE, 10.5f * SCALE};
 
-    // Current position of the head in world space.
-    Vector2 headPosition = {0, 0};
+    // Current anchor point of the head in world space.
+    Vector2 headAnchorPoint = {0, 0};
 
     // Current look offsets applied to each pupil.
     Vector2 leftLookOffset  = {0.0f, 0.0f};
@@ -906,16 +924,16 @@ public:
     void Shutdown();
 
 
-    // Set the robot's world position.
-    void SetPosition(Vector2 position);
+    // Set the robot's world-space anchor point.
+    void SetAnchorPoint(Vector2 anchorPoint);
 
     // Make the robot look towards a specific point.
     void LookAt(Vector2 point);
 
 
-    // Return the robot and head positions.
-    Vector2 GetPosition() const;
-    Vector2 GetHeadPosition();
+    // Return the robot and head anchor points.
+    Vector2 GetAnchorPoint() const;
+    Vector2 GetHeadAnchorPoint();
 
 
     // Send a speech request to RobotBrain and update
@@ -947,8 +965,8 @@ public:
 
 private:
 
-    // Current world position of the robot.
-    Vector2 position;
+    // Current world-space anchor point of the robot.
+    Vector2 anchorPoint;
 
     // Controls the robot's behaviour and state.
     RobotBrain robotBrain;
@@ -1257,10 +1275,10 @@ protected:
     Texture2D texture;
     Animation animation;
 
-    Vector2 position = {0,0};
+    Vector2 anchorPoint = {0,0};
     float rotation = 0.0f;
     float scale = 1.0f;
-    Vector2 origin = {0,0};
+    Vector2 anchorOffset = {0,0};
 
 public:
     virtual void Initialise() = 0;
@@ -1270,8 +1288,8 @@ public:
 
     void Shutdown();
     
-    void SetPosition(Vector2 position);
-    Vector2 GetPosition() const;
+    void SetAnchorPoint(Vector2 anchorPoint);
+    Vector2 GetAnchorPoint() const;
 
     void SetRotation(float rotation);
 
@@ -1508,6 +1526,22 @@ void Arm::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    // Position the arm anchor offset relative to the body anchor point based on which side it is on.
+    if(side == "left")
+    {
+        anchorOffset = {
+            bodyWidth / 2.0f + FRAME_WIDTH,
+            bodyHeight / 2.0f
+        }; 
+    }
+    else if(side == "right")
+    {
+        anchorOffset = {
+            -bodyWidth / 2.0f,
+            bodyHeight / 2.0f
+        }; 
+    }
 }
 
 // Return the current head animation frame.
@@ -1520,6 +1554,14 @@ int Arm::GetFrame() const
 void Arm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+}
+
+// Set the dimensions of the body to position the arm correctly relative to the body.
+void Arm::SetBodyDimensions(float width, float height, std::string side)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+    this->side = side; 
 }
 
 
@@ -1558,22 +1600,44 @@ Body::Body() :
 void Body::Initialise()
 {
     bodyBase.Initialise();
-    bodyBase.SetPosition(position);
+    
+    //head.SetBodyDimensions() must be called before head.Initialise() 
+    // so that the head can anchor itself correctly relative to the body
     head.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
     );
-
     head.Initialise();
-    head.SetPosition(position);
+    
+
+    leftArm.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "left"
+    );
     leftArm.Initialise();
-    leftArm.SetPosition(position);
+    
+
+    rightArm.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "right"
+    );
     rightArm.Initialise();
-    rightArm.SetPosition(position);
+    
+    leftLeg.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "left"
+    );
     leftLeg.Initialise();
-    leftLeg.SetPosition(position);
+
+    rightLeg.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "right"
+    );
     rightLeg.Initialise();
-    rightLeg.SetPosition(position);
 }
 
 // Release resources used by each body component.
@@ -1602,64 +1666,62 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    //leftArm.Draw();
-    //rightArm.Draw();
-    //leftLeg.Draw();
-    //rightLeg.Draw();
+    leftArm.Draw();
+    rightArm.Draw();
+    leftLeg.Draw();
+    rightLeg.Draw();
     
     bodyBase.Draw();
 
-    DrawCircleV(position, 5.0f, RED);
-  
     head.Draw();
 }
 
-void Body::SetPosition(Vector2 position)
+void Body::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->homePosition = position;
-    ApplyPosition(position);
+    this->homeAnchorPoint = anchorPoint;
+    ApplyAnchorPoint(anchorPoint);
 }
 
-void Body::ApplyPosition(Vector2 position)
+void Body::ApplyAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
+    this->anchorPoint = anchorPoint;
 
-    bodyBase.SetPosition(position);
+    bodyBase.SetAnchorPoint(anchorPoint);
 
-    head.SetPosition(
+    head.SetAnchorPoint(
             {
-                position.x + headOffset.x,
-                position.y + headOffset.y
+                anchorPoint.x + headOffset.x,
+                anchorPoint.y + headOffset.y
             });
 
-    leftArm.SetPosition(
+    leftArm.SetAnchorPoint(
             {
-                position.x + leftArmOffset.x,
-                position.y + leftArmOffset.y
-            });
-    
-    rightArm.SetPosition(
-            {
-                position.x + rightArmOffset.x,
-                position.y + rightArmOffset.y
-            });
-
-    leftLeg.SetPosition(
-            {
-                position.x + leftLegOffset.x,
-                position.y + leftLegOffset.y
+                anchorPoint.x + leftArmOffset.x,
+                anchorPoint.y + leftArmOffset.y
             });
     
-    rightLeg.SetPosition(
+    rightArm.SetAnchorPoint(
             {
-                position.x + rightLegOffset.x,
-                position.y + rightLegOffset.y
+                anchorPoint.x + rightArmOffset.x,
+                anchorPoint.y + rightArmOffset.y
+            });
+
+    leftLeg.SetAnchorPoint(
+            {
+                anchorPoint.x + leftLegOffset.x,
+                anchorPoint.y + leftLegOffset.y
+            });
+    
+    rightLeg.SetAnchorPoint(
+            {
+                anchorPoint.x + rightLegOffset.x,
+                anchorPoint.y + rightLegOffset.y
             });
 }
 
-Vector2 Body::GetPosition() const
+Vector2 Body::GetAnchorPoint() const
 {
-    return position;
+    return anchorPoint;
 }
 
 void Body::SetRotation(float rotation)
@@ -1688,7 +1750,7 @@ float Body::GetRotation()
 void Body::PlayIdleBodyTransform(float dt)
 {
     PlayBodyBob(dt);
-    ApplyPosition(position);
+    ApplyAnchorPoint(anchorPoint);
 
     PlayBodyWiggle(dt);
     ApplyRotation(rotation);
@@ -1744,8 +1806,8 @@ void Body::PlayBodyBob(float dt)
     bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
     bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
 
-    position.x = homePosition.x + bodyBobOffset.x;
-    position.y = homePosition.y + bodyBobOffset.y;
+    anchorPoint.x = homeAnchorPoint.x + bodyBobOffset.x;
+    anchorPoint.y = homeAnchorPoint.y + bodyBobOffset.y;
 }
 
 Head& Body::GetHead()
@@ -1794,7 +1856,7 @@ void BodyBase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    origin = {FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f}; 
+    anchorOffset = {FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f};
 }
 
 // Return the current head animation frame.
@@ -1827,6 +1889,7 @@ float BodyBase::GetFrameHeight() const
 
 #include "body/Leg.h"
 #include "Constants.h"
+#include <string>
 
 // Load the head sprite and initialise its animation.
 void Leg::Initialise()
@@ -1859,6 +1922,21 @@ void Leg::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    if(side == "left")
+    {
+        anchorOffset = {
+            bodyWidth / 2, 
+            -bodyHeight / 2
+        };
+    }
+    else if(side == "right")
+    {
+        anchorOffset = {
+            -bodyWidth / 2 + FRAME_WIDTH, 
+            -bodyHeight / 2
+        };
+    }
 }
 
 // Return the current head animation frame.
@@ -1871,6 +1949,13 @@ int Leg::GetFrame() const
 void Leg::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+}
+
+void Leg::SetBodyDimensions(float width, float height, const std::string& side)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+    this->side = side;
 }
 
 
@@ -1922,18 +2007,18 @@ void Game::Initialise()
 
     // Initialise robot
     robot.Initialise();
-    robot.SetPosition(robotWorldPos);
+	robot.SetAnchorPoint(robotWorldPos);
 
     // Initialise ball
     ball.SetTextureFilename("./assets/images/toys/ball.png");
     ball.Initialise();
-    ball.SetPosition({100, 100});
+	ball.SetAnchorPoint({100, 100});
     ball.SetName("ball");
 
     // Initialise banana
     banana.SetTextureFilename("./assets/images/toys/banana.png");
     banana.Initialise();
-    banana.SetPosition({300, 300});
+	banana.SetAnchorPoint({300, 300});
     banana.SetName("banana");
 
     objects = {&ball, &banana};
@@ -2318,7 +2403,7 @@ void Eyes::Initialise()
     texture = LoadTexture("assets/images/TingoBingo/head/eyes.png");
 
     // Sprite sheet layout.
-    const int COLUMNS = 5;
+    const int COLUMNS = 1;
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
@@ -2343,6 +2428,14 @@ void Eyes::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    anchorOffset = {
+        FRAME_WIDTH / 2.0f,
+        FRAME_HEIGHT / 2.0f + 
+        bodyHeight / 2.0f + 
+        headHeight / 2.0f + 
+        eyesOffset.y
+    };
 }
 
 void Eyes::Update(float dt)
@@ -2356,12 +2449,22 @@ void Eyes::Update(float dt)
     
     if(idleAnimationTimer > nextIdleAnimation)
     {
-        animation.Play(0, 4, AnimationPriority::Idle);
+        animation.Play(0, 0, AnimationPriority::Idle);
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
 
-    
+void Eyes::SetHeadDimensions(float width, float height)
+{
+    headWidth = width;
+    headHeight = height;
+}
+
+void Eyes::SetBodyDimensions(float width, float height)
+{
+    bodyWidth = width;
+    bodyHeight = height;
 }
 
 
@@ -2404,7 +2507,20 @@ void Head::Initialise()
     antenna.Initialise();
     ears.Initialise();
     eyebrows.Initialise();
+    
+    // Set the head dimensions for the eyes so they can anchor correctly.
+    //themselves correctly relative to the head base.
+    //This must be done before eyes.Initialise() is called.
+    eyes.SetHeadDimensions(
+        headBase.GetFrameWidth(), 
+        headBase.GetFrameHeight()
+    );
+    eyes.SetBodyDimensions(
+        bodyWidth, 
+        bodyHeight
+    );
     eyes.Initialise();
+    
     mouth.Initialise();
     nose.Initialise();
     pupils.Initialise();
@@ -2442,10 +2558,7 @@ void Head::Draw() const
 {
     //ears.Draw();
     headBase.Draw();
-
-    DrawCircleV(position, 5.0f, GREEN);
-
-    //eyes.Draw();
+    eyes.Draw();
     //mouth.Draw();
     //nose.Draw();
     //eyebrows.Draw();
@@ -2453,30 +2566,30 @@ void Head::Draw() const
     //pupils.Draw();
 }
 
-// Set the head's home position and apply it to every component.
-void Head::SetPosition(Vector2 position)
+// Set the head's home anchor point and apply it to every component.
+void Head::SetAnchorPoint(Vector2 anchorPoint)
 {
-    ApplyPosition(position);
+    ApplyAnchorPoint(anchorPoint);
 }
 
-// Move every head component to the same world position.
-void Head::ApplyPosition(Vector2 position)
+// Move every head component to the same world-space anchor point.
+void Head::ApplyAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
+    this->anchorPoint = anchorPoint;
 
-    headBase.SetPosition(position);
-    antenna.SetPosition(position);
-    ears.SetPosition(position);
-    eyebrows.SetPosition(position);
-    eyes.SetPosition(position);
-    mouth.SetPosition(position);
-    nose.SetPosition(position);
-    pupils.SetPosition(position);
+    headBase.SetAnchorPoint(anchorPoint);
+    antenna.SetAnchorPoint(anchorPoint);
+    ears.SetAnchorPoint(anchorPoint);
+    eyebrows.SetAnchorPoint(anchorPoint);
+    eyes.SetAnchorPoint(anchorPoint);
+    mouth.SetAnchorPoint(anchorPoint);
+    nose.SetAnchorPoint(anchorPoint);
+    pupils.SetAnchorPoint(anchorPoint);
 }
 
-Vector2 Head::GetPosition()
+Vector2 Head::GetAnchorPoint()
 {
-    return position;
+    return anchorPoint;
 }
 
 // Set the head's home rotation.
@@ -2574,7 +2687,10 @@ void Headbase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    origin = {bodyWidth / 2, bodyHeight / 2};
+    anchorOffset = {
+        FRAME_WIDTH / 2.0f, 
+        (FRAME_HEIGHT / 1.0f) + (bodyHeight / 2.0f)
+    };
 }
 
 // Return the current head animation frame.
@@ -2593,6 +2709,16 @@ void Headbase::SetBodyDimensions(float width, float height)
 {
     bodyWidth = width;
     bodyHeight = height;
+}
+
+float Headbase::GetFrameWidth() const
+{
+    return animation.GetFrameWidth();
+}
+
+float Headbase::GetFrameHeight() const
+{
+    return animation.GetFrameHeight();
 }
 
 
@@ -2848,25 +2974,25 @@ void Pupils::Draw() const
     rightPupil.Draw();
 }
 
-// Position both pupils relative to the head.
-void Pupils::SetPosition(Vector2 position)
+// Set both pupil anchor points relative to the head.
+void Pupils::SetAnchorPoint(Vector2 anchorPoint)
 {
-    headPosition = position;
+    headAnchorPoint = anchorPoint;
 
-    leftPupil.SetPosition(
+    leftPupil.SetAnchorPoint(
     {
-        position.x + leftEyeOffset.x,
-        position.y + leftEyeOffset.y
+        anchorPoint.x + leftEyeOffset.x,
+        anchorPoint.y + leftEyeOffset.y
     });
 
-    rightPupil.SetPosition(
+    rightPupil.SetAnchorPoint(
     {
-        position.x + rightEyeOffset.x,
-        position.y + rightEyeOffset.y
+        anchorPoint.x + rightEyeOffset.x,
+        anchorPoint.y + rightEyeOffset.y
     });
 }
 
-// Rotate a vector around the origin.
+// Rotate an anchor offset around the anchor point.
 Vector2 Pupils::RotateVector(Vector2 v, float rotation)
 {
     float r = rotation * DEG2RAD;
@@ -2887,16 +3013,16 @@ void Pupils::SetRotation(float rotation)
     Vector2 rotatedRight =
         RotateVector(Vector2Add(rightEyeOffset, rightLookOffset), rotation);
 
-    leftPupil.SetPosition(
+    leftPupil.SetAnchorPoint(
     {
-        headPosition.x + rotatedLeft.x,
-        headPosition.y + rotatedLeft.y
+        headAnchorPoint.x + rotatedLeft.x,
+        headAnchorPoint.y + rotatedLeft.y
     });
 
-    rightPupil.SetPosition(
+    rightPupil.SetAnchorPoint(
     {
-        headPosition.x + rotatedRight.x,
-        headPosition.y + rotatedRight.y
+        headAnchorPoint.x + rotatedRight.x,
+        headAnchorPoint.y + rotatedRight.y
     });
 
     leftPupil.SetRotation(rotation);
@@ -2909,14 +3035,14 @@ void Pupils::LookAt(Vector2 point)
 {
     Vector2 leftEyeCentre =
     {
-        headPosition.x + leftEyeOffset.x,
-        headPosition.y + leftEyeOffset.y
+        headAnchorPoint.x + leftEyeOffset.x,
+        headAnchorPoint.y + leftEyeOffset.y
     };
 
     Vector2 rightEyeCentre =
     {
-        headPosition.x + rightEyeOffset.x,
-        headPosition.y + rightEyeOffset.y
+        headAnchorPoint.x + rightEyeOffset.x,
+        headAnchorPoint.y + rightEyeOffset.y
     };
 
     // Calculate the direction from each eye to the target.
@@ -2954,16 +3080,16 @@ void Pupils::LookForward()
     leftLookOffset = {0.0f, 0.0f};
     rightLookOffset = {0.0f, 0.0f};
 
-    leftPupil.SetPosition(
+    leftPupil.SetAnchorPoint(
     {
-        headPosition.x + leftEyeOffset.x,
-        headPosition.y + leftEyeOffset.y
+        headAnchorPoint.x + leftEyeOffset.x,
+        headAnchorPoint.y + leftEyeOffset.y
     });
 
-    rightPupil.SetPosition(
+    rightPupil.SetAnchorPoint(
     {
-        headPosition.x + rightEyeOffset.x,
-        headPosition.y + rightEyeOffset.y
+        headAnchorPoint.x + rightEyeOffset.x,
+        headAnchorPoint.y + rightEyeOffset.y
     });
 }
 
@@ -3060,13 +3186,13 @@ int main ()
 // Initialise
 //
 // Loads the toy's sprite and sets up its animation,
-// transform, starting position and collision box.
+// transform, starting anchor point and collision box.
 //====================================================
 
 void Object::Initialise()
 {
-    // Start the toy at the origin.
-    position = Vector2(0, 0);
+    // Start the toy at the default anchor point.
+    anchorPoint = Vector2(0, 0);
 
     // Load the toy sprite sheet.
     texture = LoadTexture(textureFilename.c_str());
@@ -3104,8 +3230,8 @@ void Object::Initialise()
     // to determine when the toy overlaps with other objects.
     collisionBox = Rectangle
     (
-        position.x - FRAME_WIDTH / 2.0f,
-        position.y - FRAME_HEIGHT / 2.0f,
+        anchorPoint.x - FRAME_WIDTH / 2.0f,
+        anchorPoint.y - FRAME_HEIGHT / 2.0f,
         FRAME_WIDTH,
         FRAME_HEIGHT
     );
@@ -3144,8 +3270,8 @@ void Object::UpdateObject(
 
     // Calculate the horizontal and vertical distance
     // between the mouse and the centre of the toy.
-    float dx = abs(position.x - mousePosition.x);
-    float dy = abs(position.y - mousePosition.y);
+    float dx = abs(anchorPoint.x - mousePosition.x);
+    float dy = abs(anchorPoint.y - mousePosition.y);
 
 
     // The mouse must be within 40 pixels of the toy
@@ -3168,17 +3294,17 @@ void Object::UpdateObject(
     // While dragging, make the toy follow the mouse.
     if (heldByMouse)
     {
-        position = mousePosition;
+        anchorPoint = mousePosition;
     }
 
 
     // Keep the collision box centred on the toy's
-    // current position after it has moved.
+    // current anchor point after it has moved.
     collisionBox.x =
-        position.x - FRAME_WIDTH / 2.0f;
+        anchorPoint.x - FRAME_WIDTH / 2.0f;
 
     collisionBox.y =
-        position.y - FRAME_HEIGHT / 2.0f;
+        anchorPoint.y - FRAME_HEIGHT / 2.0f;
 }
 
 
@@ -3253,7 +3379,7 @@ std::string Object::GetName()
 Robot::Robot() : robotBrain(*this){}
 
 // Initialise the robot's head and place it at the
-// robot's starting position.
+// robot's starting anchor point.
 void Robot::Initialise()
 {
     body.Initialise();
@@ -3287,26 +3413,26 @@ void Robot::SetSpeaking(bool state)
 }
 
 
-// Set the robot's position and move the head to the
-// same position.
-void Robot::SetPosition(Vector2 position)
+// Set the robot's anchor point and move the head to the
+// same anchor point.
+void Robot::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
-    body.SetPosition(position);
+    this->anchorPoint = anchorPoint;
+    body.SetAnchorPoint(anchorPoint);
 }
 
 
-// Return the robot's current position.
-Vector2 Robot::GetPosition() const
+// Return the robot's current anchor point.
+Vector2 Robot::GetAnchorPoint() const
 {
-    return position;
+    return anchorPoint;
 }
 
 
-// Return the current position of the robot's head.
-Vector2 Robot::GetHeadPosition()
+// Return the current anchor point of the robot's head.
+Vector2 Robot::GetHeadAnchorPoint()
 {
-    return body.GetHead().GetPosition();
+    return body.GetHead().GetAnchorPoint();
 }
 
 
@@ -3799,7 +3925,7 @@ void RobotBrain::Update(float dt)
 
         if(targetObject->IsHeldByMouse())
         {
-            robot.LookAt(targetObject->GetPosition());
+            robot.LookAt(targetObject->GetAnchorPoint());
             SetState(State::Reacting);
 
 
@@ -3884,7 +4010,7 @@ void RobotBrain::Update(float dt)
         //
         // Instead, Tingo looks directly at the object's current
         // position.
-        robot.LookAt(detectedObject->GetPosition());
+            robot.LookAt(detectedObject->GetAnchorPoint());
 
         // The object has become the focus of Tingo's behaviour.
         SetState(State::Reacting);
@@ -4150,7 +4276,7 @@ void RobotBrain::Search(float dt)
     // that visually represents where Tingo is looking from.
     // --------------------------------------------------------
 
-    searchRayOrigin = robot.GetHeadPosition();
+    searchRayOrigin = robot.GetHeadAnchorPoint();
 
 
     // --------------------------------------------------------
@@ -5535,7 +5661,7 @@ bool Speech::GenerateSpeech
 //
 // Provides a base class for drawable sprites.
 //
-// A Sprite stores its texture, position, rotation,
+// A Sprite stores its texture, anchor point, rotation,
 // scale and animation. Derived classes only need to
 // load their textures and configure their animations.
 //====================================================
@@ -5555,22 +5681,22 @@ void Sprite::Draw() const
 
     Rectangle destination =
     {
-        position.x,
-        position.y,
+        anchorPoint.x,
+        anchorPoint.y,
         animation.GetFrameWidth() * scale,
         animation.GetFrameHeight() * scale
     };
 
-    Vector2 drawOrigin = { 
-        origin.x * scale,
-        origin.y * scale
+    Vector2 drawAnchorOffset = {
+        anchorOffset.x * scale,
+        anchorOffset.y * scale
     };
 
     DrawTexturePro(
         texture,
         source,
         destination,
-        drawOrigin, 
+        drawAnchorOffset,
         rotation,
         WHITE
     );
@@ -5582,16 +5708,16 @@ void Sprite::Shutdown()
     UnloadTexture(texture);
 }
 
-// Set the sprite's world position.
-void Sprite::SetPosition(Vector2 position)
+// Set the sprite's world-space anchor point.
+void Sprite::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
+    this->anchorPoint = anchorPoint;
 }
 
-// Return the sprite's current position.
-Vector2 Sprite::GetPosition() const
+// Return the sprite's current anchor point.
+Vector2 Sprite::GetAnchorPoint() const
 {
-    return position;
+    return anchorPoint;
 }
 
 // Set the sprite's rotation in degrees.

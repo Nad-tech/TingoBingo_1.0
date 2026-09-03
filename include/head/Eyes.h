@@ -17,5 +17,5 @@ class Eyes : public Sprite
         float headHeight;
         float bodyWidth;
         float bodyHeight;
-        Vector2 eyesOffset = {0, -30.0f};
+        Vector2 eyesOffset = {0, 0.0f};
 }; 

@@ -40,16 +40,16 @@ public:
     void Shutdown();
 
 
-    // Set the robot's world position.
-    void SetPosition(Vector2 position);
+    // Set the robot's world-space anchor point.
+    void SetAnchorPoint(Vector2 anchorPoint);
 
     // Make the robot look towards a specific point.
     void LookAt(Vector2 point);
 
 
-    // Return the robot and head positions.
-    Vector2 GetPosition() const;
-    Vector2 GetHeadPosition();
+    // Return the robot and head anchor points.
+    Vector2 GetAnchorPoint() const;
+    Vector2 GetHeadAnchorPoint();
 
 
     // Send a speech request to RobotBrain and update
@@ -81,8 +81,8 @@ public:
 
 private:
 
-    // Current world position of the robot.
-    Vector2 position;
+    // Current world-space anchor point of the robot.
+    Vector2 anchorPoint;
 
     // Controls the robot's behaviour and state.
     RobotBrain robotBrain;

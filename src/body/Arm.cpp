@@ -33,17 +33,17 @@ void Arm::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    //Position the arm origin relative to the body origin based on which side it is on
+    // Position the arm anchor offset relative to the body anchor point based on which side it is on.
     if(side == "left")
     {
-        origin = {
+        anchorOffset = {
             bodyWidth / 2.0f + FRAME_WIDTH,
             bodyHeight / 2.0f
         }; 
     }
     else if(side == "right")
     {
-        origin = {
+        anchorOffset = {
             -bodyWidth / 2.0f,
             bodyHeight / 2.0f
         }; 

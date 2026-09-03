@@ -3,7 +3,7 @@
 //
 // Provides a base class for drawable sprites.
 //
-// A Sprite stores its texture, position, rotation,
+// A Sprite stores its texture, anchor point, rotation,
 // scale and animation. Derived classes only need to
 // load their textures and configure their animations.
 //====================================================
@@ -23,22 +23,22 @@ void Sprite::Draw() const
 
     Rectangle destination =
     {
-        position.x,
-        position.y,
+        anchorPoint.x,
+        anchorPoint.y,
         animation.GetFrameWidth() * scale,
         animation.GetFrameHeight() * scale
     };
 
-    Vector2 drawOrigin = { 
-        origin.x * scale,
-        origin.y * scale
+    Vector2 drawAnchorOffset = {
+        anchorOffset.x * scale,
+        anchorOffset.y * scale
     };
 
     DrawTexturePro(
         texture,
         source,
         destination,
-        drawOrigin, 
+        drawAnchorOffset,
         rotation,
         WHITE
     );
@@ -50,16 +50,16 @@ void Sprite::Shutdown()
     UnloadTexture(texture);
 }
 
-// Set the sprite's world position.
-void Sprite::SetPosition(Vector2 position)
+// Set the sprite's world-space anchor point.
+void Sprite::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->position = position;
+    this->anchorPoint = anchorPoint;
 }
 
-// Return the sprite's current position.
-Vector2 Sprite::GetPosition() const
+// Return the sprite's current anchor point.
+Vector2 Sprite::GetAnchorPoint() const
 {
-    return position;
+    return anchorPoint;
 }
 
 // Set the sprite's rotation in degrees.

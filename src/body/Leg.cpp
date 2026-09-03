@@ -36,14 +36,14 @@ void Leg::Initialise()
 
     if(side == "left")
     {
-        origin = {
+        anchorOffset = {
             bodyWidth / 2, 
             -bodyHeight / 2
         };
     }
     else if(side == "right")
     {
-        origin = {
+        anchorOffset = {
             -bodyWidth / 2 + FRAME_WIDTH, 
             -bodyHeight / 2
         };

@@ -43,7 +43,7 @@ void Headbase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    origin = {
+    anchorOffset = {
         FRAME_WIDTH / 2.0f, 
         (FRAME_HEIGHT / 1.0f) + (bodyHeight / 2.0f)
     };
