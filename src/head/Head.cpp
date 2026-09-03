@@ -33,7 +33,20 @@ void Head::Initialise()
     antenna.Initialise();
     ears.Initialise();
     eyebrows.Initialise();
+    
+    //Set the head dimensions for the eyes so they can position 
+    //themselves correctly relative to the head base.
+    //This must be done before eyes.Initialise() is called.
+    eyes.SetHeadDimensions(
+        headBase.GetFrameWidth(), 
+        headBase.GetFrameHeight()
+    );
+    eyes.SetBodyDimensions(
+        bodyWidth, 
+        bodyHeight
+    );
     eyes.Initialise();
+    
     mouth.Initialise();
     nose.Initialise();
     pupils.Initialise();
@@ -71,7 +84,7 @@ void Head::Draw() const
 {
     //ears.Draw();
     headBase.Draw();
-    //eyes.Draw();
+    eyes.Draw();
     //mouth.Draw();
     //nose.Draw();
     //eyebrows.Draw();

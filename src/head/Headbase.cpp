@@ -66,3 +66,13 @@ void Headbase::SetBodyDimensions(float width, float height)
     bodyWidth = width;
     bodyHeight = height;
 }
+
+float Headbase::GetFrameWidth() const
+{
+    return animation.GetFrameWidth();
+}
+
+float Headbase::GetFrameHeight() const
+{
+    return animation.GetFrameHeight();
+}
