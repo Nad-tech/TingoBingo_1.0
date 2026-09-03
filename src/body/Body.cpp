@@ -29,22 +29,33 @@ Body::Body() :
 void Body::Initialise()
 {
     bodyBase.Initialise();
-    bodyBase.SetPosition(position);
+    
+    //head.SetBodyDimensions() must be called before head.Initialise() 
+    //so that the head can position itself correctly relative to the body
     head.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
     );
-
     head.Initialise();
-    head.SetPosition(position);
+    
+
+    leftArm.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "left"
+    );
     leftArm.Initialise();
-    leftArm.SetPosition(position);
+    
+
+    rightArm.SetBodyDimensions(
+        bodyBase.GetFrameWidth(), 
+        bodyBase.GetFrameHeight(),
+        "right"
+    );
     rightArm.Initialise();
-    rightArm.SetPosition(position);
+    
     leftLeg.Initialise();
-    leftLeg.SetPosition(position);
     rightLeg.Initialise();
-    rightLeg.SetPosition(position);
 }
 
 // Release resources used by each body component.
@@ -73,15 +84,13 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    //leftArm.Draw();
-    //rightArm.Draw();
+    leftArm.Draw();
+    rightArm.Draw();
     //leftLeg.Draw();
     //rightLeg.Draw();
     
     bodyBase.Draw();
 
-    DrawCircleV(position, 5.0f, RED);
-  
     head.Draw();
 }
 

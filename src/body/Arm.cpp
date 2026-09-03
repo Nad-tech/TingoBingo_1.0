@@ -32,6 +32,22 @@ void Arm::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    //Position the arm origin relative to the body origin based on which side it is on
+    if(side == "left")
+    {
+        origin = {
+            bodyWidth / 2.0f + FRAME_WIDTH,
+            bodyHeight / 2.0f
+        }; 
+    }
+    else if(side == "right")
+    {
+        origin = {
+            -bodyWidth / 2.0f,
+            bodyHeight / 2.0f
+        }; 
+    }
 }
 
 // Return the current head animation frame.
@@ -44,4 +60,12 @@ int Arm::GetFrame() const
 void Arm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+}
+
+// Set the dimensions of the body to position the arm correctly relative to the body.
+void Arm::SetBodyDimensions(float width, float height, std::string side)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+    this->side = side; 
 }

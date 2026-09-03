@@ -103,7 +103,6 @@ private:
     Arm rightArm;
     Arm leftArm;
 
-
     Vector2 leftArmOffset = {0, 0};
     Vector2 rightArmOffset = {0, 0};
     Vector2 leftLegOffset = {0, 0};
