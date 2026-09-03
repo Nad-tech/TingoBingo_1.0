@@ -6,7 +6,6 @@ TingoBingo is an ongoing project to build a virtual interactive robot with its o
 
 The project is deliberately modular. The robot's behaviour, head, facial features, animation, speech and objects are separate systems that communicate with each other.
 
----
 
 ## Current Status
 
@@ -14,7 +13,6 @@ The project is deliberately modular. The robot's behaviour, head, facial feature
 
 The core robot, animation system, speech system, object interaction and autonomous searching behaviour are currently being developed and expanded.
 
----
 
 # ✨ Current Features
 
@@ -30,7 +28,6 @@ The core robot, animation system, speech system, object interaction and autonomo
 * Speaking state.
 * Emotional states.
 
----
 
 ## 🧠 RobotBrain
 
@@ -83,7 +80,6 @@ RobotBrain also manages:
 * Reaction cooldowns.
 * Behaviour timers.
 
----
 
 # 👁️ Searching & Object Detection
 
@@ -148,7 +144,6 @@ Left│  Object   │Right
 
 The system also handles the case where the ray begins inside the collision rectangle.
 
----
 
 # 🖱️ Object Interaction
 
@@ -175,7 +170,6 @@ When an object is held:
 * Speech can be triggered.
 * A reaction cooldown prevents repeated responses.
 
----
 
 # 🗣️ Speech
 
@@ -221,7 +215,6 @@ The speech controller currently distinguishes between:
 
 This separation prevents speech generation from being confused with actual audio playback.
 
----
 
 # ❤️ Emotions
 
@@ -240,7 +233,6 @@ Currently implemented behaviour primarily uses:
 
 Emotions can affect Tingo's facial animation and behaviour.
 
----
 
 # 🎭 Facial Animation
 
@@ -277,7 +269,6 @@ When the head is facing forward, the facial components are rendered independentl
 
 When the head is rotated, the head-base artwork is rendered on its own because the facial features are already included in the rotated head artwork.
 
----
 
 # 🎞️ Animation System
 
@@ -308,7 +299,6 @@ Idle
 
 This allows an emotional animation to take control over a lower-priority idle animation.
 
----
 
 # 😴 Idle Behaviour
 
@@ -326,7 +316,6 @@ Current idle animations include:
 
 Many of these behaviours use randomised timing so that they do not repeat at exactly the same intervals.
 
----
 
 # 🏗️ Architecture
 
@@ -404,7 +393,6 @@ Represents interactive objects that can be manipulated and detected.
 
 Manages speech generation and audio playback.
 
----
 
 # 📁 Project Structure
 
@@ -443,7 +431,6 @@ TingoBingo/
 └── build/
 ```
 
----
 
 # 🛠️ Technologies
 
@@ -455,7 +442,6 @@ TingoBingo/
 * **Visual Studio Code**
 * **Git**
 
----
 
 # 🔮 Future Ideas
 
@@ -538,7 +524,6 @@ Longer-term possibilities include:
 * Object recognition.
 * AI-assisted conversation.
 
----
 
 # 🎯 Long-Term Goal
 
