@@ -40,7 +40,7 @@ public:
     void PlayBodyBob(float dt);
 
     Head& GetHead();
-    
+
 private:
     Vector2 anchorPoint;
 

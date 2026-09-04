@@ -79,6 +79,10 @@ void Game::HandleInput()
 	{
 		robot.SetEmotion(Emotion::Happy);
 	}
+
+	if(input.RightPressed()){
+
+	}
 }
 
 // Update the game state.
@@ -116,13 +120,13 @@ void Game::Draw()
 
 	robot.Draw();
 	
-	//ball.DrawCollisionBox();
-	//ball.Draw();
+	ball.DrawCollisionBox();
+	ball.Draw();
 	
-	//banana.DrawCollisionBox();
-	//banana.Draw();
+	banana.DrawCollisionBox();
+	banana.Draw();
 	
-	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
+	DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 }
 
 // Release resources before exiting.

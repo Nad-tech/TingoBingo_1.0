@@ -9,6 +9,7 @@ class Arm : public Sprite
         int GetFrame() const;
         void SetRotation(float rotation);
         void SetBodyDimensions(float width, float height, std::string side);
+        void PlayArmMovement();
 
     private:
         float bodyWidth;

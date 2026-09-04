@@ -69,3 +69,9 @@ void Arm::SetBodyDimensions(float width, float height, std::string side)
     bodyHeight = height;
     this->side = side; 
 }
+
+void Arm::PlayArmMovement()
+{
+    rotation += 15.0f; // Example rotation change for arm movement
+    SetRotation(rotation); // Example rotation change for arm movement
+}

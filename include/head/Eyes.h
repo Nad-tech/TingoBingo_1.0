@@ -9,6 +9,7 @@ class Eyes : public Sprite
         void Update(float dt) override;
         void SetHeadDimensions(float width, float height);
         void SetBodyDimensions(float width, float height);
+        float GetYOffset();
 
     private:
         float idleAnimationTimer = 0.0f;
@@ -17,5 +18,5 @@ class Eyes : public Sprite
         float headHeight;
         float bodyWidth;
         float bodyHeight;
-        Vector2 eyesOffset = {0, 0.0f};
+        Vector2 eyesOffset = {0, 30.0f};
 }; 

@@ -53,6 +53,14 @@ public:
     // anchor point.
     void LookForward();
 
+    void SetBodyHeadEyeOffsetDimensions(
+        float bWidth, 
+        float bHeight, 
+        float hWidth, 
+        float hHeight,
+        float eyesYOffset
+    );
+
 private:
     // The two independently rendered pupils.
     Pupil leftPupil;
@@ -60,9 +68,6 @@ private:
 
     // Maximum distance a pupil can move from the centre of the eye.
     const float LOOK_DISTANCE = 10.0f;
-
-    Vector2 leftEyeOffset  = {-33.5f * SCALE, 10.5f * SCALE};
-    Vector2 rightEyeOffset = { 40.5f * SCALE, 10.5f * SCALE};
 
     // Current anchor point of the head in world space.
     Vector2 headAnchorPoint = {0, 0};

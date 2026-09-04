@@ -16,11 +16,65 @@ void Sprite::Update(float dt)
     animation.Update(dt);
 }
 
-// Draw the sprite using its current animation frame.
+//====================================================
+// Sprite Positioning
+//
+// anchorPoint is the world-space reference point and
+// initial position for the sprite. It is also the point
+// around which the sprite rotates.
+//
+// anchorOffset defines how far the sprite is offset
+// from the anchorPoint.
+//
+// anchorPoint and anchorOffset work together to define
+// the sprite's actual position in world space.
+//
+//====================================================
+// DrawTexturePro()
+//
+// DrawTexturePro(
+//     texture,
+//     source,
+//     destination,
+//     origin,
+//     rotation,
+//     tint
+// );
+//
+// texture
+//     The texture to draw.
+//
+// source
+//     Defines which part of the texture is drawn.
+//     Used here to select the current animation frame.
+//
+// destination
+//     Defines where the reference position is and the
+//     size of the sprite when it is drawn.
+//
+// origin
+//     Defines how far the sprite is offset from the
+//     reference position.
+//
+// rotation
+//     The rotation angle in degrees around the reference
+//     position.
+//
+// tint
+//     The colour applied to the sprite. WHITE draws the
+//     sprite using its original colours.
+//====================================================
+//
+// The anchorOffset is scaled with the sprite so that
+// the offset remains correctly aligned when the sprite
+// is drawn at different scales.
+//====================================================
 void Sprite::Draw() const
 {
+    // Get the source rectangle for the current animation frame.
     Rectangle source = animation.GetSourceRectangle();
 
+    // Define the sprite's world-space position and scaled size.
     Rectangle destination =
     {
         anchorPoint.x,
@@ -29,11 +83,14 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * scale
     };
 
+    // Scale the local anchor offset to match the sprite's scale.
     Vector2 drawAnchorOffset = {
         anchorOffset.x * scale,
         anchorOffset.y * scale
     };
 
+    // Draw the selected animation frame at the anchor point,
+    // using the anchor offset as the drawing and rotation pivot.
     DrawTexturePro(
         texture,
         source,

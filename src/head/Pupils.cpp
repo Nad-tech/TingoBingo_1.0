@@ -16,7 +16,10 @@
 // Initialise both pupil sprites.
 void Pupils::Initialise()
 {
+    leftPupil.SetSide("left");
     leftPupil.Initialise();
+   
+    rightPupil.SetSide("right");
     rightPupil.Initialise();
 }
 
@@ -48,14 +51,14 @@ void Pupils::SetAnchorPoint(Vector2 anchorPoint)
 
     leftPupil.SetAnchorPoint(
     {
-        anchorPoint.x + leftEyeOffset.x,
-        anchorPoint.y + leftEyeOffset.y
+        anchorPoint.x,
+        anchorPoint.y
     });
 
     rightPupil.SetAnchorPoint(
     {
-        anchorPoint.x + rightEyeOffset.x,
-        anchorPoint.y + rightEyeOffset.y
+        anchorPoint.x,
+        anchorPoint.y
     });
 }
 
@@ -75,10 +78,10 @@ Vector2 Pupils::RotateVector(Vector2 v, float rotation)
 void Pupils::SetRotation(float rotation)
 {
     Vector2 rotatedLeft =
-        RotateVector(Vector2Add(leftEyeOffset, leftLookOffset), rotation);
+        RotateVector(leftLookOffset, rotation);
 
     Vector2 rotatedRight =
-        RotateVector(Vector2Add(rightEyeOffset, rightLookOffset), rotation);
+        RotateVector(rightLookOffset, rotation);
 
     leftPupil.SetAnchorPoint(
     {
@@ -102,14 +105,14 @@ void Pupils::LookAt(Vector2 point)
 {
     Vector2 leftEyeCentre =
     {
-        headAnchorPoint.x + leftEyeOffset.x,
-        headAnchorPoint.y + leftEyeOffset.y
+        headAnchorPoint.x,
+        headAnchorPoint.y
     };
 
     Vector2 rightEyeCentre =
     {
-        headAnchorPoint.x + rightEyeOffset.x,
-        headAnchorPoint.y + rightEyeOffset.y
+        headAnchorPoint.x,
+        headAnchorPoint.y
     };
 
     // Calculate the direction from each eye to the target.
@@ -149,13 +152,28 @@ void Pupils::LookForward()
 
     leftPupil.SetAnchorPoint(
     {
-        headAnchorPoint.x + leftEyeOffset.x,
-        headAnchorPoint.y + leftEyeOffset.y
+        headAnchorPoint.x,
+        headAnchorPoint.y
     });
 
     rightPupil.SetAnchorPoint(
     {
-        headAnchorPoint.x + rightEyeOffset.x,
-        headAnchorPoint.y + rightEyeOffset.y
+        headAnchorPoint.x,
+        headAnchorPoint.y
     });
+}
+
+void Pupils::SetBodyHeadEyeOffsetDimensions(float bWidth, 
+    float bHeight, 
+    float hWidth, 
+    float hHeight,
+    float eyesYOffset
+)
+{
+    leftPupil.SetBodyDimensions(bWidth, bHeight);
+    rightPupil.SetBodyDimensions(bWidth, bHeight);
+    leftPupil.SetHeadDimensions(hWidth, hHeight);
+    rightPupil.SetHeadDimensions(hWidth, hHeight);
+    leftPupil.SetEyesYOffset(eyesYOffset);
+    rightPupil.SetEyesYOffset(eyesYOffset);
 }

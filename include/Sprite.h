@@ -10,10 +10,14 @@ protected:
     Texture2D texture;
     Animation animation;
 
+    // World-space position of the sprite's anchor point.
     Vector2 anchorPoint = {0,0};
+
+    // Local offset from the sprite's anchor point used for drawing and rotation.
+    Vector2 anchorOffset = {0,0};
+
     float rotation = 0.0f;
     float scale = 1.0f;
-    Vector2 anchorOffset = {0,0};
 
 public:
     virtual void Initialise() = 0;

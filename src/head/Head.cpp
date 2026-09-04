@@ -49,6 +49,14 @@ void Head::Initialise()
     
     mouth.Initialise();
     nose.Initialise();
+    
+    pupils.SetBodyHeadEyeOffsetDimensions(
+        bodyWidth, 
+        bodyHeight, 
+        headBase.GetFrameWidth(), 
+        headBase.GetFrameHeight(),
+        eyes.GetYOffset()
+    );
     pupils.Initialise();
 }
 
@@ -89,7 +97,7 @@ void Head::Draw() const
     //nose.Draw();
     //eyebrows.Draw();
     //antenna.Draw();
-    //pupils.Draw();
+    pupils.Draw();
 }
 
 // Set the head's home anchor point and apply it to every component.

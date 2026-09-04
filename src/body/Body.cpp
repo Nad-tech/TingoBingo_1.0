@@ -162,10 +162,10 @@ void Body::SetRotation(float rotation)
 void Body::ApplyRotation(float rotation)
 {
     this->rotation = rotation;
-
+   
     bodyBase.SetRotation(rotation);
     leftArm.SetRotation(rotation);
-    rightArm.SetRotation(rotation);
+    rightArm.SetRotation(rotation); // Apply the stored arm rotation
     leftLeg.SetRotation(rotation);
     rightLeg.SetRotation(rotation);
     head.SetRotation(rotation);
@@ -193,9 +193,9 @@ void Body::PlayBodyWiggle(float dt)
     {
         bodyWiggling = true;
         bodyWiggleTimer = 0.0f;
-        bodyWiggleAmplitude = (float)GetRandomValue(10, 20);
+        bodyWiggleAmplitude = (float)GetRandomValue(5, 10);
         nextBodyWiggle = (float)GetRandomValue(5, 7);
-        bodyWiggleFrequency = (float)GetRandomValue(10, 40);
+        bodyWiggleFrequency = (float)GetRandomValue(5, 20);
     }
 
     if (bodyWiggling)

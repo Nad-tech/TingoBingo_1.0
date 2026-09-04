@@ -16,7 +16,7 @@ void Eyes::Initialise()
     texture = LoadTexture("assets/images/TingoBingo/head/eyes.png");
 
     // Sprite sheet layout.
-    const int COLUMNS = 1;
+    const int COLUMNS = 5;
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
@@ -62,7 +62,7 @@ void Eyes::Update(float dt)
     
     if(idleAnimationTimer > nextIdleAnimation)
     {
-        animation.Play(0, 0, AnimationPriority::Idle);
+        animation.Play(0, 4, AnimationPriority::Idle);
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
@@ -78,4 +78,9 @@ void Eyes::SetBodyDimensions(float width, float height)
 {
     bodyWidth = width;
     bodyHeight = height;
+}
+
+float Eyes::GetYOffset()
+{
+    return eyesOffset.y;
 }

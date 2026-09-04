@@ -9,6 +9,7 @@
 
 #include "head/Pupil.h"
 #include "Constants.h"
+#include <string>
 
 // Load the pupil sprite and initialise its animation.
 void Pupil::Initialise()
@@ -41,10 +42,53 @@ void Pupil::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    if(side == "left")
+    {
+        anchorOffset = {
+            FRAME_WIDTH / 2.0f - sideOffset, 
+            FRAME_HEIGHT / 2.0f + 
+            bodyHeight / 2.0f + 
+            headHeight / 2.0f +
+            eyesYOffset
+        };
+    }
+    else if(side == "right")
+    {
+        anchorOffset = {
+            FRAME_WIDTH / 2.0f + sideOffset, 
+            FRAME_HEIGHT / 2.0f + 
+            bodyHeight / 2.0f + 
+            headHeight / 2.0f +
+            eyesYOffset
+        };
+    }
 }
 
 // Advance the pupil animation.
 void Pupil::Update(float dt)
 {
     Sprite::Update(dt);
+}
+
+void Pupil::SetBodyDimensions(float width, float height)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+}
+
+void Pupil::SetHeadDimensions(float width, float height)
+{
+    headWidth = width;
+    headHeight = height;
+}
+
+void Pupil::SetEyesYOffset(float yOffset)
+{
+    eyesYOffset = yOffset;
+}
+
+void Pupil::SetSide(std::string side)
+{
+    this->side = side;
 }
