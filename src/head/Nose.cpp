@@ -22,6 +22,11 @@
 #include <iostream>
 #include <cmath>
 
+Vector2 Vector2Add(Vector2 a, Vector2 b)
+{
+    return {a.x + b.x , a.y + b.y};
+}
+
 //====================================================
 // Initialise
 //====================================================
@@ -103,6 +108,8 @@ void Nose::Initialise()
         - bodyHeight / 2.0f
         - headHeight / 2.0f
     };
+
+    homeAnchorPoint = anchorOffset;
 }
 
 //====================================================
@@ -127,12 +134,57 @@ void Nose::Update(float dt)
     // Update the base Sprite animation.
     Sprite::Update(dt);
 
-    // Temporary continuous local rotation.
-    //
-    // This rotates the nose independently around its
-    // own centre while it continues to follow the
-    // head's movement and rotation.
-    localRotation += 1.0f;
+    //Nose Idle animation
+    nextNoseRotation -= dt;
+
+    if (nextNoseRotation <= 0.0f && !noseRotating)
+    {
+        noseRotating = true;
+        noseRotateTimer = 0.0f;
+        nextNoseRotation = (float)GetRandomValue(7, 12);
+    }
+
+    if (noseRotating)
+    {
+        noseRotateTimer += dt;
+
+        localRotation += LOCAL_ROTATION_SPEED * dt;
+
+        if (localRotation >= 360.0f)
+        {
+            noseRotating = false;
+            localRotation = 0;
+        }
+    }
+
+    //Nose wigglw animation
+    nextNoseWiggle -= dt;
+
+    if (nextNoseWiggle <= 0.0f && !noseWiggling)
+    {
+        noseWiggling = true;
+        noseWiggleTimer = 0.0f;
+        nextNoseWiggle = (float)GetRandomValue(5, 7);
+        homeAnchorPoint.x = anchorOffset.x;
+    }
+
+    if (noseWiggling)
+    {
+        noseWiggleTimer += dt;
+
+        wiggleOffSetX =
+            sinf(noseWiggleTimer * WIGGLE_SPEED) * WIGGLE_AMOUNT;
+
+        anchorOffset.x = homeAnchorPoint.x + wiggleOffSetX;
+
+        if (noseWiggleTimer >= 1.0f)
+        {
+            noseWiggling = false;
+            noseWiggleTimer = 0.0f;
+            wiggleOffSetX = 0.0f;
+            anchorOffset.x = homeAnchorPoint.x;
+        }
+    }
 }
 
 //====================================================
@@ -185,15 +237,12 @@ void Nose::SetBodyHeadDimensions(
 void Nose::Draw() const
 {
     // Get the current animation frame.
-    Rectangle source =
-        animation.GetSourceRectangle();
+    Rectangle source = animation.GetSourceRectangle();
 
     // Calculate the scaled dimensions of the nose.
-    float width =
-        animation.GetFrameWidth() * scale;
+    float width = animation.GetFrameWidth() * scale;
 
-    float height =
-        animation.GetFrameHeight() * scale;
+    float height = animation.GetFrameHeight() * scale;
 
     //================================================
     // Parent Transform
@@ -210,18 +259,14 @@ void Nose::Draw() const
 
     // Raylib rotation values are in degrees while
     // sinf/cosf use radians.
-    float radians =
-        rotation * DEG2RAD;
+    float radians = rotation * DEG2RAD;
 
     // Rotate the nose's position around the
     // body/head pivot.
     Vector2 rotatedOffset =
     {
-        offset.x * cosf(radians)
-            - offset.y * sinf(radians),
-
-        offset.x * sinf(radians)
-            + offset.y * cosf(radians)
+        offset.x * cosf(radians) - offset.y * sinf(radians),
+        offset.x * sinf(radians) + offset.y * cosf(radians)
     };
 
     //================================================
@@ -236,11 +281,8 @@ void Nose::Draw() const
     //
     Vector2 nosePosition =
     {
-        anchorPoint.x
-            + rotatedOffset.x * scale,
-
-        anchorPoint.y
-            + rotatedOffset.y * scale
+        anchorPoint.x + rotatedOffset.x * scale,
+        anchorPoint.y + rotatedOffset.y * scale
     };
 
     //================================================
@@ -294,13 +336,14 @@ void Nose::Draw() const
     // Adding them together means the nose inherits
     // the head rotation while also applying its own
     // local rotation.
-    //
-    DrawTexturePro(
-        texture,
-        source,
-        destination,
-        origin,
-        rotation + localRotation,
-        WHITE
-    );
+    
+
+        DrawTexturePro(
+            texture,
+            source,
+            destination,
+            origin,
+            rotation + localRotation,
+            WHITE
+        );
 }
