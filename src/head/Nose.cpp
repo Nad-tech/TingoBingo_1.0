@@ -1,20 +1,22 @@
 //====================================================
 // Nose.cpp
 //
-// Handles the robot's nose sprite and animation.
+// Handles the robot's nose sprite and idle animations.
 //
 // The nose uses two levels of rotation:
 //
 // 1. Parent rotation:
 //    The nose position rotates around the body/head
 //    reference point, allowing it to follow the head
-//    when the body/head rotates.
+//    when the head rotates.
 //
 // 2. Local rotation:
 //    The nose itself rotates around its own centre.
 //
-// This allows the nose to remain attached to the
-// robot's head while also having independent movement.
+// The nose also has an independent horizontal wiggle
+// animation. The wiggle modifies the nose's local
+// local position offset while preserving its original position.
+//
 //====================================================
 
 #include "head/Nose.h"
@@ -33,11 +35,15 @@ Vector2 Vector2Add(Vector2 a, Vector2 b)
 //
 // Loads the nose texture and sets up its animation.
 //
-// The nose uses the same anchor point supplied by the
-// Head as the other head components.
+// The nose uses the anchor point supplied by the Head
+// as its parent rotation reference.
 //
-// anchorOffset describes where the centre of the nose
-// is located relative to the body/head reference point.
+// localPositionOffset stores the nose's position relative to
+// that parent anchor point.
+//
+// homeAnchorPoint stores the original local offset.
+// This gives the wiggle animation a fixed position to
+// return to after the animation finishes.
 //
 //====================================================
 
@@ -84,23 +90,33 @@ void Nose::Initialise()
     // Sprite Transform
     //================================================
 
+    // The nose initially has no local rotation.
     rotation = 0.0f;
+
+    // Use the global robot sprite scale.
     scale = SCALE;
 
-    // Position the nose relative to the body/head
-    // reference point.
+    //================================================
+    // Nose Position
+    //================================================
+    //
+    // localPositionOffset is expressed in LOCAL coordinates
+    // relative to anchorPoint.
     //
     // X:
-    // Position the nose horizontally using half of
-    // the nose frame width.
+    // Position the nose horizontally relative to the
+    // parent anchor using half of the nose frame width.
     //
     // Y:
-    // Position the nose around the vertical centre
-    // of the head.
+    // Position the nose vertically using the nose frame
+    // height and the stored body/head dimensions.
     //
-    // anchorOffset is later rotated around anchorPoint
-    // when the body/head rotates.
-    anchorOffset =
+    // The offset is rotated around anchorPoint in Draw()
+    // when the head rotates.
+    //
+    //================================================
+
+    localPositionOffset =
     {
         FRAME_WIDTH / 2.0f,
 
@@ -109,23 +125,37 @@ void Nose::Initialise()
         - headHeight / 2.0f
     };
 
-    homeAnchorPoint = anchorOffset;
+    // Store the original LOCAL offset.
+    //
+    // This is deliberately not a world-space position.
+    // The wiggle animation uses this as the nose's
+    // permanent home position.
+    homeAnchorPoint = localPositionOffset;
 }
 
 //====================================================
 // Update
 //====================================================
 //
-// Updates the normal Sprite animation and applies the
-// nose's independent local rotation.
+// Updates the base Sprite animation and the nose's
+// independent idle animations.
 //
-// localRotation is separate from rotation.
+// The nose has two independent idle behaviours:
+//
+// 1. Rotation:
+//    Occasionally rotates the nose through 360 degrees.
+//
+// 2. Wiggle:
+//    Occasionally moves the nose horizontally around
+//    its original local anchor position.
+//
+// localRotation is independent of the parent's rotation.
 //
 // rotation:
 //     Rotation inherited from the Head.
 //
 // localRotation:
-//     Rotation belonging only to the nose.
+//     Additional rotation belonging only to the nose.
 //
 //====================================================
 
@@ -134,22 +164,37 @@ void Nose::Update(float dt)
     // Update the base Sprite animation.
     Sprite::Update(dt);
 
-    //Nose Idle animation
+    //================================================
+    // Nose Rotation Idle Animation
+    //================================================
+
+    // Count down until the next nose rotation.
     nextNoseRotation -= dt;
 
     if (nextNoseRotation <= 0.0f && !noseRotating)
     {
+        // Start a new nose rotation.
         noseRotating = true;
+
+        // Reset the rotation timer.
         noseRotateTimer = 0.0f;
+
+        // Randomise the delay before the following rotation.
         nextNoseRotation = (float)GetRandomValue(7, 12);
     }
 
     if (noseRotating)
     {
+        // Track how long the rotation has been active.
         noseRotateTimer += dt;
 
+        // Rotate the nose using a frame-rate independent
+        // speed defined by LOCAL_ROTATION_SPEED.
         localRotation += LOCAL_ROTATION_SPEED * dt;
 
+        // Once a complete 360-degree rotation is reached,
+        // stop the idle animation and return to zero local
+        // rotation.
         if (localRotation >= 360.0f)
         {
             noseRotating = false;
@@ -157,32 +202,61 @@ void Nose::Update(float dt)
         }
     }
 
-    //Nose wigglw animation
+    //================================================
+    // Nose Wiggle Idle Animation
+    //================================================
+
+    // Count down until the next nose wiggle.
     nextNoseWiggle -= dt;
 
     if (nextNoseWiggle <= 0.0f && !noseWiggling)
     {
+        // Start a new wiggle.
         noseWiggling = true;
+
+        // Reset the wiggle timer.
         noseWiggleTimer = 0.0f;
+
+        // Randomise the delay before the following wiggle.
         nextNoseWiggle = (float)GetRandomValue(5, 7);
-        homeAnchorPoint.x = anchorOffset.x;
+
+        // The original local anchor position is already
+        // stored in homeAnchorPoint.
     }
 
     if (noseWiggling)
     {
+        // Track how long the wiggle has been active.
         noseWiggleTimer += dt;
 
+        // Calculate the horizontal wiggle using a sine wave.
+        //
+        // WIGGLE_SPEED controls how quickly the nose moves.
+        // WIGGLE_AMOUNT controls how far it moves from
+        // its original position.
         wiggleOffSetX =
             sinf(noseWiggleTimer * WIGGLE_SPEED) * WIGGLE_AMOUNT;
 
-        anchorOffset.x = homeAnchorPoint.x + wiggleOffSetX;
+        // Apply the wiggle to the original LOCAL position.
+        //
+        // Using homeAnchorPoint as the starting position
+        // prevents the wiggle from accumulating movement
+        // from one frame to the next.
+        localPositionOffset.x =
+            homeAnchorPoint.x + wiggleOffSetX;
 
+        // The wiggle lasts for one second.
         if (noseWiggleTimer >= 1.0f)
         {
+            // Stop the wiggle.
             noseWiggling = false;
+
+            // Reset the wiggle state.
             noseWiggleTimer = 0.0f;
             wiggleOffSetX = 0.0f;
-            anchorOffset.x = homeAnchorPoint.x;
+
+            // Restore the original LOCAL anchor position.
+            localPositionOffset.x = homeAnchorPoint.x;
         }
     }
 }
@@ -191,8 +265,12 @@ void Nose::Update(float dt)
 // Set Body / Head Dimensions
 //====================================================
 //
-// Stores the body and head dimensions used to calculate
-// the nose's position relative to the body/head anchor.
+// Stores the body and head dimensions used when
+// calculating the nose's position relative to the
+// body/head anchor point.
+//
+// These values are used by Initialise() to calculate
+// localPositionOffset.
 //
 //====================================================
 
@@ -203,9 +281,11 @@ void Nose::SetBodyHeadDimensions(
     float hHeight
 )
 {
+    // Store the supplied body dimensions.
     bodyWidth = bwidth;
     bodyHeight = bHeight;
 
+    // Store the supplied head dimensions.
     headWidth = hWidth;
     headHeight = hHeight;
 }
@@ -214,23 +294,31 @@ void Nose::SetBodyHeadDimensions(
 // Draw
 //====================================================
 //
-// The nose uses two separate transforms:
+// The nose uses two separate transforms.
 //
 // Parent transform:
-//     anchorOffset is rotated around anchorPoint.
+//     Rotates the nose's POSITION around anchorPoint.
 //
 // Local transform:
-//     the nose sprite is rotated around its own centre.
+//     Rotates the nose SPRITE around its own centre.
 //
-// This effectively creates:
+// This creates the following transform hierarchy:
 //
-//     Body/Head Pivot
-//          ↓
-//     rotate nose position
-//          ↓
-//     Nose Centre
-//          ↓
-//     rotate nose around itself
+//     Body / Head Pivot
+//            |
+//            v
+//     Rotate nose position
+//            |
+//            v
+//       Nose Centre
+//            |
+//            v
+//     Rotate nose sprite
+//
+// The parent rotation controls where the nose is
+// positioned around the head.
+//
+// The local rotation controls the nose's own rotation.
 //
 //====================================================
 
@@ -248,20 +336,19 @@ void Nose::Draw() const
     // Parent Transform
     //================================================
     //
-    // anchorOffset represents the nose's position
-    // relative to the body/head reference point.
+    // localPositionOffset represents the nose's LOCAL position
+    // relative to the body/head anchor point.
     //
-    // We rotate this offset around the parent's
-    // anchorPoint so the nose follows the head's
-    // rotation.
+    // Rotate this local offset around the parent anchor
+    // so the nose follows the head when it rotates.
     //
-    Vector2 offset = anchorOffset;
+    Vector2 offset = localPositionOffset;
 
-    // Raylib rotation values are in degrees while
-    // sinf/cosf use radians.
+    // Raylib rotation values are measured in degrees,
+    // while sinf() and cosf() require radians.
     float radians = rotation * DEG2RAD;
 
-    // Rotate the nose's position around the
+    // Rotate the nose's local position around the
     // body/head pivot.
     Vector2 rotatedOffset =
     {
@@ -273,11 +360,11 @@ void Nose::Draw() const
     // Nose World Position
     //================================================
     //
-    // Add the rotated offset to the parent's
+    // Add the rotated local offset to the parent's
     // world-space anchor point.
     //
-    // This gives us the centre of the nose after
-    // the parent/head rotation has been applied.
+    // The result is the nose's world-space centre
+    // after the parent/head rotation has been applied.
     //
     Vector2 nosePosition =
     {
@@ -290,11 +377,11 @@ void Nose::Draw() const
     //================================================
     //
     // Build the destination rectangle around the
-    // calculated centre of the nose.
+    // calculated nose centre.
     //
     // Subtracting half the width and height means
-    // nosePosition represents the centre rather than
-    // the top-left corner.
+    // nosePosition represents the centre of the sprite
+    // rather than its top-left corner.
     //
     Rectangle destination =
     {
@@ -309,13 +396,15 @@ void Nose::Draw() const
     //================================================
     //
     // The destination rectangle is centred around
-    // nosePosition, so its centre is simply half its
-    // width and height.
+    // nosePosition.
     //
-    // This is the nose's LOCAL rotation point.
+    // Therefore, the centre of the rectangle is simply
+    // half its width and half its height.
+    //
+    // This is the nose's LOCAL rotation origin.
     //
     // It is separate from anchorPoint, which remains
-    // the body/head rotation reference point.
+    // the parent/body/head rotation reference point.
     //
     Vector2 origin =
     {
@@ -333,17 +422,16 @@ void Nose::Draw() const
     // localRotation:
     //     Independent nose rotation.
     //
-    // Adding them together means the nose inherits
-    // the head rotation while also applying its own
-    // local rotation.
-    
-
-        DrawTexturePro(
-            texture,
-            source,
-            destination,
-            origin,
-            rotation + localRotation,
-            WHITE
-        );
+    // Adding the two rotations causes the nose to
+    // inherit the head's rotation while also applying
+    // its own independent local rotation.
+    //
+    DrawTexturePro(
+        texture,
+        source,
+        destination,
+        origin,
+        rotation + localRotation,
+        WHITE
+    );
 }
