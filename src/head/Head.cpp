@@ -48,6 +48,13 @@ void Head::Initialise()
     eyes.Initialise();
     
     mouth.Initialise();
+    
+    nose.SetBodyHeadDimensions(
+        bodyWidth, 
+        bodyHeight, 
+        headBase.GetFrameWidth(), 
+        headBase.GetFrameHeight()
+    );
     nose.Initialise();
     
     pupils.SetBodyHeadEyeOffsetDimensions(
@@ -84,8 +91,6 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
     mouth.UpdateMouth(dt, speaking, emotion);
     nose.Update(dt);
     pupils.Update(dt);
-
-    //PlayIdleHeadTransform(dt);
 }
 
 void Head::Draw() const
@@ -94,7 +99,7 @@ void Head::Draw() const
     headBase.Draw();
     eyes.Draw();
     //mouth.Draw();
-    //nose.Draw();
+    nose.Draw();
     //eyebrows.Draw();
     //antenna.Draw();
     pupils.Draw();

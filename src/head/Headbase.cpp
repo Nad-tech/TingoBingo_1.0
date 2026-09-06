@@ -45,7 +45,8 @@ void Headbase::Initialise()
 
     anchorOffset = {
         FRAME_WIDTH / 2.0f, 
-        (FRAME_HEIGHT / 1.0f) + (bodyHeight / 2.0f)
+        (FRAME_HEIGHT / 1.0f) + 
+        (bodyHeight / 2.0f)
     };
 }
 

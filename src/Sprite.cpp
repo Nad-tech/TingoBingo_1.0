@@ -9,6 +9,7 @@
 //====================================================
 
 #include "Sprite.h"
+#include <iostream>
 
 // Update the sprite's animation.
 void Sprite::Update(float dt)

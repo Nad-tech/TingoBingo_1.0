@@ -24,7 +24,6 @@ public:
 
     virtual void Update(float dt);
     virtual void Draw() const;
-
     void Shutdown();
     
     void SetAnchorPoint(Vector2 anchorPoint);
