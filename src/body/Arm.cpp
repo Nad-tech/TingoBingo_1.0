@@ -1,7 +1,8 @@
 #include "body/Arm.h"
 #include "Constants.h"
+#include <cmath>
 
-// Load the head sprite and initialise its animation.
+// Load the arm sprite and initialise its animation.
 void Arm::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
@@ -33,36 +34,47 @@ void Arm::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    // Position the arm anchor offset relative to the body anchor point based on which side it is on.
+    // Position the arm's anchor point relative to the body.
+    // The anchor point represents where the arm attaches
+    // to the body at the shoulder.
     if(side == "left")
     {
-        anchorOffset = {
-            bodyWidth / 2.0f + FRAME_WIDTH,
-            bodyHeight / 2.0f
+        localPositionOffset = {
+            bodyWidth / 2 + FRAME_WIDTH,
+            -bodyHeight / 2
         }; 
     }
     else if(side == "right")
     {
-        anchorOffset = {
+        localPositionOffset = {
             -bodyWidth / 2.0f,
-            bodyHeight / 2.0f
+            -bodyHeight / 2.0f
         }; 
     }
+
+    homeRotation = rotation;
 }
 
-// Return the current head animation frame.
+void Arm::Update(float dt)
+{
+    Sprite::Update(dt);
+    localRotation += 100*dt;
+}
+
+// Return the current arm animation frame.
 int Arm::GetFrame() const
 {
     return animation.GetFrame();
 }
 
-// Apply a rotation transform to the head sprite.
+// Apply a rotation to the arm.
 void Arm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
 
-// Set the dimensions of the body to position the arm correctly relative to the body.
+// Set the dimensions of the body so the arm can be positioned
+// correctly relative to the body.
 void Arm::SetBodyDimensions(float width, float height, std::string side)
 {
     bodyWidth = width;
@@ -70,8 +82,108 @@ void Arm::SetBodyDimensions(float width, float height, std::string side)
     this->side = side; 
 }
 
-void Arm::PlayArmMovement()
+void Arm::Draw() const
 {
-    rotation += 15.0f; // Example rotation change for arm movement
-    SetRotation(rotation); // Example rotation change for arm movement
+    // Get the current animation frame.
+    Rectangle source = animation.GetSourceRectangle();
+
+    // Calculate the scaled dimensions of the arm.
+    float width = animation.GetFrameWidth() * scale;
+    float height = animation.GetFrameHeight() * scale;
+
+    //================================================
+    // Parent Transform
+    //================================================
+    //
+    // localPositionOffset represents the arm's local
+    // position relative to the body anchor point.
+    //
+    // Rotate this local offset around the body anchor
+    // so the arm follows the body's rotation.
+    //
+    Vector2 offset = localPositionOffset;
+
+    // Raylib rotation values are measured in degrees,
+    // while sinf() and cosf() require radians.
+    float radians = rotation * DEG2RAD;
+
+    // Rotate the arm's local offset around the
+    // body anchor point.
+    Vector2 rotatedOffset =
+    {
+        offset.x * cosf(radians) - offset.y * sinf(radians),
+        offset.x * sinf(radians) + offset.y * cosf(radians)
+    };
+
+    //================================================
+    // Arm World Position
+    //================================================
+    //
+    // Add the rotated local offset to the body's
+    // world-space anchor point.
+    //
+    // The arm anchor point is attached to the body
+    // at the shoulder and follows the body's rotation.
+    //
+    Vector2 armAnchorPosition =
+    {
+        anchorPoint.x + rotatedOffset.x * scale,
+        anchorPoint.y + rotatedOffset.y * scale
+    };
+
+    //================================================
+    // Arm Destination
+    //================================================
+    //
+    // Position the arm sprite using its anchor point.
+    //
+    // The anchor point is at the top-centre of the
+    // arm sprite, where the arm attaches to the shoulder.
+    //
+    Rectangle destination =
+    {
+        armAnchorPosition.x - width / 2.0f,
+        armAnchorPosition.y,
+        width,
+        height
+    };
+
+    //================================================
+    // Local Rotation Pivot
+    //================================================
+    //
+    // Set the rotation origin to the top-centre of the arm.
+    //
+    // This is the point where the arm attaches to the
+    // body at the shoulder, allowing the arm to rotate
+    // around the shoulder rather than its centre.
+    //
+    Vector2 origin =
+    {
+        width / 2.0f,
+        0
+    };
+
+    //================================================
+    // Draw
+    //================================================
+    //
+    // rotation:
+    //     Rotation inherited from the body.
+    //
+    // localRotation:
+    //     Independent rotation of the arm.
+    //
+    // Adding the two rotations allows the arm to
+    // follow the body while also rotating independently.
+    //
+    DrawTexturePro(
+        texture,
+        source,
+        destination,
+        origin,
+        rotation + localRotation,
+        WHITE
+    );
 }
+

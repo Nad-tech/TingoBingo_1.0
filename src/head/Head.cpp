@@ -112,7 +112,7 @@ void Head::Draw() const
     ears.Draw();
     headBase.Draw();
     eyes.Draw();
-    mouth.Draw();
+    //mouth.Draw();
     nose.Draw();
     eyebrows.Draw();
     //antenna.Draw();
