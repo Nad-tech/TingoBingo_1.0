@@ -123,6 +123,7 @@ void Nose::Initialise()
         FRAME_HEIGHT / 2.0f
         - bodyHeight / 2.0f
         - headHeight / 2.0f
+        + slightPositionOffset
     };
 
     // Store the original LOCAL offset.

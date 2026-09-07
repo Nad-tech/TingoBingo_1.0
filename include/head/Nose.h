@@ -19,6 +19,7 @@ class Nose : public Sprite
     private:
         // Nose-centre translation in local head coordinates.
         Vector2 localPositionOffset = {0, 0};
+        float slightPositionOffset = 5.0f;
 
         float bodyWidth = 0.0f;
         float bodyHeight = 0.0f;
@@ -48,3 +49,5 @@ class Nose : public Sprite
         const float WIGGLE_SPEED = 25.0f;
         const float WIGGLE_AMOUNT = 5.0f;
 }; 
+
+

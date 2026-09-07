@@ -16,7 +16,7 @@ void Eyebrows::Initialise()
     texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
 
     // Define the sprite sheet layout.
-    const int COLUMNS = 4;
+    const int COLUMNS = 1;
     const int ROWS = 1;
 
     // Determine the dimensions of each frame.
@@ -42,6 +42,18 @@ void Eyebrows::Initialise()
     // Apply the default sprite transform.
     rotation = ROTATION;
     scale = SCALE;
+
+    localPositionOffset =
+    {
+        FRAME_WIDTH / 2.0f,
+
+        FRAME_HEIGHT / 2.0f
+        + bodyHeight / 2.0f
+        + headHeight / 2.0f
+        + foreheadOffset
+    };
+
+    anchorOffset = localPositionOffset;
 }
 
 void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
@@ -111,4 +123,20 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Eyebrows::SetBodyHeadDimensions(
+    float bwidth,
+    float bHeight,
+    float hWidth,
+    float hHeight
+)
+{
+    // Store the supplied body dimensions.
+    bodyWidth = bwidth;
+    bodyHeight = bHeight;
+
+    // Store the supplied head dimensions.
+    headWidth = hWidth;
+    headHeight = hHeight;
 }
