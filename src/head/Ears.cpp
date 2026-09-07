@@ -40,6 +40,16 @@ void Ears::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    localPositionOffset =
+    {
+        FRAME_WIDTH / 2.0f,
+        FRAME_HEIGHT / 2.0f
+        + bodyHeight / 2.0f
+        + headHeight / 2.0f
+    };
+
+    anchorOffset = localPositionOffset;
 }
 
 void Ears::Update(float dt)
@@ -57,4 +67,20 @@ void Ears::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Ears::SetBodyHeadDimensions(
+    float bwidth,
+    float bHeight,
+    float hWidth,
+    float hHeight
+)
+{
+    // Store the supplied body dimensions.
+    bodyWidth = bwidth;
+    bodyHeight = bHeight;
+
+    // Store the supplied head dimensions.
+    headWidth = hWidth;
+    headHeight = hHeight;
 }

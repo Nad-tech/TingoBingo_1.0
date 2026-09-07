@@ -31,6 +31,13 @@ void Head::Initialise()
 {
     headBase.Initialise();
     antenna.Initialise();
+    
+    ears.SetBodyHeadDimensions(
+        bodyWidth,
+        bodyHeight,
+        headBase.GetFrameWidth(),
+        headBase.GetFrameHeight()
+    );
     ears.Initialise();
     
     eyebrows.SetBodyHeadDimensions(
@@ -102,10 +109,10 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
 
 void Head::Draw() const
 {
-    //ears.Draw();
+    ears.Draw();
     headBase.Draw();
     eyes.Draw();
-    //mouth.Draw();
+    mouth.Draw();
     nose.Draw();
     eyebrows.Draw();
     //antenna.Draw();
