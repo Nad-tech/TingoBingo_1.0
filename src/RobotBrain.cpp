@@ -290,12 +290,19 @@ void RobotBrain::Update(float dt)
         // enters Idle, the ten-second countdown starts again.
         // ----------------------------------------------------
 
+        
+        SwingArm("left", true);
+        SwingArm("right", true);
+
         if(idleTimer >= 10.0f)
         {
             searchTimer = 0.0f;
             idleTimer = 0.0f;
 
             state = State::Searching;
+
+            SwingArm("left", false);
+            SwingArm("right", false);
         }
     }
 
@@ -1137,4 +1144,9 @@ Object* RobotBrain::DetectCollision(
     // --------------------------------------------------------
 
     return nullptr;
+}
+
+void RobotBrain::SwingArm(std::string side, bool swinging)
+{
+    robot.SwingArm(side, swinging);
 }

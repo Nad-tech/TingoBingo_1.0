@@ -41,6 +41,8 @@ public:
 
     Head& GetHead();
 
+    void SwingArm(std::string side, bool swinging);
+
 private:
     Vector2 anchorPoint;
 
@@ -109,4 +111,7 @@ private:
     Vector2 rightLegOffset = {0, 0};
 
     Vector2 headOffset = {0.0f, 0.0f};
+
+    bool swingLeftArm = false;
+    bool swingRightArm = false;
 };

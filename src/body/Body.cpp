@@ -91,6 +91,16 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     rightLeg.Update(dt);
     
     PlayIdleBodyTransform(dt);
+
+    if(swingLeftArm)
+    {
+        leftArm.SwingArm(dt, 0, 180);
+    }
+
+    if(swingRightArm)
+    {
+        rightArm.SwingArm(dt, 100, 180);
+    }
 }
 
 void Body::Draw() const
@@ -242,4 +252,25 @@ void Body::PlayBodyBob(float dt)
 Head& Body::GetHead()
 {
     return head;
+}
+
+void Body::SwingArm(std::string side,  bool swinging)
+{
+    if(side == "left" && swinging)
+    {
+        swingLeftArm = true;
+    }
+    else if(side == "left" && !swinging)
+    {
+        swingLeftArm = false;
+    }
+
+    if(side == "right" && swinging)
+    {
+        swingRightArm = true;
+    }
+    else if(side == "right" && !swinging)
+    {
+        swingRightArm = false;
+    }
 }

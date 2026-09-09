@@ -42,7 +42,9 @@ class RobotBrain
                         (
                             Vector2 rayOrigin, 
                             Vector2 rayEnd
-                        ); 
+                        );
+                        
+        void SwingArm(std::string side, bool swinging);
 
     private:
         Robot& robot;

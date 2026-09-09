@@ -1,6 +1,7 @@
 #include "body/Arm.h"
 #include "Constants.h"
 #include <cmath>
+#include <iostream>
 
 // Load the arm sprite and initialise its animation.
 void Arm::Initialise()
@@ -58,7 +59,6 @@ void Arm::Initialise()
 void Arm::Update(float dt)
 {
     Sprite::Update(dt);
-    localRotation += 100*dt;
 }
 
 // Return the current arm animation frame.
@@ -187,3 +187,28 @@ void Arm::Draw() const
     );
 }
 
+void Arm::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
+{
+    swingTime += dt * SWING_SPEED;
+
+    if (swingTime >= 2.0f * PI)
+    {
+        swingTime -= 2.0f * PI;
+    }
+
+    float unitAngle = 0;
+    
+    if(side == "left")
+    {
+        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
+    }
+
+    if(side == "right")
+    {
+        unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
+    }
+
+    localRotation =
+            swingMinAngle +
+            unitAngle * (swingMaxAngle - swingMinAngle);
+}

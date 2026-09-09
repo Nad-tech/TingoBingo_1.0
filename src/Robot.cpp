@@ -131,3 +131,8 @@ void Robot::PlaySfx(std::string sound)
 {
     sfxController.PlaySfx(sound);
 }
+
+void Robot::SwingArm(std::string side, bool swinging)
+{
+    body.SwingArm(side, swinging);
+}

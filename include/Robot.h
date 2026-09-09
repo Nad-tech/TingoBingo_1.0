@@ -79,6 +79,8 @@ public:
 
     void PlaySfx(std::string sound);
 
+    void SwingArm(std::string side, bool swinging);
+
 private:
 
     // Current world-space anchor point of the robot.
