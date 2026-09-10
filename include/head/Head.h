@@ -101,6 +101,8 @@ public:
     void LookForward();
 
     void SetBodyDimensions(float width, float height);
+
+    Vector2 GetWorldPosition() const;
     
 private:
 

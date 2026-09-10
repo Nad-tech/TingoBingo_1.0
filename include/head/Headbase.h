@@ -11,6 +11,7 @@ class Headbase : public Sprite
         void SetBodyDimensions(float width, float height);
         float GetFrameWidth() const;
         float GetFrameHeight() const;
+        Vector2 GetWorldPosition() const;
 
     private:
         float bodyWidth;

@@ -81,6 +81,8 @@ public:
 
     void SwingArm(std::string side, bool swinging);
 
+    Vector2 GetHeadWorldPosition() const;
+
 private:
 
     // Current world-space anchor point of the robot.

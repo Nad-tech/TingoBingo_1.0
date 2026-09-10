@@ -10,6 +10,7 @@
 
 #include "head/Headbase.h"
 #include "Constants.h"
+#include "raylib.h"
 
 // Load the head sprite and initialise its animation.
 void Headbase::Initialise()
@@ -76,4 +77,14 @@ float Headbase::GetFrameWidth() const
 float Headbase::GetFrameHeight() const
 {
     return animation.GetFrameHeight();
+}
+
+Vector2 Headbase::GetWorldPosition() const
+{
+   return {
+    anchorPoint.x, 
+    anchorPoint.y - 
+    (bodyHeight / 2.0f) * SCALE -
+    (animation.GetFrameHeight() / 2) * SCALE
+   }; 
 }

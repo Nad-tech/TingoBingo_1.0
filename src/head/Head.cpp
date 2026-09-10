@@ -189,3 +189,8 @@ void Head::SetBodyDimensions(float width, float height)
 
     headBase.SetBodyDimensions(width, height);
 }
+
+Vector2 Head::GetWorldPosition() const
+{
+    return headBase.GetWorldPosition();
+}

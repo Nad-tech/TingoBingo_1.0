@@ -43,6 +43,8 @@ public:
 
     void SwingArm(std::string side, bool swinging);
 
+    Vector2 GetHeadWorldPosition() const;
+
 private:
     Vector2 anchorPoint;
 

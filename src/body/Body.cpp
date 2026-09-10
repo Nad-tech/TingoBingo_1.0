@@ -274,3 +274,8 @@ void Body::SwingArm(std::string side,  bool swinging)
         swingRightArm = false;
     }
 }
+
+Vector2 Body::GetHeadWorldPosition() const
+{
+    return head.GetWorldPosition();
+}

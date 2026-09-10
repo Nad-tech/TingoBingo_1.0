@@ -775,7 +775,7 @@ void RobotBrain::Search(float dt)
     // that visually represents where Tingo is looking from.
     // --------------------------------------------------------
 
-    searchRayOrigin = robot.GetHeadAnchorPoint();
+    searchRayOrigin = robot.GetHeadWorldPosition();
 
 
     // --------------------------------------------------------

@@ -24,11 +24,6 @@
 #include <iostream>
 #include <cmath>
 
-Vector2 Vector2Add(Vector2 a, Vector2 b)
-{
-    return {a.x + b.x , a.y + b.y};
-}
-
 //====================================================
 // Initialise
 //====================================================

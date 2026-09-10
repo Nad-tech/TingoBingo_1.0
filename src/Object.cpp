@@ -50,8 +50,8 @@ void Object::Initialise()
     // to determine when the toy overlaps with other objects.
     collisionBox = Rectangle
     (
-        anchorPoint.x - FRAME_WIDTH / 2.0f,
-        anchorPoint.y - FRAME_HEIGHT / 2.0f,
+        anchorPoint.x,
+        anchorPoint.y,
         FRAME_WIDTH,
         FRAME_HEIGHT
     );
@@ -121,10 +121,10 @@ void Object::UpdateObject(
     // Keep the collision box centred on the toy's
     // current anchor point after it has moved.
     collisionBox.x =
-        anchorPoint.x - FRAME_WIDTH / 2.0f;
+        anchorPoint.x;
 
     collisionBox.y =
-        anchorPoint.y - FRAME_HEIGHT / 2.0f;
+        anchorPoint.y;
 }
 
 

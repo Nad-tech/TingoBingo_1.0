@@ -175,15 +175,28 @@ class Arm : public Sprite
 {
     public:
         void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
+        
         int GetFrame() const;
+        
         void SetRotation(float rotation);
         void SetBodyDimensions(float width, float height, std::string side);
-        void PlayArmMovement();
+
+        void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
 
     private:
-        float bodyWidth;
-        float bodyHeight;
-        std::string side;
+        Vector2 localPositionOffset = {0, 0};
+        float localRotation = 0.0f;
+        float homeRotation = 0.0f;
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+        std::string side = "";
+
+        const float SWING_MIN = 0.0f;
+        const float SWING_MAX = 180.0f;
+        const float SWING_SPEED = 10.0f;
+        float swingTime = 0;
 };
 
 
@@ -233,6 +246,10 @@ public:
     void PlayBodyBob(float dt);
 
     Head& GetHead();
+
+    void SwingArm(std::string side, bool swinging);
+
+    Vector2 GetHeadWorldPosition() const;
 
 private:
     Vector2 anchorPoint;
@@ -302,6 +319,9 @@ private:
     Vector2 rightLegOffset = {0, 0};
 
     Vector2 headOffset = {0.0f, 0.0f};
+
+    bool swingLeftArm = false;
+    bool swingRightArm = false;
 };
 
 
@@ -467,8 +487,22 @@ class Ears : public Sprite
      public:
         void Initialise() override;
         void Update(float dt) override;
-   
+        void SetBodyHeadDimensions(
+            float bwidth, 
+            float bHeigh, 
+            float hWidth, 
+            float hHeight
+        );
+
     private:
+        //Ears-centre translation in local head coordinates.
+        Vector2 localPositionOffset = {0, 0};
+
+        float bodyWidth = 0.0f;
+        float bodyHeight = 0.0f;
+        float headWidth = 0.0f;
+        float headHeight = 0.0f;
+        
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0;
 };
@@ -488,8 +522,24 @@ class Eyebrows : public Sprite
     public:
         void Initialise() override;
         void UpdateEyebrows(float dt, bool speaking, Emotion emotion);
+        void SetBodyHeadDimensions(
+            float bwidth, 
+            float bHeigh, 
+            float hWidth, 
+            float hHeight
+        );
 
     private:
+        // Eyebrows-centre translation in local head coordinates.
+        Vector2 localPositionOffset = {0, 0};
+        float foreheadOffset = 65;
+
+        float bodyWidth = 0.0f;
+        float bodyHeight = 0.0f;
+        float headWidth = 0.0f;
+        float headHeight = 0.0f;
+        
+
         float happyAnimationTimer = 0.0f;
         float nextHappyAnimation = 3.0f;
 
@@ -635,6 +685,8 @@ public:
     void LookForward();
 
     void SetBodyDimensions(float width, float height);
+
+    Vector2 GetWorldPosition() const;
     
 private:
 
@@ -684,6 +736,7 @@ class Headbase : public Sprite
         void SetBodyDimensions(float width, float height);
         float GetFrameWidth() const;
         float GetFrameHeight() const;
+        Vector2 GetWorldPosition() const;
 
     private:
         float bodyWidth;
@@ -736,6 +789,10 @@ class Nose : public Sprite
         );
 
     private:
+        // Nose-centre translation in local head coordinates.
+        Vector2 localPositionOffset = {0, 0};
+        float slightPositionOffset = 5.0f;
+
         float bodyWidth = 0.0f;
         float bodyHeight = 0.0f;
         float headWidth = 0.0f;
@@ -764,6 +821,8 @@ class Nose : public Sprite
         const float WIGGLE_SPEED = 25.0f;
         const float WIGGLE_AMOUNT = 5.0f;
 }; 
+
+
 
 
 =====================================
@@ -1017,6 +1076,10 @@ public:
 
     void PlaySfx(std::string sound);
 
+    void SwingArm(std::string side, bool swinging);
+
+    Vector2 GetHeadWorldPosition() const;
+
 private:
 
     // Current world-space anchor point of the robot.
@@ -1083,7 +1146,9 @@ class RobotBrain
                         (
                             Vector2 rayOrigin, 
                             Vector2 rayEnd
-                        ); 
+                        );
+                        
+        void SwingArm(std::string side, bool swinging);
 
     private:
         Robot& robot;
@@ -1551,8 +1616,10 @@ void Animation::Stop()
 
 #include "body/Arm.h"
 #include "Constants.h"
+#include <cmath>
+#include <iostream>
 
-// Load the head sprite and initialise its animation.
+// Load the arm sprite and initialise its animation.
 void Arm::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
@@ -1584,36 +1651,46 @@ void Arm::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    // Position the arm anchor offset relative to the body anchor point based on which side it is on.
+    // Position the arm's anchor point relative to the body.
+    // The anchor point represents where the arm attaches
+    // to the body at the shoulder.
     if(side == "left")
     {
-        anchorOffset = {
-            bodyWidth / 2.0f + FRAME_WIDTH,
-            bodyHeight / 2.0f
+        localPositionOffset = {
+            bodyWidth / 2 + FRAME_WIDTH,
+            -bodyHeight / 2
         }; 
     }
     else if(side == "right")
     {
-        anchorOffset = {
+        localPositionOffset = {
             -bodyWidth / 2.0f,
-            bodyHeight / 2.0f
+            -bodyHeight / 2.0f
         }; 
     }
+
+    homeRotation = rotation;
 }
 
-// Return the current head animation frame.
+void Arm::Update(float dt)
+{
+    Sprite::Update(dt);
+}
+
+// Return the current arm animation frame.
 int Arm::GetFrame() const
 {
     return animation.GetFrame();
 }
 
-// Apply a rotation transform to the head sprite.
+// Apply a rotation to the arm.
 void Arm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
 
-// Set the dimensions of the body to position the arm correctly relative to the body.
+// Set the dimensions of the body so the arm can be positioned
+// correctly relative to the body.
 void Arm::SetBodyDimensions(float width, float height, std::string side)
 {
     bodyWidth = width;
@@ -1621,10 +1698,135 @@ void Arm::SetBodyDimensions(float width, float height, std::string side)
     this->side = side; 
 }
 
-void Arm::PlayArmMovement()
+void Arm::Draw() const
 {
-    rotation += 15.0f; // Example rotation change for arm movement
-    SetRotation(rotation); // Example rotation change for arm movement
+    // Get the current animation frame.
+    Rectangle source = animation.GetSourceRectangle();
+
+    // Calculate the scaled dimensions of the arm.
+    float width = animation.GetFrameWidth() * scale;
+    float height = animation.GetFrameHeight() * scale;
+
+    //================================================
+    // Parent Transform
+    //================================================
+    //
+    // localPositionOffset represents the arm's local
+    // position relative to the body anchor point.
+    //
+    // Rotate this local offset around the body anchor
+    // so the arm follows the body's rotation.
+    //
+    Vector2 offset = localPositionOffset;
+
+    // Raylib rotation values are measured in degrees,
+    // while sinf() and cosf() require radians.
+    float radians = rotation * DEG2RAD;
+
+    // Rotate the arm's local offset around the
+    // body anchor point.
+    Vector2 rotatedOffset =
+    {
+        offset.x * cosf(radians) - offset.y * sinf(radians),
+        offset.x * sinf(radians) + offset.y * cosf(radians)
+    };
+
+    //================================================
+    // Arm World Position
+    //================================================
+    //
+    // Add the rotated local offset to the body's
+    // world-space anchor point.
+    //
+    // The arm anchor point is attached to the body
+    // at the shoulder and follows the body's rotation.
+    //
+    Vector2 armAnchorPosition =
+    {
+        anchorPoint.x + rotatedOffset.x * scale,
+        anchorPoint.y + rotatedOffset.y * scale
+    };
+
+    //================================================
+    // Arm Destination
+    //================================================
+    //
+    // Position the arm sprite using its anchor point.
+    //
+    // The anchor point is at the top-centre of the
+    // arm sprite, where the arm attaches to the shoulder.
+    //
+    Rectangle destination =
+    {
+        armAnchorPosition.x - width / 2.0f,
+        armAnchorPosition.y,
+        width,
+        height
+    };
+
+    //================================================
+    // Local Rotation Pivot
+    //================================================
+    //
+    // Set the rotation origin to the top-centre of the arm.
+    //
+    // This is the point where the arm attaches to the
+    // body at the shoulder, allowing the arm to rotate
+    // around the shoulder rather than its centre.
+    //
+    Vector2 origin =
+    {
+        width / 2.0f,
+        0
+    };
+
+    //================================================
+    // Draw
+    //================================================
+    //
+    // rotation:
+    //     Rotation inherited from the body.
+    //
+    // localRotation:
+    //     Independent rotation of the arm.
+    //
+    // Adding the two rotations allows the arm to
+    // follow the body while also rotating independently.
+    //
+    DrawTexturePro(
+        texture,
+        source,
+        destination,
+        origin,
+        rotation + localRotation,
+        WHITE
+    );
+}
+
+void Arm::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
+{
+    swingTime += dt * SWING_SPEED;
+
+    if (swingTime >= 2.0f * PI)
+    {
+        swingTime -= 2.0f * PI;
+    }
+
+    float unitAngle = 0;
+    
+    if(side == "left")
+    {
+        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
+    }
+
+    if(side == "right")
+    {
+        unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
+    }
+
+    localRotation =
+            swingMinAngle +
+            unitAngle * (swingMaxAngle - swingMinAngle);
 }
 
 
@@ -1725,6 +1927,16 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     rightLeg.Update(dt);
     
     PlayIdleBodyTransform(dt);
+
+    if(swingLeftArm)
+    {
+        leftArm.SwingArm(dt, 0, 180);
+    }
+
+    if(swingRightArm)
+    {
+        rightArm.SwingArm(dt, 100, 180);
+    }
 }
 
 void Body::Draw() const
@@ -1876,6 +2088,32 @@ void Body::PlayBodyBob(float dt)
 Head& Body::GetHead()
 {
     return head;
+}
+
+void Body::SwingArm(std::string side,  bool swinging)
+{
+    if(side == "left" && swinging)
+    {
+        swingLeftArm = true;
+    }
+    else if(side == "left" && !swinging)
+    {
+        swingLeftArm = false;
+    }
+
+    if(side == "right" && swinging)
+    {
+        swingRightArm = true;
+    }
+    else if(side == "right" && !swinging)
+    {
+        swingRightArm = false;
+    }
+}
+
+Vector2 Body::GetHeadWorldPosition() const
+{
+    return head.GetWorldPosition();
 }
 
 
@@ -2308,6 +2546,16 @@ void Ears::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    localPositionOffset =
+    {
+        FRAME_WIDTH / 2.0f,
+        FRAME_HEIGHT / 2.0f
+        + bodyHeight / 2.0f
+        + headHeight / 2.0f
+    };
+
+    anchorOffset = localPositionOffset;
 }
 
 void Ears::Update(float dt)
@@ -2325,6 +2573,22 @@ void Ears::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Ears::SetBodyHeadDimensions(
+    float bwidth,
+    float bHeight,
+    float hWidth,
+    float hHeight
+)
+{
+    // Store the supplied body dimensions.
+    bodyWidth = bwidth;
+    bodyHeight = bHeight;
+
+    // Store the supplied head dimensions.
+    headWidth = hWidth;
+    headHeight = hHeight;
 }
 
 
@@ -2350,7 +2614,7 @@ void Eyebrows::Initialise()
     texture = LoadTexture("assets/images/TingoBingo/head/eyebrows.png");
 
     // Define the sprite sheet layout.
-    const int COLUMNS = 4;
+    const int COLUMNS = 1;
     const int ROWS = 1;
 
     // Determine the dimensions of each frame.
@@ -2376,6 +2640,18 @@ void Eyebrows::Initialise()
     // Apply the default sprite transform.
     rotation = ROTATION;
     scale = SCALE;
+
+    localPositionOffset =
+    {
+        FRAME_WIDTH / 2.0f,
+
+        FRAME_HEIGHT / 2.0f
+        + bodyHeight / 2.0f
+        + headHeight / 2.0f
+        + foreheadOffset
+    };
+
+    anchorOffset = localPositionOffset;
 }
 
 void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
@@ -2445,6 +2721,22 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Eyebrows::SetBodyHeadDimensions(
+    float bwidth,
+    float bHeight,
+    float hWidth,
+    float hHeight
+)
+{
+    // Store the supplied body dimensions.
+    bodyWidth = bwidth;
+    bodyHeight = bHeight;
+
+    // Store the supplied head dimensions.
+    headWidth = hWidth;
+    headHeight = hHeight;
 }
 
 
@@ -2577,7 +2869,21 @@ void Head::Initialise()
 {
     headBase.Initialise();
     antenna.Initialise();
+    
+    ears.SetBodyHeadDimensions(
+        bodyWidth,
+        bodyHeight,
+        headBase.GetFrameWidth(),
+        headBase.GetFrameHeight()
+    );
     ears.Initialise();
+    
+    eyebrows.SetBodyHeadDimensions(
+        bodyWidth,
+        bodyHeight,
+        headBase.GetFrameWidth(),
+        headBase.GetFrameHeight()
+    );
     eyebrows.Initialise();
     
     // Set the head dimensions for the eyes so they can anchor correctly.
@@ -2641,12 +2947,12 @@ void Head::Update(float dt, bool speaking, Emotion emotion)
 
 void Head::Draw() const
 {
-    //ears.Draw();
+    ears.Draw();
     headBase.Draw();
     eyes.Draw();
     //mouth.Draw();
     nose.Draw();
-    //eyebrows.Draw();
+    eyebrows.Draw();
     //antenna.Draw();
     pupils.Draw();
 }
@@ -2722,6 +3028,11 @@ void Head::SetBodyDimensions(float width, float height)
     headBase.SetBodyDimensions(width, height);
 }
 
+Vector2 Head::GetWorldPosition() const
+{
+    return headBase.GetWorldPosition();
+}
+
 
 =====================================
 .\src\head\Headbase.cpp
@@ -2739,6 +3050,7 @@ void Head::SetBodyDimensions(float width, float height)
 
 #include "head/Headbase.h"
 #include "Constants.h"
+#include "raylib.h"
 
 // Load the head sprite and initialise its animation.
 void Headbase::Initialise()
@@ -2805,6 +3117,14 @@ float Headbase::GetFrameWidth() const
 float Headbase::GetFrameHeight() const
 {
     return animation.GetFrameHeight();
+}
+
+Vector2 Headbase::GetWorldPosition() const
+{
+   return {
+        anchorPoint.x + anchorOffset.x,
+        anchorPoint.y + anchorOffset.y
+    };
 }
 
 
@@ -2910,7 +3230,7 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 //
 // The nose also has an independent horizontal wiggle
 // animation. The wiggle modifies the nose's local
-// anchor offset while preserving its original position.
+// local position offset while preserving its original position.
 //
 //====================================================
 
@@ -2918,11 +3238,6 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 #include "Constants.h"
 #include <iostream>
 #include <cmath>
-
-Vector2 Vector2Add(Vector2 a, Vector2 b)
-{
-    return {a.x + b.x , a.y + b.y};
-}
 
 //====================================================
 // Initialise
@@ -2933,7 +3248,7 @@ Vector2 Vector2Add(Vector2 a, Vector2 b)
 // The nose uses the anchor point supplied by the Head
 // as its parent rotation reference.
 //
-// anchorOffset stores the nose's position relative to
+// localPositionOffset stores the nose's position relative to
 // that parent anchor point.
 //
 // homeAnchorPoint stores the original local offset.
@@ -2995,7 +3310,7 @@ void Nose::Initialise()
     // Nose Position
     //================================================
     //
-    // anchorOffset is expressed in LOCAL coordinates
+    // localPositionOffset is expressed in LOCAL coordinates
     // relative to anchorPoint.
     //
     // X:
@@ -3011,13 +3326,14 @@ void Nose::Initialise()
     //
     //================================================
 
-    anchorOffset =
+    localPositionOffset =
     {
         FRAME_WIDTH / 2.0f,
 
         FRAME_HEIGHT / 2.0f
         - bodyHeight / 2.0f
         - headHeight / 2.0f
+        + slightPositionOffset
     };
 
     // Store the original LOCAL offset.
@@ -3025,7 +3341,7 @@ void Nose::Initialise()
     // This is deliberately not a world-space position.
     // The wiggle animation uses this as the nose's
     // permanent home position.
-    homeAnchorPoint = anchorOffset;
+    homeAnchorPoint = localPositionOffset;
 }
 
 //====================================================
@@ -3137,7 +3453,7 @@ void Nose::Update(float dt)
         // Using homeAnchorPoint as the starting position
         // prevents the wiggle from accumulating movement
         // from one frame to the next.
-        anchorOffset.x =
+        localPositionOffset.x =
             homeAnchorPoint.x + wiggleOffSetX;
 
         // The wiggle lasts for one second.
@@ -3151,7 +3467,7 @@ void Nose::Update(float dt)
             wiggleOffSetX = 0.0f;
 
             // Restore the original LOCAL anchor position.
-            anchorOffset.x = homeAnchorPoint.x;
+            localPositionOffset.x = homeAnchorPoint.x;
         }
     }
 }
@@ -3165,7 +3481,7 @@ void Nose::Update(float dt)
 // body/head anchor point.
 //
 // These values are used by Initialise() to calculate
-// anchorOffset.
+// localPositionOffset.
 //
 //====================================================
 
@@ -3231,13 +3547,13 @@ void Nose::Draw() const
     // Parent Transform
     //================================================
     //
-    // anchorOffset represents the nose's LOCAL position
+    // localPositionOffset represents the nose's LOCAL position
     // relative to the body/head anchor point.
     //
     // Rotate this local offset around the parent anchor
     // so the nose follows the head when it rotates.
     //
-    Vector2 offset = anchorOffset;
+    Vector2 offset = localPositionOffset;
 
     // Raylib rotation values are measured in degrees,
     // while sinf() and cosf() require radians.
@@ -3753,8 +4069,8 @@ void Object::Initialise()
     // to determine when the toy overlaps with other objects.
     collisionBox = Rectangle
     (
-        anchorPoint.x - FRAME_WIDTH / 2.0f,
-        anchorPoint.y - FRAME_HEIGHT / 2.0f,
+        anchorPoint.x,
+        anchorPoint.y,
         FRAME_WIDTH,
         FRAME_HEIGHT
     );
@@ -3824,10 +4140,10 @@ void Object::UpdateObject(
     // Keep the collision box centred on the toy's
     // current anchor point after it has moved.
     collisionBox.x =
-        anchorPoint.x - FRAME_WIDTH / 2.0f;
+        anchorPoint.x;
 
     collisionBox.y =
-        anchorPoint.y - FRAME_HEIGHT / 2.0f;
+        anchorPoint.y;
 }
 
 
@@ -4022,6 +4338,16 @@ void Robot::SetObjectPointers(std::vector<Object*> toys)
 void Robot::PlaySfx(std::string sound)
 {
     sfxController.PlaySfx(sound);
+}
+
+void Robot::SwingArm(std::string side, bool swinging)
+{
+    body.SwingArm(side, swinging);
+}
+
+Vector2 Robot::GetHeadWorldPosition() const
+{
+    return body.GetHeadWorldPosition();
 }
 
 
@@ -4321,12 +4647,19 @@ void RobotBrain::Update(float dt)
         // enters Idle, the ten-second countdown starts again.
         // ----------------------------------------------------
 
+        
+        SwingArm("left", true);
+        SwingArm("right", true);
+
         if(idleTimer >= 10.0f)
         {
             searchTimer = 0.0f;
             idleTimer = 0.0f;
 
             state = State::Searching;
+
+            SwingArm("left", false);
+            SwingArm("right", false);
         }
     }
 
@@ -4799,7 +5132,7 @@ void RobotBrain::Search(float dt)
     // that visually represents where Tingo is looking from.
     // --------------------------------------------------------
 
-    searchRayOrigin = robot.GetHeadAnchorPoint();
+    searchRayOrigin = robot.GetHeadWorldPosition();
 
 
     // --------------------------------------------------------
@@ -5168,6 +5501,11 @@ Object* RobotBrain::DetectCollision(
     // --------------------------------------------------------
 
     return nullptr;
+}
+
+void RobotBrain::SwingArm(std::string side, bool swinging)
+{
+    robot.SwingArm(side, swinging);
 }
 
 

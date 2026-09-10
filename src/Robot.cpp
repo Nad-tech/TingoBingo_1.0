@@ -136,3 +136,8 @@ void Robot::SwingArm(std::string side, bool swinging)
 {
     body.SwingArm(side, swinging);
 }
+
+Vector2 Robot::GetHeadWorldPosition() const
+{
+    return body.GetHeadWorldPosition();
+}
