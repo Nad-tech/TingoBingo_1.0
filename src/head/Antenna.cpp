@@ -41,6 +41,17 @@ void Antenna::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    localPositionOffset =
+    {
+        FRAME_WIDTH / 2.0f,
+        FRAME_HEIGHT / 2.0f
+        + bodyHeight / 2.0f
+        + headHeight / 2.0f
+        + topOfHeadOffset
+    };
+
+    anchorOffset = localPositionOffset;
 }
 
 void Antenna::Update(float dt)
@@ -60,3 +71,10 @@ void Antenna::Update(float dt)
     }
 }
 
+void Antenna::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
+{
+    bodyWidth = bW;
+    bodyHeight = bH;
+    headWidth = hW;
+    headHeight = hH;
+}
