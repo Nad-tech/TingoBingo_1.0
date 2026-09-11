@@ -40,6 +40,17 @@ void Mouth::Initialise()
 
     rotation = ROTATION;
     scale = SCALE;
+
+    localPositionOffset =
+    {
+        FRAME_WIDTH / 2.0f,
+        FRAME_HEIGHT / 2.0f
+        + bodyHeight / 2.0f
+        + headHeight / 2.0f
+        + mouthDisplayOffset
+    };
+
+    anchorOffset = localPositionOffset;
 }
 
 // Advance the mouth animation.
@@ -72,4 +83,12 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
     }
+}
+
+void Mouth::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
+{
+    bodyWidth = bW;
+    bodyHeight = bH;
+    headWidth = hW;
+    headHeight = hH;
 }

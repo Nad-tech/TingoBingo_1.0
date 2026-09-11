@@ -61,6 +61,12 @@ void Head::Initialise()
     );
     eyes.Initialise();
     
+    mouth.SetBodyHeadDimensions(
+        bodyWidth, 
+        bodyHeight,
+        headBase.GetFrameWidth(),
+        headBase.GetFrameHeight()
+    );
     mouth.Initialise();
     
     nose.SetBodyHeadDimensions(
@@ -112,7 +118,7 @@ void Head::Draw() const
     ears.Draw();
     headBase.Draw();
     eyes.Draw();
-    //mouth.Draw();
+    mouth.Draw();
     nose.Draw();
     eyebrows.Draw();
     //antenna.Draw();
