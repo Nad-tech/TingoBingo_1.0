@@ -106,13 +106,13 @@ void Pupils::LookAt(Vector2 point)
     Vector2 leftEyeCentre =
     {
         headAnchorPoint.x,
-        headAnchorPoint.y
+        headAnchorPoint.y - bodyHeight / 2 - headHeight / 2
     };
 
     Vector2 rightEyeCentre =
     {
         headAnchorPoint.x,
-        headAnchorPoint.y
+        headAnchorPoint.y - bodyHeight / 2 - headHeight / 2
     };
 
     // Calculate the direction from each eye to the target.
@@ -163,13 +163,18 @@ void Pupils::LookForward()
     });
 }
 
-void Pupils::SetBodyHeadEyeOffsetDimensions(float bWidth, 
+void Pupils::SetBodyHeadEyeOffsetDimensions(
+    float bWidth, 
     float bHeight, 
     float hWidth, 
     float hHeight,
     float eyesYOffset
 )
 {
+    bodyWidth = bWidth;
+    bodyHeight = bHeight;
+    headWidth = hWidth;
+    headHeight = hHeight;
     leftPupil.SetBodyDimensions(bWidth, bHeight);
     rightPupil.SetBodyDimensions(bWidth, bHeight);
     leftPupil.SetHeadDimensions(hWidth, hHeight);

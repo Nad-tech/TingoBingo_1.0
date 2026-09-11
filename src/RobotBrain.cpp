@@ -294,7 +294,7 @@ void RobotBrain::Update(float dt)
         SwingArm("left", true);
         SwingArm("right", true);
 
-        if(idleTimer >= 10.0f)
+        if(idleTimer >= idleTimeLimit)
         {
             searchTimer = 0.0f;
             idleTimer = 0.0f;

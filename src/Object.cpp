@@ -154,6 +154,7 @@ void Object::Initialise()
     //
     Image image = LoadImage(textureFilename.c_str());
 
+
     // -------------------------------------------------
     // Start with the largest possible bounds
     // -------------------------------------------------

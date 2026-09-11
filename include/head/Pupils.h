@@ -75,4 +75,9 @@ private:
     // Current look offsets applied to each pupil.
     Vector2 leftLookOffset  = {0.0f, 0.0f};
     Vector2 rightLookOffset = {0.0f, 0.0f};
+
+    float bodyHeight = 0.0f;
+    float bodyWidth = 0.0f;
+    float headHeight = 0.0f;
+    float headWidth = 0.0f;
 };

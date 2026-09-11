@@ -27,7 +27,7 @@ void Eyes::Initialise()
 
     // Animation settings.
     const float ROTATION = 0.0f;
-    const float FRAME_DURATION = 0.02f;
+    const float FRAME_DURATION = 0.06f;
 
     // Initialise the animation using the sprite sheet information.
     animation.Initialise

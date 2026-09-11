@@ -54,6 +54,7 @@ class RobotBrain
         Emotion emotion;
         float searchTimer = 0;
         float idleTimer = 0;
+        float idleTimeLimit = 3.0f;
         float searchAngle = 0.0f;
         float searchSpeed = 1.0f;
         Vector2 searchRayOrigin = {};
