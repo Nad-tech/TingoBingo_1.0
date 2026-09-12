@@ -16,7 +16,9 @@ TARGET = build/TingoBingo.exe
 
 SOURCES = $(wildcard src/*.cpp) \
           $(wildcard src/head/*.cpp) \
-          $(wildcard src/body/*.cpp)
+          $(wildcard src/body/*.cpp) \
+		  $(wildcard src/body/Arms/*.cpp) \
+		  $(wildcard src/body/Legs/*.cpp)
 
 #----------------------------------------------------
 # Object files

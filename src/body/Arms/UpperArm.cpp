@@ -1,10 +1,10 @@
-#include "body/Arm.h"
+#include "body/Arms/UpperArm.h"
 #include "Constants.h"
 #include <cmath>
 #include <iostream>
 
 // Load the arm sprite and initialise its animation.
-void Arm::Initialise()
+void UpperArm::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
 
@@ -56,33 +56,33 @@ void Arm::Initialise()
     homeRotation = rotation;
 }
 
-void Arm::Update(float dt)
+void UpperArm::Update(float dt)
 {
     Sprite::Update(dt);
 }
 
 // Return the current arm animation frame.
-int Arm::GetFrame() const
+int UpperArm::GetFrame() const
 {
     return animation.GetFrame();
 }
 
 // Apply a rotation to the arm.
-void Arm::SetRotation(float rotation)
+void UpperArm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
 
 // Set the dimensions of the body so the arm can be positioned
 // correctly relative to the body.
-void Arm::SetBodyDimensions(float width, float height, std::string side)
+void UpperArm::SetBodyDimensions(float width, float height, std::string side)
 {
     bodyWidth = width;
     bodyHeight = height;
     this->side = side; 
 }
 
-void Arm::Draw() const
+void UpperArm::Draw() const
 {
     // Get the current animation frame.
     Rectangle source = animation.GetSourceRectangle();
@@ -187,7 +187,7 @@ void Arm::Draw() const
     );
 }
 
-void Arm::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
+void UpperArm::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
 {
     swingTime += dt * SWING_SPEED;
 

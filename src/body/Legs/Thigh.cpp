@@ -1,9 +1,9 @@
-#include "body/Leg.h"
+#include "body/Legs/Thigh.h"
 #include "Constants.h"
 #include <string>
 
 // Load the head sprite and initialise its animation.
-void Leg::Initialise()
+void Thigh::Initialise()
 {
     texture = LoadTexture("assets/images/TingoBingo/body/Leg.png");
 
@@ -51,18 +51,18 @@ void Leg::Initialise()
 }
 
 // Return the current head animation frame.
-int Leg::GetFrame() const
+int Thigh::GetFrame() const
 {
     return animation.GetFrame();
 }
 
 // Apply a rotation transform to the head sprite.
-void Leg::SetRotation(float rotation)
+void Thigh::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
 
-void Leg::SetBodyDimensions(float width, float height, const std::string& side)
+void Thigh::SetBodyDimensions(float width, float height, const std::string& side)
 {
     bodyWidth = width;
     bodyHeight = height;

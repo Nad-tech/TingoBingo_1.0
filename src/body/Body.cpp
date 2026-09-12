@@ -32,41 +32,24 @@ void Body::Initialise()
     
     //head.SetBodyDimensions() must be called before head.Initialise() 
     // so that the head can anchor itself correctly relative to the body
+    //The same for arms and legs
     head.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
     );
     head.Initialise();
     
-
-    leftArm.SetBodyDimensions(
+    arms.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight(),
-        "left"
-    );
-    leftArm.Initialise();
+        bodyBase.GetFrameHeight()
+        );
+    arms.Initialise();
     
-
-    rightArm.SetBodyDimensions(
+    legs.SetBodyDimension(
         bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight(),
-        "right"
+        bodyBase.GetFrameHeight()
     );
-    rightArm.Initialise();
-    
-    leftLeg.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight(),
-        "left"
-    );
-    leftLeg.Initialise();
-
-    rightLeg.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight(),
-        "right"
-    );
-    rightLeg.Initialise();
+    legs.Initialise();
 }
 
 // Release resources used by each body component.
@@ -74,10 +57,8 @@ void Body::Shutdown()
 {
     head.Shutdown();
     bodyBase.Shutdown();
-    leftArm.Shutdown();
-    rightArm.Shutdown();
-    leftLeg.Shutdown();
-    rightLeg.Shutdown();
+    arms.Shutdown();
+    legs.Shutdown();
 }
 
 // Update every animated body component.
@@ -85,30 +66,17 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 {
     head.Update(dt, speaking, emotion);
     bodyBase.Update(dt);
-    leftArm.Update(dt);
-    rightArm.Update(dt);
-    leftLeg.Update(dt);
-    rightLeg.Update(dt);
+    arms.Update(dt);
+    legs.Update(dt);
     
     PlayIdleBodyTransform(dt);
-
-    if(swingLeftArm)
-    {
-        leftArm.SwingArm(dt, 0, 180);
-    }
-
-    if(swingRightArm)
-    {
-        rightArm.SwingArm(dt, 100, 180);
-    }
 }
 
 void Body::Draw() const
 {
-    leftArm.Draw();
-    rightArm.Draw();
-    leftLeg.Draw();
-    rightLeg.Draw();
+    arms.Draw();
+    
+    legs.Draw();
     
     bodyBase.Draw();
 
@@ -127,35 +95,11 @@ void Body::ApplyAnchorPoint(Vector2 anchorPoint)
 
     bodyBase.SetAnchorPoint(anchorPoint);
 
-    head.SetAnchorPoint(
-            {
-                anchorPoint.x + headOffset.x,
-                anchorPoint.y + headOffset.y
-            });
+    head.SetAnchorPoint(anchorPoint);
 
-    leftArm.SetAnchorPoint(
-            {
-                anchorPoint.x + leftArmOffset.x,
-                anchorPoint.y + leftArmOffset.y
-            });
-    
-    rightArm.SetAnchorPoint(
-            {
-                anchorPoint.x + rightArmOffset.x,
-                anchorPoint.y + rightArmOffset.y
-            });
+    arms.SetAnchorPoint(anchorPoint);
 
-    leftLeg.SetAnchorPoint(
-            {
-                anchorPoint.x + leftLegOffset.x,
-                anchorPoint.y + leftLegOffset.y
-            });
-    
-    rightLeg.SetAnchorPoint(
-            {
-                anchorPoint.x + rightLegOffset.x,
-                anchorPoint.y + rightLegOffset.y
-            });
+    legs.SetAnchorPoint(anchorPoint);
 }
 
 Vector2 Body::GetAnchorPoint() const
@@ -174,10 +118,9 @@ void Body::ApplyRotation(float rotation)
     this->rotation = rotation;
    
     bodyBase.SetRotation(rotation);
-    leftArm.SetRotation(rotation);
-    rightArm.SetRotation(rotation); // Apply the stored arm rotation
-    leftLeg.SetRotation(rotation);
-    rightLeg.SetRotation(rotation);
+    arms.SetRotation(rotation);
+
+    legs.SetRotation(rotation);
     head.SetRotation(rotation);
 }
 
@@ -254,25 +197,9 @@ Head& Body::GetHead()
     return head;
 }
 
-void Body::SwingArm(std::string side,  bool swinging)
+void Body::SwingArm(std::string side,  bool swing)
 {
-    if(side == "left" && swinging)
-    {
-        swingLeftArm = true;
-    }
-    else if(side == "left" && !swinging)
-    {
-        swingLeftArm = false;
-    }
-
-    if(side == "right" && swinging)
-    {
-        swingRightArm = true;
-    }
-    else if(side == "right" && !swinging)
-    {
-        swingRightArm = false;
-    }
+    arms.SwingArm(side, swing);
 }
 
 Vector2 Body::GetHeadWorldPosition() const

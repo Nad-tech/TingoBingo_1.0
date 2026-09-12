@@ -2,7 +2,8 @@
 
 #include "Sprite.h"
 #include <string>
-class Leg : public Sprite
+
+class Thigh : public Sprite
 {
     public:
         void Initialise() override;

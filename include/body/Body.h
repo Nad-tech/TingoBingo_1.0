@@ -3,8 +3,8 @@
 #include "raylib.h"
 #include "Emotion.h"
 #include "BodyBase.h"
-#include "Arm.h"
-#include "Leg.h"
+#include "body/Arms/Arms.h"
+#include "body/Pelvis.h"
 #include "head/Head.h"
 
 class Body
@@ -41,7 +41,7 @@ public:
 
     Head& GetHead();
 
-    void SwingArm(std::string side, bool swinging);
+    void SwingArm(std::string side, bool swing);
 
     Vector2 GetHeadWorldPosition() const;
 
@@ -102,18 +102,8 @@ private:
     BodyBase bodyBase;
 
     Head head;
-    Leg rightLeg;
-    Leg leftLeg;
-    Arm rightArm;
-    Arm leftArm;
 
-    Vector2 leftArmOffset = {0, 0};
-    Vector2 rightArmOffset = {0, 0};
-    Vector2 leftLegOffset = {0, 0};
-    Vector2 rightLegOffset = {0, 0};
+    //Pelvis pelvis;
 
-    Vector2 headOffset = {0.0f, 0.0f};
-
-    bool swingLeftArm = false;
-    bool swingRightArm = false;
+    Arms arms;
 };
