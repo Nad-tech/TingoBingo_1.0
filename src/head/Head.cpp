@@ -58,13 +58,13 @@ void Head::Initialise()
     // Set the head dimensions for the eyes so they can anchor correctly.
     //themselves correctly relative to the head base.
     //This must be done before eyes.Initialise() is called.
-    eyes.SetHeadDimensions(
+    eyes.SetBodyHeadNeckDimensions(
+        bodyWidth,
+        bodyHeight,
         headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight()
-    );
-    eyes.SetBodyDimensions(
-        bodyWidth, 
-        bodyHeight
+        headBase.GetFrameHeight(),
+        neckWidth,
+        neckHeight
     );
     eyes.Initialise();
     
@@ -84,11 +84,13 @@ void Head::Initialise()
     );
     nose.Initialise();
     
-    pupils.SetBodyHeadEyeOffsetDimensions(
+    pupils.SetBodyHeadNeckEyeOffsetDimensions(
         bodyWidth, 
         bodyHeight, 
         headBase.GetFrameWidth(), 
         headBase.GetFrameHeight(),
+        neckWidth,
+        neckHeight,
         eyes.GetYOffset()
     );
     pupils.Initialise();
@@ -195,12 +197,24 @@ void Head::LookForward()
     pupils.LookForward();
 }
 
-void Head::SetBodyDimensions(float width, float height)
+void Head::SetBodyNeckDimensions(
+    float bWidth, 
+    float bHeight,
+    float nWidth,
+    float nHeight
+)
 {
-    bodyWidth = width;
-    bodyHeight = height;
+    bodyWidth = bWidth;
+    bodyHeight = bHeight;
+    neckWidth = nWidth;
+    neckHeight = nHeight;
 
-    headBase.SetBodyDimensions(width, height);
+    headBase.SetBodyNeckDimensions(
+        bodyWidth, 
+        bodyHeight,
+        neckWidth,
+        neckHeight
+    );
 }
 
 Vector2 Head::GetWorldPosition() const

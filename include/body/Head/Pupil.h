@@ -8,9 +8,12 @@ class Pupil : public Sprite
     public:
         void Initialise() override;
         void Update(float dt) override;
-        void SetHeadDimensions(float width, float height);
-        void SetBodyDimensions(float width, float height);
-        void SetEyesYOffset(float yOffset);
+        void SetBodyHeadNeckEyeOffsetDimensions(
+            float bW, float bH, 
+            float hW, float hH,
+            float nW, float nH,
+            float eyesYOffset
+        );
         void SetSide(std::string side);
 
     private:
@@ -18,6 +21,8 @@ class Pupil : public Sprite
         float bodyHeight;
         float headWidth;
         float headHeight;
+        float neckWidth;
+        float neckHeight;
         float eyesYOffset;
         std::string side; // "left" or "right"
         float sideOffset = 40;

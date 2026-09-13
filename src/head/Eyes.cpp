@@ -47,6 +47,7 @@ void Eyes::Initialise()
         FRAME_HEIGHT / 2.0f + 
         bodyHeight / 2.0f + 
         headHeight / 2.0f + 
+        neckHeight +
         eyesOffset.y
     };
 }
@@ -68,16 +69,18 @@ void Eyes::Update(float dt)
     }
 }
 
-void Eyes::SetHeadDimensions(float width, float height)
+void Eyes::SetBodyHeadNeckDimensions(
+            float bW, float bH,
+            float hW, float hH,
+            float nW, float nH
+        )
 {
-    headWidth = width;
-    headHeight = height;
-}
-
-void Eyes::SetBodyDimensions(float width, float height)
-{
-    bodyWidth = width;
-    bodyHeight = height;
+    bodyWidth = bW;
+    bodyHeight = bH;
+    headWidth = hW;
+    headHeight = hH;
+    neckWidth = nW;
+    neckHeight = nH;
 }
 
 float Eyes::GetYOffset()

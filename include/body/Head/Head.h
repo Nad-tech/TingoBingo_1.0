@@ -100,7 +100,12 @@ public:
     // Return the pupils to their forward-facing anchor position.
     void LookForward();
 
-    void SetBodyDimensions(float width, float height);
+    void SetBodyNeckDimensions(
+        float bWidth, 
+        float bHeight,
+        float nWidth,
+        float nHeight
+    );
 
     Vector2 GetWorldPosition() const;
     
@@ -132,4 +137,6 @@ private:
 
     float bodyWidth;
     float bodyHeight;
+    float neckWidth;
+    float neckHeight;
 };

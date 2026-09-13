@@ -47,7 +47,8 @@ void Headbase::Initialise()
     anchorOffset = {
         FRAME_WIDTH / 2.0f, 
         (FRAME_HEIGHT / 1.0f) + 
-        (bodyHeight / 2.0f)
+        (bodyHeight / 2.0f) +
+        (neckHeight)
     };
 }
 
@@ -63,10 +64,12 @@ void Headbase::SetRotation(float rotation)
     Sprite::SetRotation(rotation);
 }
 
-void Headbase::SetBodyDimensions(float width, float height)
+void Headbase::SetBodyNeckDimensions(float bW, float bH, float nW, float nH)
 {
-    bodyWidth = width;
-    bodyHeight = height;
+    bodyWidth = bW;
+    bodyHeight = bH;
+    neckWidth = nW;
+    neckHeight = nH;
 }
 
 float Headbase::GetFrameWidth() const

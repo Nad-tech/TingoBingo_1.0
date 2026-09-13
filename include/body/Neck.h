@@ -22,4 +22,7 @@ class Neck : public Sprite
         Vector2 localPositionOffset = {};
         float bodyWidth = 0;
         float bodyHeight = 0;
+
+        const int NECK_WIDTH = 50;
+        const int NECK_HEIGHT = 50;
 };

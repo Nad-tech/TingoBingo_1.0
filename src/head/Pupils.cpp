@@ -163,22 +163,13 @@ void Pupils::LookForward()
     });
 }
 
-void Pupils::SetBodyHeadEyeOffsetDimensions(
-    float bWidth, 
-    float bHeight, 
-    float hWidth, 
-    float hHeight,
+void Pupils::SetBodyHeadNeckEyeOffsetDimensions(
+    float bW, float bH, 
+    float hW, float hH,
+    float nW, float nH,
     float eyesYOffset
 )
 {
-    bodyWidth = bWidth;
-    bodyHeight = bHeight;
-    headWidth = hWidth;
-    headHeight = hHeight;
-    leftPupil.SetBodyDimensions(bWidth, bHeight);
-    rightPupil.SetBodyDimensions(bWidth, bHeight);
-    leftPupil.SetHeadDimensions(hWidth, hHeight);
-    rightPupil.SetHeadDimensions(hWidth, hHeight);
-    leftPupil.SetEyesYOffset(eyesYOffset);
-    rightPupil.SetEyesYOffset(eyesYOffset);
+    leftPupil.SetBodyHeadNeckEyeOffsetDimensions(bW, bH, hW, hH, nW, nH, eyesYOffset);
+    rightPupil.SetBodyHeadNeckEyeOffsetDimensions(bW, bH, hW, hH, nW, nH, eyesYOffset);
 }

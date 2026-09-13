@@ -53,11 +53,10 @@ public:
     // anchor point.
     void LookForward();
 
-    void SetBodyHeadEyeOffsetDimensions(
-        float bWidth, 
-        float bHeight, 
-        float hWidth, 
-        float hHeight,
+    void SetBodyHeadNeckEyeOffsetDimensions(
+        float bW, float bH, 
+        float hW, float hH,
+        float nW, float nH,
         float eyesYOffset
     );
 
@@ -80,4 +79,6 @@ private:
     float bodyWidth = 0.0f;
     float headHeight = 0.0f;
     float headWidth = 0.0f;
+    float neckWidth;
+    float neckHeight;
 };

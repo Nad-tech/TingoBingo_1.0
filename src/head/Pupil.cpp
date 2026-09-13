@@ -50,6 +50,7 @@ void Pupil::Initialise()
             FRAME_HEIGHT / 2.0f + 
             bodyHeight / 2.0f + 
             headHeight / 2.0f +
+            neckHeight +
             eyesYOffset
         };
     }
@@ -60,6 +61,7 @@ void Pupil::Initialise()
             FRAME_HEIGHT / 2.0f + 
             bodyHeight / 2.0f + 
             headHeight / 2.0f +
+            neckHeight +
             eyesYOffset
         };
     }
@@ -71,21 +73,20 @@ void Pupil::Update(float dt)
     Sprite::Update(dt);
 }
 
-void Pupil::SetBodyDimensions(float width, float height)
+void Pupil::SetBodyHeadNeckEyeOffsetDimensions(
+            float bW, float bH, 
+            float hW, float hH,
+            float nW, float nH,
+            float eyesYOffset
+     )
 {
-    bodyWidth = width;
-    bodyHeight = height;
-}
-
-void Pupil::SetHeadDimensions(float width, float height)
-{
-    headWidth = width;
-    headHeight = height;
-}
-
-void Pupil::SetEyesYOffset(float yOffset)
-{
-    eyesYOffset = yOffset;
+    bodyWidth = bW;
+    bodyHeight = bH;
+    headWidth = hW;
+    headHeight = hH;
+    neckWidth = nW;
+    neckHeight = nH;
+    this->eyesYOffset = eyesYOffset; 
 }
 
 void Pupil::SetSide(std::string side)
