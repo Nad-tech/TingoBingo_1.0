@@ -13,7 +13,7 @@
 // including bobbing and wiggling.
 //====================================================
 
-#include "head/Head.h"
+#include "Body/Head/Head.h"
 #include <cmath>
 #include "Emotion.h"
 

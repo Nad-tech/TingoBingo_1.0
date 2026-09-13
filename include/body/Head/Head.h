@@ -1,14 +1,14 @@
 #pragma once
 
 #include "raylib.h"
-#include "head/Antenna.h"
-#include "head/Ears.h"
-#include "head/Eyebrows.h"
-#include "head/Mouth.h"
-#include "head/Eyes.h"
-#include "head/Headbase.h"
-#include "head/Nose.h"
-#include "head/Pupils.h"
+#include "Body/Head/Antenna.h"
+#include "Body/Head/Ears.h"
+#include "Body/Head/Eyebrows.h"
+#include "Body/Head/Mouth.h"
+#include "Body/Head/Eyes.h"
+#include "Body/Head/Headbase.h"
+#include "Body/Head/Nose.h"
+#include "Body/Head/Pupils.h"
 #include "Emotion.h"
 
 

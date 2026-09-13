@@ -5,7 +5,7 @@
 // The eyebrows can play idle and emotional animations.
 //====================================================
 
-#include "head/Eyebrows.h"
+#include "Body/Head/Eyebrows.h"
 #include "Constants.h"
 #include "Emotion.h"
 #include "Animation.h"

@@ -19,7 +19,7 @@
 //
 //====================================================
 
-#include "head/Nose.h"
+#include "Body/Head/Nose.h"
 #include "Constants.h"
 #include <iostream>
 #include <cmath>

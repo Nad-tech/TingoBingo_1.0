@@ -3,9 +3,10 @@
 #include "raylib.h"
 #include "Emotion.h"
 #include "BodyBase.h"
-#include "body/Arms/Arms.h"
-#include "body/Pelvis.h"
-#include "head/Head.h"
+#include "Body/Arms/Arms.h"
+#include "Body/Pelvis.h"
+#include "Body/Head/Head.h"
+#include "Body/Neck.h"
 
 class Body
 {
@@ -43,7 +44,7 @@ public:
 
     void SwingArm(std::string side, bool swing);
 
-    Vector2 GetHeadWorldPosition() const;
+    Vector2 GetHeadWorldPosition();
 
 private:
     Vector2 anchorPoint;
@@ -101,9 +102,10 @@ private:
 
     BodyBase bodyBase;
 
-    Head head;
+    Neck neck;
 
-    //Pelvis pelvis;
+    Pelvis pelvis;
 
     Arms arms;
+
 };

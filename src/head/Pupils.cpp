@@ -8,7 +8,7 @@
 // the illusion that the robot is looking around.
 //====================================================
 
-#include "head/Pupils.h"
+#include "Body/Head/Pupils.h"
 #include "raylib.h"
 #include "cmath"
 #include "raymath.h"

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Sprite.h"
+#include "ForeArm.h"
+
 #include <string>
 
 class Elbow : public Sprite
@@ -22,4 +24,7 @@ class Elbow : public Sprite
         float bodyWidth = 0;
         float bodyHeight = 0;
         std::string side = "";
+
+        ForeArm leftForeArm;
+        ForeArm rightForeArm;
 };

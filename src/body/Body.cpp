@@ -30,14 +30,14 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     
-    //head.SetBodyDimensions() must be called before head.Initialise() 
+    //neck.SetBodyDimensions() must be called before head.Initialise() 
     // so that the head can anchor itself correctly relative to the body
     //The same for arms and legs
-    head.SetBodyDimensions(
+    neck.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
     );
-    head.Initialise();
+    neck.Initialise();
     
     arms.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
@@ -45,29 +45,29 @@ void Body::Initialise()
         );
     arms.Initialise();
     
-    legs.SetBodyDimension(
+    pelvis.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
     );
-    legs.Initialise();
+    pelvis.Initialise();
 }
 
 // Release resources used by each body component.
 void Body::Shutdown()
 {
-    head.Shutdown();
+    neck.Shutdown();
     bodyBase.Shutdown();
     arms.Shutdown();
-    legs.Shutdown();
+    pelvis.Shutdown();
 }
 
 // Update every animated body component.
 void Body::Update(float dt, bool speaking, Emotion emotion)
 {
-    head.Update(dt, speaking, emotion);
+    neck.Update(dt, speaking, emotion);
     bodyBase.Update(dt);
     arms.Update(dt);
-    legs.Update(dt);
+    pelvis.Update(dt);
     
     PlayIdleBodyTransform(dt);
 }
@@ -76,11 +76,11 @@ void Body::Draw() const
 {
     arms.Draw();
     
-    legs.Draw();
+    pelvis.Draw();
     
     bodyBase.Draw();
 
-    head.Draw();
+    neck.Draw();
 }
 
 void Body::SetAnchorPoint(Vector2 anchorPoint)
@@ -95,11 +95,11 @@ void Body::ApplyAnchorPoint(Vector2 anchorPoint)
 
     bodyBase.SetAnchorPoint(anchorPoint);
 
-    head.SetAnchorPoint(anchorPoint);
+    neck.SetAnchorPoint(anchorPoint);
 
     arms.SetAnchorPoint(anchorPoint);
 
-    legs.SetAnchorPoint(anchorPoint);
+    pelvis.SetAnchorPoint(anchorPoint);
 }
 
 Vector2 Body::GetAnchorPoint() const
@@ -120,8 +120,8 @@ void Body::ApplyRotation(float rotation)
     bodyBase.SetRotation(rotation);
     arms.SetRotation(rotation);
 
-    legs.SetRotation(rotation);
-    head.SetRotation(rotation);
+    pelvis.SetRotation(rotation);
+    neck.SetRotation(rotation);
 }
 
 float Body::GetRotation()
@@ -194,7 +194,7 @@ void Body::PlayBodyBob(float dt)
 
 Head& Body::GetHead()
 {
-    return head;
+    return neck.GetHead();
 }
 
 void Body::SwingArm(std::string side,  bool swing)
@@ -202,7 +202,7 @@ void Body::SwingArm(std::string side,  bool swing)
     arms.SwingArm(side, swing);
 }
 
-Vector2 Body::GetHeadWorldPosition() const
+Vector2 Body::GetHeadWorldPosition()
 {
-    return head.GetWorldPosition();
+    return neck.GetHead().GetWorldPosition();
 }

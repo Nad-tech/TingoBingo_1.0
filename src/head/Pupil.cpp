@@ -7,7 +7,7 @@
 // can move independently when the robot looks around.
 //====================================================
 
-#include "head/Pupil.h"
+#include "Body/Head/Pupil.h"
 #include "Constants.h"
 #include <string>
 

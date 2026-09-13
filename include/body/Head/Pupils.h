@@ -1,6 +1,6 @@
 #pragma once
 
-#include "head/Pupil.h"
+#include "Body/Head/Pupil.h"
 #include "raylib.h"
 #include "Constants.h"
 

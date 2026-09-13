@@ -18,8 +18,8 @@ class Arms
         Shoulder leftShoulder;
         Shoulder rightShoulder;
 
-        bool swingLeftUpperArm = false;
-        bool swingRightUpperArm = false;
+        bool swingLeftArm = false;
+        bool swingRightArm = false;
 
         float bodyWidth;
         float bodyHeight;

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Sprite.h"
+#include "Knee.h"
+
 #include <string>
 
 class Thigh : public Sprite
@@ -15,4 +17,7 @@ class Thigh : public Sprite
         float bodyWidth;
         float bodyHeight;
         std::string side;
+
+        Knee leftKnee;
+        Knee rightKnee;
 };

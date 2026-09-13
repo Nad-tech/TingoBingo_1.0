@@ -15,6 +15,8 @@ class Shoulder : public Sprite
         void SetRotation(float rotation);
         void SetBodyDimensions(float width, float height, std::string side);
 
+        void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
+
     private:
         Vector2 localPositionOffset = {0, 0};
         float localRotation = 0.0f;
@@ -25,4 +27,7 @@ class Shoulder : public Sprite
         
         UpperArm leftUpperArm;
         UpperArm rightUpperArm;
+
+        const float SWING_SPEED = 10.0f;
+        float swingTime = 0;
 };

@@ -164,12 +164,12 @@ private:
 
 
 =====================================
-.\include\body\Arms\Arms.h
+.\include\Body\Arms\Arms.h
 =====================================
 
 #pragma once
 
-#include "UpperArm.h"
+#include "Shoulder.h"
 
 class Arms
 {
@@ -184,52 +184,171 @@ class Arms
         void Shutdown();
 
     private:
-        UpperArm rightUpperArm;
-        UpperArm leftUpperArm;
+        Shoulder leftShoulder;
+        Shoulder rightShoulder;
+
+        bool swingLeftArm = false;
+        bool swingRightArm = false;
 
         float bodyWidth;
         float bodyHeight;
-
-        bool swingLeftUpperArm = false;
-        bool swingRightUpperArm = false;
-
 };
 
 
 
 
 =====================================
-.\include\body\Arms\Elbow.h
+.\include\Body\Arms\Elbow.h
 =====================================
 
+#pragma once
+
+#include "Sprite.h"
+#include "ForeArm.h"
+
+#include <string>
+
+class Elbow : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
+        
+        int GetFrame() const;
+        
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height, std::string side);
+
+    private:
+        Vector2 localPositionOffset = {0, 0};
+        float localRotation = 0.0f;
+        float homeRotation = 0.0f;
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+        std::string side = "";
+
+        ForeArm leftForeArm;
+        ForeArm rightForeArm;
+};
 
 
 =====================================
-.\include\body\Arms\ForeArm.h
+.\include\Body\Arms\ForeArm.h
 =====================================
 
+#pragma once
+
+#include <string>
+
+#include "Sprite.h"
+#include "Hand.h"
+
+class ForeArm : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
+        
+        int GetFrame() const;
+        
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height, std::string side);
+
+    private:
+        Vector2 localPositionOffset = {0, 0};
+        float localRotation = 0.0f;
+        float homeRotation = 0.0f;
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+        std::string side = "";
+
+        Hand leftHand;
+        Hand rightHand;
+};
 
 
 =====================================
-.\include\body\Arms\Hand.h
-=====================================
-
-
-
-=====================================
-.\include\body\Arms\Shoulder.h
-=====================================
-
-
-
-=====================================
-.\include\body\Arms\UpperArm.h
+.\include\Body\Arms\Hand.h
 =====================================
 
 #pragma once
 
 #include "Sprite.h"
 #include <string>
+
+class Hand : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
+        
+        int GetFrame() const;
+        
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height, std::string side);
+        
+    private:
+        Vector2 localPositionOffset = {0, 0};
+        float localRotation = 0.0f;
+        float homeRotation = 0.0f;
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+        std::string side = "";
+};
+
+
+=====================================
+.\include\Body\Arms\Shoulder.h
+=====================================
+
+#pragma once 
+
+#include "Sprite.h"
+#include "UpperArm.h"
+
+class Shoulder : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const override;
+        
+        int GetFrame() const;
+        
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height, std::string side);
+
+        void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
+
+    private:
+        Vector2 localPositionOffset = {0, 0};
+        float localRotation = 0.0f;
+        float homeRotation = 0.0f;
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+        std::string side = "";
+        
+        UpperArm leftUpperArm;
+        UpperArm rightUpperArm;
+
+        const float SWING_SPEED = 10.0f;
+        float swingTime = 0;
+};
+
+
+=====================================
+.\include\Body\Arms\UpperArm.h
+=====================================
+
+#pragma once
+#include <string>
+
+#include "Sprite.h"
+#include "Body/Arms/Elbow.h"
+
 class UpperArm : public Sprite
 {
     public:
@@ -256,11 +375,14 @@ class UpperArm : public Sprite
         const float SWING_MAX = 180.0f;
         const float SWING_SPEED = 10.0f;
         float swingTime = 0;
+
+        Elbow leftElbow;
+        Elbow rightElbow;
 };
 
 
 =====================================
-.\include\body\Body.h
+.\include\Body\Body.h
 =====================================
 
 #pragma once
@@ -268,9 +390,10 @@ class UpperArm : public Sprite
 #include "raylib.h"
 #include "Emotion.h"
 #include "BodyBase.h"
-#include "body/Arms/Arms.h"
-#include "body/Legs/Legs.h"
-#include "head/Head.h"
+#include "Body/Arms/Arms.h"
+#include "Body/Pelvis.h"
+#include "Body/Head/Head.h"
+#include "Body/Neck.h"
 
 class Body
 {
@@ -366,16 +489,17 @@ private:
 
     BodyBase bodyBase;
 
-    Head head;
+    Neck neck;
 
-    Legs legs;
+    Pelvis pelvis;
 
     Arms arms;
+
 };
 
 
 =====================================
-.\include\body\BodyBase.h
+.\include\Body\BodyBase.h
 =====================================
 
 #pragma once
@@ -394,167 +518,7 @@ class BodyBase : public Sprite
 
 
 =====================================
-.\include\body\Legs\Foot.h
-=====================================
-
-
-
-=====================================
-.\include\body\Legs\Knee.h
-=====================================
-
-
-
-=====================================
-.\include\body\Legs\Legs.h
-=====================================
-
-#pragma once
-
-#include "body/Legs/Thigh.h"
-
-class Legs
-{
-    public:
-        void Initialise();
-        void Shutdown();
-        void Update(float dt);
-        void Draw() const;
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void SetRotation(float rotation);
-        void SetBodyDimension(float bodyWidth, float bodyHeight);
-
-    private:
-        Thigh rightThigh;
-        Thigh leftThigh;
-};
-
-
-=====================================
-.\include\body\Legs\Shin.h
-=====================================
-
-
-
-=====================================
-.\include\body\Legs\Thigh.h
-=====================================
-
-#pragma once
-
-#include "Sprite.h"
-#include <string>
-
-class Thigh : public Sprite
-{
-    public:
-        void Initialise() override;
-        int GetFrame() const;
-        void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, const std::string& side);
-
-    private:
-        float bodyWidth;
-        float bodyHeight;
-        std::string side;
-};
-
-
-=====================================
-.\include\body\Neck.h
-=====================================
-
-
-
-=====================================
-.\include\Constants.h
-=====================================
-
-//==================================================
-//
-// Template Project
-//
-// Version 1.0
-//
-// Raylib
-// C++20
-//
-//==================================================
-
-#pragma once
-
-constexpr int SCREEN_WIDTH = 700;
-constexpr int SCREEN_HEIGHT = 700;
-constexpr char WINDOW_TITLE[] = "Tingo Bingo";
-constexpr int TARGET_FPS = 60;
-
-constexpr int ROBOT_WIDTH = 0;
-constexpr int ROBOT_HEIGHT = 0;
-constexpr float SCALE = 0.8f;
-
-
-=====================================
-.\include\Emotion.h
-=====================================
-
-#pragma once
-
-
-//====================================================
-// Emotion
-//
-// High-level emotional states used by RobotBrain
-// to control Tingo's facial expressions and behaviour.
-//====================================================
-
-enum class Emotion
-{
-    Neutral,
-    Happy,
-    Sad,
-    Angry,
-    Surprised
-};
-
-
-=====================================
-.\include\Game.h
-=====================================
-
-#pragma once
-
-#include "Robot.h"
-#include "Input.h"
-#include "Object.h"
-class Game
-{
-public:
-	
-	void Run();
-	
-private:
-	
-	void Initialise();
-	void Shutdown();
-
-	void HandleInput();
-	void Update(const float dt);
-	void Draw();
-	
-	Robot robot;
-	Vector2 robotWorldPos = {
-		SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f
-	};
-	Input input;
-	Object ball;
-	Object banana;
-	Texture2D background;
-	std::vector<Object*> objects; 
-};
-
-
-=====================================
-.\include\head\Antenna.h
+.\include\Body\Head\Antenna.h
 =====================================
 
 #pragma once
@@ -582,7 +546,7 @@ class Antenna : public Sprite
 
 
 =====================================
-.\include\head\Ears.h
+.\include\Body\Head\Ears.h
 =====================================
 
 #pragma once
@@ -616,7 +580,7 @@ class Ears : public Sprite
 
 
 =====================================
-.\include\head\Eyebrows.h
+.\include\Body\Head\Eyebrows.h
 =====================================
 
 #pragma once
@@ -658,7 +622,7 @@ class Eyebrows : public Sprite
 
 
 =====================================
-.\include\head\Eyes.h
+.\include\Body\Head\Eyes.h
 =====================================
 
 #pragma once
@@ -686,20 +650,20 @@ class Eyes : public Sprite
 
 
 =====================================
-.\include\head\Head.h
+.\include\Body\Head\Head.h
 =====================================
 
 #pragma once
 
 #include "raylib.h"
-#include "head/Antenna.h"
-#include "head/Ears.h"
-#include "head/Eyebrows.h"
-#include "head/Mouth.h"
-#include "head/Eyes.h"
-#include "head/Headbase.h"
-#include "head/Nose.h"
-#include "head/Pupils.h"
+#include "Body/Head/Antenna.h"
+#include "Body/Head/Ears.h"
+#include "Body/Head/Eyebrows.h"
+#include "Body/Head/Mouth.h"
+#include "Body/Head/Eyes.h"
+#include "Body/Head/Headbase.h"
+#include "Body/Head/Nose.h"
+#include "Body/Head/Pupils.h"
 #include "Emotion.h"
 
 
@@ -827,7 +791,7 @@ private:
 
 
 =====================================
-.\include\head\Headbase.h
+.\include\Body\Head\Headbase.h
 =====================================
 
 #pragma once
@@ -852,7 +816,7 @@ class Headbase : public Sprite
 
 
 =====================================
-.\include\head\Mouth.h
+.\include\Body\Head\Mouth.h
 =====================================
 
 #pragma once
@@ -883,7 +847,7 @@ class Mouth : public Sprite
 
 
 =====================================
-.\include\head\Nose.h
+.\include\Body\Head\Nose.h
 =====================================
 
 #pragma once
@@ -942,7 +906,7 @@ class Nose : public Sprite
 
 
 =====================================
-.\include\head\Pupil.h
+.\include\Body\Head\Pupil.h
 =====================================
 
 #pragma once
@@ -972,12 +936,12 @@ class Pupil : public Sprite
 
 
 =====================================
-.\include\head\Pupils.h
+.\include\Body\Head\Pupils.h
 =====================================
 
 #pragma once
 
-#include "head/Pupil.h"
+#include "Body/Head/Pupil.h"
 #include "raylib.h"
 #include "Constants.h"
 
@@ -1057,6 +1021,296 @@ private:
     float bodyWidth = 0.0f;
     float headHeight = 0.0f;
     float headWidth = 0.0f;
+};
+
+
+=====================================
+.\include\Body\Legs\Foot.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+
+class Foot : public Sprite
+{
+    public:
+        public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float bW, float bH);
+        void SetAnchorPoint(Vector2 anchorPoint);
+        void Shutdown();
+
+    private:
+        Vector2 localPositionOffset = {};
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+};
+
+
+=====================================
+.\include\Body\Legs\Knee.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+#include "Shin.h"
+class Knee : public Sprite
+{
+    public:
+        public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float bW, float bH);
+        void SetAnchorPoint(Vector2 anchorPoint);
+        void Shutdown();
+
+    private:
+        Vector2 localPositionOffset = {};
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+
+        Shin leftShin;
+        Shin rightShin;
+};
+
+
+=====================================
+.\include\Body\Legs\Legs.h
+=====================================
+
+#pragma once
+
+#include "body/Legs/Thigh.h"
+
+class Legs
+{
+    public:
+        void Initialise();
+        void Shutdown();
+        void Update(float dt);
+        void Draw() const;
+        void SetAnchorPoint(Vector2 anchorPoint);
+        void SetRotation(float rotation);
+        void SetBodyDimension(float bodyWidth, float bodyHeight);
+
+    private:
+        Thigh rightThigh;
+        Thigh leftThigh;
+};
+
+
+=====================================
+.\include\Body\Legs\Shin.h
+=====================================
+
+#pragma once
+#include "Sprite.h"
+
+#include "Foot.h"
+class Shin : public Sprite
+{
+    public:
+        public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float bW, float bH);
+        void SetAnchorPoint(Vector2 anchorPoint);
+        void Shutdown();
+
+    private:
+        Vector2 localPositionOffset = {};
+        
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+
+        Foot leftFoot;
+        Foot rightFoot;
+};
+
+
+=====================================
+.\include\Body\Legs\Thigh.h
+=====================================
+
+#pragma once
+
+#include "Sprite.h"
+#include "Knee.h"
+
+#include <string>
+
+class Thigh : public Sprite
+{
+    public:
+        void Initialise() override;
+        int GetFrame() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float width, float height, const std::string& side);
+
+    private:
+        float bodyWidth;
+        float bodyHeight;
+        std::string side;
+
+        Knee leftKnee;
+        Knee rightKnee;
+};
+
+
+=====================================
+.\include\Body\Neck.h
+=====================================
+
+#pragma once
+
+#include "Body/Head/Head.h"
+#include "Sprite.h"
+
+#include "Emotion.h"
+
+class Neck : public Sprite
+{
+    public:
+        void Initialise() override;
+        void Update(float dt, bool speaking, Emotion emotion);
+        void Draw() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float bW, float bH);
+        void SetAnchorPoint(Vector2 anchorPoint);
+        Head& GetHead() const;
+        void Shutdown();
+    
+    private:
+        Head head;
+        Vector2 localPositionOffset = {};
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+};
+
+
+=====================================
+.\include\Body\Pelvis.h
+=====================================
+
+#pragma once
+#include "body/Legs/Legs.h"
+#include "Sprite.h"
+class Pelvis : Sprite
+{
+    public:
+        public:
+        void Initialise() override;
+        void Update(float dt) override;
+        void Draw() const;
+        void SetRotation(float rotation);
+        void SetBodyDimensions(float bW, float bH);
+        void SetAnchorPoint(Vector2 anchorPoint);
+        void Shutdown();
+
+    private:
+        Vector2 localPositionOffset = {};
+        float topOfHeadOffset = 46.0f;
+        float bodyWidth = 0;
+        float bodyHeight = 0;
+
+    private:
+        Legs legs;
+};
+
+
+=====================================
+.\include\Constants.h
+=====================================
+
+//==================================================
+//
+// Template Project
+//
+// Version 1.0
+//
+// Raylib
+// C++20
+//
+//==================================================
+
+#pragma once
+
+constexpr int SCREEN_WIDTH = 700;
+constexpr int SCREEN_HEIGHT = 700;
+constexpr char WINDOW_TITLE[] = "Tingo Bingo";
+constexpr int TARGET_FPS = 60;
+
+constexpr int ROBOT_WIDTH = 0;
+constexpr int ROBOT_HEIGHT = 0;
+constexpr float SCALE = 0.8f;
+
+
+=====================================
+.\include\Emotion.h
+=====================================
+
+#pragma once
+
+
+//====================================================
+// Emotion
+//
+// High-level emotional states used by RobotBrain
+// to control Tingo's facial expressions and behaviour.
+//====================================================
+
+enum class Emotion
+{
+    Neutral,
+    Happy,
+    Sad,
+    Angry,
+    Surprised
+};
+
+
+=====================================
+.\include\Game.h
+=====================================
+
+#pragma once
+
+#include "Robot.h"
+#include "Input.h"
+#include "Object.h"
+class Game
+{
+public:
+	
+	void Run();
+	
+private:
+	
+	void Initialise();
+	void Shutdown();
+
+	void HandleInput();
+	void Update(const float dt);
+	void Draw();
+	
+	Robot robot;
+	Vector2 robotWorldPos = {
+		SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f
+	};
+	Input input;
+	Object ball;
+	Object banana;
+	Texture2D background;
+	std::vector<Object*> objects; 
 };
 
 
@@ -1745,111 +1999,355 @@ void Animation::Stop()
 
 
 =====================================
-.\src\body\Arm\Arms.cpp
+.\src\body\Arms\Arms.cpp
 =====================================
 
 #include "body/Arms/Arms.h"
 
 void Arms::Initialise()
 {
-    leftUpperArm.Initialise();
-    rightUpperArm.Initialise();
+    leftShoulder.Initialise();
+    rightShoulder.Initialise();
 }
 
 void Arms::SetBodyDimensions(float bodyWidth, float bodyHeight)
 {
-    leftUpperArm.SetBodyDimensions(bodyWidth, bodyHeight, "left");
-    rightUpperArm.SetBodyDimensions(bodyWidth, bodyHeight, "right");
+    leftShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "left");
+    rightShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "right");
 }
 
 void Arms::Shutdown()
 {
-    leftUpperArm.Shutdown();
-    rightUpperArm.Shutdown();
+    leftShoulder.Shutdown();
+    rightShoulder.Shutdown();
 }
 
 void Arms::Update(float dt)
 {
-    leftUpperArm.Update(dt);
-    rightUpperArm.Update(dt);
+    leftShoulder.Update(dt);
+    rightShoulder.Update(dt);
 
-    if(swingLeftUpperArm)
+    if(swingLeftArm)
     {
-        leftUpperArm.SwingArm(dt, 0, 180);
+        leftShoulder.SwingArm(dt, 0, 180);
     }
 
-    if(swingRightUpperArm)
+    if(swingRightArm)
     {
-        rightUpperArm.SwingArm(dt, 100, 180);
+        rightShoulder.SwingArm(dt, 0, 180);
     }
 }
 
 void Arms::Draw() const 
 {
-    leftUpperArm.Draw();
-    rightUpperArm.Draw();
+    leftShoulder.Draw();
+    rightShoulder.Draw();
 }
 
 void Arms::SetAnchorPoint(Vector2 anchorPoint)
 {
-    leftUpperArm.SetAnchorPoint(anchorPoint);
-    rightUpperArm.SetAnchorPoint(anchorPoint);
+    leftShoulder.SetAnchorPoint(anchorPoint);
+    rightShoulder.SetAnchorPoint(anchorPoint);
 }
 
 void Arms::SetRotation(float rotation) 
 {
-    leftUpperArm.SetRotation(rotation);
-    rightUpperArm.SetRotation(rotation);
+    leftShoulder.SetRotation(rotation);
+    rightShoulder.SetRotation(rotation);
 }
 
 void Arms::SwingArm(std::string side, bool swing)
 {
     if(side == "left" && swing)
     {
-        swingLeftUpperArm = true;
+        swingLeftArm = true;
     }
     else if(side == "left" && !swing)
     {
-        swingLeftUpperArm = false;
+        swingLeftArm = false;
     }
 
     if(side == "right" && swing)
     {
-        swingRightUpperArm = true;
+        swingRightArm = true;
     }
     else if(side == "right" && !swing)
     {
-        swingRightUpperArm = false;
+        swingRightArm = false;
     }
 }
 
 
 =====================================
-.\src\body\Arm\Elbow.cpp
+.\src\body\Arms\Elbow.cpp
 =====================================
 
+#include "Body/Arms/Elbow.h"
 
+void Elbow::Initialise(){}
+void Elbow::Update(float dt){}
+void Elbow::Draw()const {}
 
-=====================================
-.\src\body\Arm\ForeArm.cpp
-=====================================
+int Elbow::GetFrame() const{}
 
-
-
-=====================================
-.\src\body\Arm\Hand.cpp
-=====================================
-
+void Elbow::SetRotation(float rotation){}
+void Elbow::SetBodyDimensions(float width, float height, std::string side){}
 
 
 =====================================
-.\src\body\Arm\Shoulder.cpp
+.\src\body\Arms\ForeArm.cpp
 =====================================
 
+#include "Body/Arms/ForeArm.h"
+
+void ForeArm::Initialise(){}
+void ForeArm::Update(float dt){}
+void ForeArm::Draw() const {}
+
+int ForeArm::GetFrame() const{}
+
+void ForeArm::SetRotation(float rotation){}
+void ForeArm::SetBodyDimensions(float width, float height, std::string side){}
 
 
 =====================================
-.\src\body\Arm\UpperArm.cpp
+.\src\body\Arms\Hand.cpp
+=====================================
+
+#include "Body/Arms/Hand.h"
+
+void Hand::Initialise(){}
+void Hand::Update(float dt){}
+void Hand::Draw() const {}
+        
+int Hand::GetFrame() const{}
+        
+void Hand::SetRotation(float rotation){}
+void Hand::SetBodyDimensions(float width, float height, std::string side){}
+
+
+=====================================
+.\src\body\Arms\Shoulder.cpp
+=====================================
+
+#include "body/Arms/Shoulder.h"
+#include "Constants.h"
+#include <cmath>
+#include <iostream>
+
+// Load the shoulder sprite and initialise its animation.
+void Shoulder::Initialise()
+{
+    //texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
+
+    // Sprite sheet layout.
+    const int COLUMNS = 1;
+    const int ROWS = 1;
+
+    // Calculate the size of a single animation frame.
+    const int FRAME_WIDTH = 100;//texture.width / COLUMNS;
+    const int FRAME_HEIGHT = 100;//texture.height / ROWS;
+
+    const int TOTAL_FRAMES = COLUMNS * ROWS;
+
+    // Animation settings.
+    const float ROTATION = 0.0f;
+    const float FRAME_DURATION = 0.02f;
+
+    // Initialise the animation using the sprite sheet information.
+    animation.Initialise
+    (
+        FRAME_WIDTH,
+        FRAME_HEIGHT,
+        TOTAL_FRAMES,
+        COLUMNS,
+        FRAME_DURATION
+    );
+
+    rotation = ROTATION;
+    scale = SCALE;
+
+    // Position the shoulder's anchor point relative to the body.
+    // The anchor point represents where the shoulder attaches
+    // to the body.
+    if(side == "left")
+    {
+        localPositionOffset = {
+            bodyWidth / 2 + FRAME_WIDTH,
+            -bodyHeight / 2
+        }; 
+    }
+    else if(side == "right")
+    {
+        localPositionOffset = {
+            -bodyWidth / 2.0f,
+            -bodyHeight / 2.0f
+        }; 
+    }
+
+    homeRotation = rotation;
+}
+
+void Shoulder::Update(float dt)
+{
+    Sprite::Update(dt);
+}
+
+// Return the current shoulder animation frame.
+int Shoulder::GetFrame() const
+{
+    return animation.GetFrame();
+}
+
+// Apply a rotation to the shoulder.
+void Shoulder::SetRotation(float rotation)
+{
+    Sprite::SetRotation(rotation);
+}
+
+// Set the dimensions of the body so the shoulder can be positioned
+// correctly relative to the body.
+void Shoulder::SetBodyDimensions(float width, float height, std::string side)
+{
+    bodyWidth = width;
+    bodyHeight = height;
+    this->side = side; 
+}
+
+void Shoulder::Draw() const
+{
+    // Get the current animation frame.
+    Rectangle source = animation.GetSourceRectangle();
+
+    // Calculate the scaled dimensions of the arm.
+    float width = animation.GetFrameWidth() * scale;
+    float height = animation.GetFrameHeight() * scale;
+
+    //================================================
+    // Parent Transform
+    //================================================
+    //
+    // localPositionOffset represents the arm's local
+    // position relative to the body anchor point.
+    //
+    // Rotate this local offset around the body anchor
+    // so the arm follows the body's rotation.
+    //
+    Vector2 offset = localPositionOffset;
+
+    // Raylib rotation values are measured in degrees,
+    // while sinf() and cosf() require radians.
+    float radians = rotation * DEG2RAD;
+
+    // Rotate the arm's local offset around the
+    // body anchor point.
+    Vector2 rotatedOffset =
+    {
+        offset.x * cosf(radians) - offset.y * sinf(radians),
+        offset.x * sinf(radians) + offset.y * cosf(radians)
+    };
+
+    //================================================
+    // Shoulder World Position
+    //================================================
+    //
+    // Add the rotated local offset to the body's
+    // world-space anchor point.
+    //
+    // The arm anchor point is attached to the body
+    // at the shoulder and follows the body's rotation.
+    //
+    Vector2 armAnchorPosition =
+    {
+        anchorPoint.x + rotatedOffset.x * scale,
+        anchorPoint.y + rotatedOffset.y * scale
+    };
+
+    //================================================
+    // Shoulder Destination
+    //================================================
+    //
+    // Position the shoulder sprite using its anchor point.
+    //
+    // The anchor point is at the top-centre of the
+    // shoulder sprite, where the shoulder attaches to the body.
+    //
+    Rectangle destination =
+    {
+        armAnchorPosition.x - width / 2.0f,
+        armAnchorPosition.y,
+        width,
+        height
+    };
+
+    //================================================
+    // Local Rotation Pivot
+    //================================================
+    //
+    // Set the rotation origin to the top-centre of the shoulder.
+    //
+    // This is the point where the shoulder attaches to the
+    // body, allowing the shoulder to rotate
+    // around the shoulder aattachment point rather than its centre.
+    //
+    Vector2 origin =
+    {
+        width / 2.0f,
+        0
+    };
+
+    //================================================
+    // Draw
+    //================================================
+    //
+    // rotation:
+    //     Rotation inherited from the body.
+    //
+    // localRotation:
+    //     Independent rotation of the shoulder.
+    //
+    // Adding the two rotations allows the shoulder to
+    // follow the body while also rotating independently.
+    //
+    /*DrawTexturePro(
+        texture,
+        source,
+        destination,
+        origin,
+        rotation + localRotation,
+        WHITE
+    );*/
+}
+
+void Shoulder::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
+{
+    swingTime += dt * SWING_SPEED;
+
+    if (swingTime >= 2.0f * PI)
+    {
+        swingTime -= 2.0f * PI;
+    }
+
+    float unitAngle = 0;
+    
+    if(side == "left")
+    {
+        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
+    }
+
+    if(side == "right")
+    {
+        unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
+    }
+
+    localRotation =
+            swingMinAngle +
+            unitAngle * (swingMaxAngle - swingMinAngle);
+}
+
+
+=====================================
+.\src\body\Arms\UpperArm.cpp
 =====================================
 
 #include "body/Arms/UpperArm.h"
@@ -2104,14 +2602,14 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     
-    //head.SetBodyDimensions() must be called before head.Initialise() 
+    //neck.SetBodyDimensions() must be called before head.Initialise() 
     // so that the head can anchor itself correctly relative to the body
     //The same for arms and legs
-    head.SetBodyDimensions(
+    neck.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
     );
-    head.Initialise();
+    neck.Initialise();
     
     arms.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
@@ -2119,29 +2617,29 @@ void Body::Initialise()
         );
     arms.Initialise();
     
-    legs.SetBodyDimension(
+    pelvis.SetBodyDimensions(
         bodyBase.GetFrameWidth(), 
         bodyBase.GetFrameHeight()
     );
-    legs.Initialise();
+    pelvis.Initialise();
 }
 
 // Release resources used by each body component.
 void Body::Shutdown()
 {
-    head.Shutdown();
+    neck.Shutdown();
     bodyBase.Shutdown();
     arms.Shutdown();
-    legs.Shutdown();
+    pelvis.Shutdown();
 }
 
 // Update every animated body component.
 void Body::Update(float dt, bool speaking, Emotion emotion)
 {
-    head.Update(dt, speaking, emotion);
+    neck.Update(dt, speaking, emotion);
     bodyBase.Update(dt);
     arms.Update(dt);
-    legs.Update(dt);
+    pelvis.Update(dt);
     
     PlayIdleBodyTransform(dt);
 }
@@ -2150,11 +2648,11 @@ void Body::Draw() const
 {
     arms.Draw();
     
-    legs.Draw();
+    pelvis.Draw();
     
     bodyBase.Draw();
 
-    head.Draw();
+    neck.Draw();
 }
 
 void Body::SetAnchorPoint(Vector2 anchorPoint)
@@ -2169,11 +2667,11 @@ void Body::ApplyAnchorPoint(Vector2 anchorPoint)
 
     bodyBase.SetAnchorPoint(anchorPoint);
 
-    head.SetAnchorPoint(anchorPoint);
+    neck.SetAnchorPoint(anchorPoint);
 
     arms.SetAnchorPoint(anchorPoint);
 
-    legs.SetAnchorPoint(anchorPoint);
+    pelvis.SetAnchorPoint(anchorPoint);
 }
 
 Vector2 Body::GetAnchorPoint() const
@@ -2194,8 +2692,8 @@ void Body::ApplyRotation(float rotation)
     bodyBase.SetRotation(rotation);
     arms.SetRotation(rotation);
 
-    legs.SetRotation(rotation);
-    head.SetRotation(rotation);
+    pelvis.SetRotation(rotation);
+    neck.SetRotation(rotation);
 }
 
 float Body::GetRotation()
@@ -2268,7 +2766,7 @@ void Body::PlayBodyBob(float dt)
 
 Head& Body::GetHead()
 {
-    return head;
+    return neck.GetHead();
 }
 
 void Body::SwingArm(std::string side,  bool swing)
@@ -2278,7 +2776,7 @@ void Body::SwingArm(std::string side,  bool swing)
 
 Vector2 Body::GetHeadWorldPosition() const
 {
-    return head.GetWorldPosition();
+    return neck.GetHead().GetWorldPosition();
 }
 
 
@@ -2353,12 +2851,30 @@ float BodyBase::GetFrameHeight() const
 .\src\body\Legs\Foot.cpp
 =====================================
 
+#include "Body/Legs/Foot.h"
+
+void Foot::Initialise(){}
+void Foot::Update(float dt){}
+void Foot::Draw() const{}
+void Foot::SetRotation(float rotation){}
+void Foot::SetBodyDimensions(float bW, float bH){}
+void Foot::SetAnchorPoint(Vector2 anchorPoint){}
+void Foot::Shutdown(){}
 
 
 =====================================
 .\src\body\Legs\Knee.cpp
 =====================================
 
+#include "Body/Legs/Knee.h"
+
+void Knee::Initialise(){}
+void Knee::Update(float dt){}
+void Knee::Draw() const{}
+void Knee::SetRotation(float rotation){}
+void Knee::SetBodyDimensions(float bW, float bH){}
+void Knee::SetAnchorPoint(Vector2 anchorPoint){}
+void Knee::Shutdown(){}
 
 
 =====================================
@@ -2423,6 +2939,15 @@ void Legs::SetBodyDimension(float bodyWidth, float bodyHeight)
 .\src\body\Legs\Shin.cpp
 =====================================
 
+#include "Body/Legs/Shin.h"
+
+void Shin::Initialise(){}
+void Shin::Update(float dt){}
+void Shin::Draw() const{}
+void Shin::SetRotation(float rotation){}
+void Shin::SetBodyDimensions(float bW, float bH){}
+void Shin::SetAnchorPoint(Vector2 anchorPoint){}
+void Shin::Shutdown(){}
 
 
 =====================================
@@ -2505,12 +3030,31 @@ void Thigh::SetBodyDimensions(float width, float height, const std::string& side
 .\src\body\Neck.cpp
 =====================================
 
+#include "Body/Neck.h"
+
+void Neck::Initialise(){}
+void Neck::Update(float dt, bool speaking, Emotion emotion){}
+void Neck::Draw() const{}
+void Neck::SetRotation(float rotation){}
+void Neck::SetBodyDimensions(float bW, float bH){}
+void Neck::SetAnchorPoint(Vector2 anchorPoint){}
+Head& Neck::GetHead() const{}
+void Neck::Shutdown(){}
 
 
 =====================================
 .\src\body\Pelvis.cpp
 =====================================
 
+#include "Body/Pelvis.h"
+
+void Pelvis::Initialise(){}
+void Pelvis::Update(float dt){}
+void Pelvis::Draw() const{}
+void Pelvis::SetRotation(float rotation){}
+void Pelvis::SetBodyDimensions(float bW, float bH){}
+void Pelvis::SetAnchorPoint(Vector2 anchorPoint){}
+void Pelvis::Shutdown(){}
 
 
 =====================================
@@ -2639,10 +3183,10 @@ void Game::Draw()
 
 	robot.Draw();
 	
-	//ball.DrawCollisionBox();
+	ball.DrawCollisionBox();
 	ball.Draw();
 	
-	//banana.DrawCollisionBox();
+	banana.DrawCollisionBox();
 	banana.Draw();
 	
 	DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
@@ -2697,7 +3241,7 @@ void Game::Run()
 // triggered.
 //====================================================
 
-#include "head/Antenna.h"
+#include "Body/Head/Antenna.h"
 #include "Constants.h"
 #include "Animation.h"
 
@@ -2783,7 +3327,7 @@ void Antenna::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
 // triggered.
 //====================================================
 
-#include "head/Ears.h"
+#include "Body/Head/Ears.h"
 #include "Constants.h"
 
 void Ears::Initialise()
@@ -2874,7 +3418,7 @@ void Ears::SetBodyHeadDimensions(
 // The eyebrows can play idle and emotional animations.
 //====================================================
 
-#include "head/Eyebrows.h"
+#include "Body/Head/Eyebrows.h"
 #include "Constants.h"
 #include "Emotion.h"
 #include "Animation.h"
@@ -3024,7 +3568,7 @@ void Eyebrows::SetBodyHeadDimensions(
 // head rotation sprite.
 //====================================================
 
-#include "head/Eyes.h"
+#include "Body/Head/Eyes.h"
 #include "Constants.h"
 
 void Eyes::Initialise()
@@ -3122,7 +3666,7 @@ float Eyes::GetYOffset()
 // including bobbing and wiggling.
 //====================================================
 
-#include "head/Head.h"
+#include "Body/Head/Head.h"
 #include <cmath>
 #include "Emotion.h"
 
@@ -3332,7 +3876,7 @@ Vector2 Head::GetWorldPosition() const
 // between head frames.
 //====================================================
 
-#include "head/Headbase.h"
+#include "Body/Head/Headbase.h"
 #include "Constants.h"
 #include "raylib.h"
 
@@ -3426,7 +3970,7 @@ Vector2 Headbase::GetWorldPosition() const
 // robot a more lifelike appearance.
 //====================================================
 
-#include "head/Mouth.h"
+#include "Body/Head/Mouth.h"
 #include "Constants.h"
 #include "Emotion.h"
 
@@ -3539,7 +4083,7 @@ void Mouth::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
 //
 //====================================================
 
-#include "head/Nose.h"
+#include "Body/Head/Nose.h"
 #include "Constants.h"
 #include <iostream>
 #include <cmath>
@@ -3966,7 +4510,7 @@ void Nose::Draw() const
 // can move independently when the robot looks around.
 //====================================================
 
-#include "head/Pupil.h"
+#include "Body/Head/Pupil.h"
 #include "Constants.h"
 #include <string>
 
@@ -4067,7 +4611,7 @@ void Pupil::SetSide(std::string side)
 // the illusion that the robot is looking around.
 //====================================================
 
-#include "head/Pupils.h"
+#include "Body/Head/Pupils.h"
 #include "raylib.h"
 #include "cmath"
 #include "raymath.h"

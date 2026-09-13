@@ -2,73 +2,73 @@
 
 void Arms::Initialise()
 {
-    leftUpperArm.Initialise();
-    rightUpperArm.Initialise();
+    leftShoulder.Initialise();
+    rightShoulder.Initialise();
 }
 
 void Arms::SetBodyDimensions(float bodyWidth, float bodyHeight)
 {
-    leftUpperArm.SetBodyDimensions(bodyWidth, bodyHeight, "left");
-    rightUpperArm.SetBodyDimensions(bodyWidth, bodyHeight, "right");
+    leftShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "left");
+    rightShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "right");
 }
 
 void Arms::Shutdown()
 {
-    leftUpperArm.Shutdown();
-    rightUpperArm.Shutdown();
+    leftShoulder.Shutdown();
+    rightShoulder.Shutdown();
 }
 
 void Arms::Update(float dt)
 {
-    leftUpperArm.Update(dt);
-    rightUpperArm.Update(dt);
+    leftShoulder.Update(dt);
+    rightShoulder.Update(dt);
 
-    if(swingLeftUpperArm)
+    if(swingLeftArm)
     {
-        leftUpperArm.SwingArm(dt, 0, 180);
+        leftShoulder.SwingArm(dt, 0, 180);
     }
 
-    if(swingRightUpperArm)
+    if(swingRightArm)
     {
-        rightUpperArm.SwingArm(dt, 100, 180);
+        rightShoulder.SwingArm(dt, 0, 180);
     }
 }
 
 void Arms::Draw() const 
 {
-    leftUpperArm.Draw();
-    rightUpperArm.Draw();
+    leftShoulder.Draw();
+    rightShoulder.Draw();
 }
 
 void Arms::SetAnchorPoint(Vector2 anchorPoint)
 {
-    leftUpperArm.SetAnchorPoint(anchorPoint);
-    rightUpperArm.SetAnchorPoint(anchorPoint);
+    leftShoulder.SetAnchorPoint(anchorPoint);
+    rightShoulder.SetAnchorPoint(anchorPoint);
 }
 
 void Arms::SetRotation(float rotation) 
 {
-    leftUpperArm.SetRotation(rotation);
-    rightUpperArm.SetRotation(rotation);
+    leftShoulder.SetRotation(rotation);
+    rightShoulder.SetRotation(rotation);
 }
 
 void Arms::SwingArm(std::string side, bool swing)
 {
     if(side == "left" && swing)
     {
-        swingLeftUpperArm = true;
+        swingLeftArm = true;
     }
     else if(side == "left" && !swing)
     {
-        swingLeftUpperArm = false;
+        swingLeftArm = false;
     }
 
     if(side == "right" && swing)
     {
-        swingRightUpperArm = true;
+        swingRightArm = true;
     }
     else if(side == "right" && !swing)
     {
-        swingRightUpperArm = false;
+        swingRightArm = false;
     }
 }

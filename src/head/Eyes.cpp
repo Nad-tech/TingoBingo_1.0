@@ -7,7 +7,7 @@
 // head rotation sprite.
 //====================================================
 
-#include "head/Eyes.h"
+#include "Body/Head/Eyes.h"
 #include "Constants.h"
 
 void Eyes::Initialise()

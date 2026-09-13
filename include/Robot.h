@@ -81,7 +81,7 @@ public:
 
     void SwingArm(std::string side, bool swinging);
 
-    Vector2 GetHeadWorldPosition() const;
+    Vector2 GetHeadWorldPosition();
 
 private:
 

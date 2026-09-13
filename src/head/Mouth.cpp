@@ -6,7 +6,7 @@
 // robot a more lifelike appearance.
 //====================================================
 
-#include "head/Mouth.h"
+#include "Body/Head/Mouth.h"
 #include "Constants.h"
 #include "Emotion.h"
 

@@ -6,7 +6,7 @@
 // triggered.
 //====================================================
 
-#include "head/Ears.h"
+#include "Body/Head/Ears.h"
 #include "Constants.h"
 
 void Ears::Initialise()

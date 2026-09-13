@@ -2,7 +2,7 @@
 #include <string>
 
 #include "Sprite.h"
-#include "ForeArm.h"
+#include "Body/Arms/Elbow.h"
 
 class UpperArm : public Sprite
 {
@@ -31,6 +31,6 @@ class UpperArm : public Sprite
         const float SWING_SPEED = 10.0f;
         float swingTime = 0;
 
-        ForeArm leftForeArm;
-        ForeArm rightForeArm;
+        Elbow leftElbow;
+        Elbow rightElbow;
 };

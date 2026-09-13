@@ -4,7 +4,9 @@
 
 CXX = g++
 
-CXXFLAGS = -g -Wall -Wextra -std=c++23 -Iinclude -MMD -MP
+CXXFLAGS = -g -Wall -Wextra -std=c++23 -Iinclude -MMD -MP \
+           -fdiagnostics-color=always \
+           -fdiagnostics-show-caret
 
 LDFLAGS = -lraylib -lopengl32 -lgdi32 -lwinmm
 
@@ -44,7 +46,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	@echo "Linking TingoBingo..."
-	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
+	@$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
 
 #----------------------------------------------------
 # Compile source files
@@ -53,7 +55,7 @@ $(TARGET): $(OBJECTS)
 build/%.o: src/%.cpp
 	@mkdir -p $(dir $@)
 	@echo "Compiling $<..."
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
 #----------------------------------------------------
 # Include automatically generated dependencies
