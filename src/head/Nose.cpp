@@ -119,6 +119,7 @@ void Nose::Initialise()
         - bodyHeight / 2.0f
         - headHeight / 2.0f
         + slightPositionOffset
+        - neckHeight
     };
 
     // Store the original LOCAL offset.
@@ -270,20 +271,22 @@ void Nose::Update(float dt)
 //
 //====================================================
 
-void Nose::SetBodyHeadDimensions(
-    float bwidth,
-    float bHeight,
-    float hWidth,
-    float hHeight
+void Nose::SetBodyHeadNeckDimensions(
+    float bW, float bH, 
+    float hW, float hH, 
+    float nW, float nH 
 )
 {
     // Store the supplied body dimensions.
-    bodyWidth = bwidth;
-    bodyHeight = bHeight;
+    bodyWidth = bW;
+    bodyHeight = bH;
 
     // Store the supplied head dimensions.
-    headWidth = hWidth;
-    headHeight = hHeight;
+    headWidth = hW;
+    headHeight = hH;
+
+    neckWidth = nW;
+    neckHeight = nH;
 }
 
 //====================================================

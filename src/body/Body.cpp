@@ -206,3 +206,8 @@ Vector2 Body::GetHeadWorldPosition()
 {
     return neck.GetHead().GetWorldPosition();
 }
+
+float Body::GetEyesYOffset()
+{
+    return GetHead().GetEyesYOffset();
+}

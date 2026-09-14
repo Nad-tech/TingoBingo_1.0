@@ -28,8 +28,6 @@ void Neck::Update(float dt, bool speaking, Emotion emotion) {
 
 void Neck::Draw() const
 {
-    head.Draw();
-
     Rectangle neck =
     {
         anchorPoint.x,
@@ -49,6 +47,8 @@ void Neck::Draw() const
         rotation,
         BROWN
     );
+
+    head.Draw();
 }
 
 void Neck::SetRotation(float rotation)

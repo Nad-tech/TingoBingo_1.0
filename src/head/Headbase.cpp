@@ -88,6 +88,7 @@ Vector2 Headbase::GetWorldPosition() const
     anchorPoint.x, 
     anchorPoint.y - 
     (bodyHeight / 2.0f) * SCALE -
-    (animation.GetFrameHeight() / 2) * SCALE
+    (animation.GetFrameHeight() / 2) * SCALE -
+    neckHeight * SCALE
    }; 
 }

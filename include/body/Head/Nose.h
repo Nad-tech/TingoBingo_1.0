@@ -9,12 +9,12 @@ class Nose : public Sprite
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void SetBodyHeadDimensions(
-            float bwidth, 
-            float bHeigh, 
-            float hWidth, 
-            float hHeight
-        );
+        void SetBodyHeadNeckDimensions(
+                float bW, float bH, 
+                float hW, float hH, 
+                float nW, float nH 
+            );
+
 
     private:
         // Nose-centre translation in local head coordinates.
@@ -25,6 +25,8 @@ class Nose : public Sprite
         float bodyHeight = 0.0f;
         float headWidth = 0.0f;
         float headHeight = 0.0f;
+        float neckWidth;
+        float neckHeight;
         
         //Idle
         float localRotation = 0.0f;

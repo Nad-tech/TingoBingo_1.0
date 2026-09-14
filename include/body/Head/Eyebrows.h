@@ -8,11 +8,10 @@ class Eyebrows : public Sprite
     public:
         void Initialise() override;
         void UpdateEyebrows(float dt, bool speaking, Emotion emotion);
-        void SetBodyHeadDimensions(
-            float bwidth, 
-            float bHeigh, 
-            float hWidth, 
-            float hHeight
+        void SetBodyHeadNeckDimensions(
+            float bW, float bH, 
+            float hW, float hH, 
+            float nW, float nH 
         );
 
     private:
@@ -24,6 +23,8 @@ class Eyebrows : public Sprite
         float bodyHeight = 0.0f;
         float headWidth = 0.0f;
         float headHeight = 0.0f;
+        float neckWidth;
+        float neckHeight;
         
 
         float happyAnimationTimer = 0.0f;

@@ -83,6 +83,8 @@ public:
 
     Vector2 GetHeadWorldPosition();
 
+    float GetEyesYOffset();
+
 private:
 
     // Current world-space anchor point of the robot.

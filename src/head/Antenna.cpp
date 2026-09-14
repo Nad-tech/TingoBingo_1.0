@@ -48,6 +48,7 @@ void Antenna::Initialise()
         FRAME_HEIGHT / 2.0f
         + bodyHeight / 2.0f
         + headHeight / 2.0f
+        + neckHeight
         + topOfHeadOffset
     };
 
@@ -71,10 +72,20 @@ void Antenna::Update(float dt)
     }
 }
 
-void Antenna::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
+void Antenna::SetBodyHeadNeckDimensions(
+    float bW, float bH, 
+    float hW, float hH, 
+    float nW, float nH 
+)
 {
+    // Store the supplied body dimensions.
     bodyWidth = bW;
     bodyHeight = bH;
+
+    // Store the supplied head dimensions.
     headWidth = hW;
     headHeight = hH;
+
+    neckWidth = nW;
+    neckHeight = nH;
 }

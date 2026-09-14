@@ -77,6 +77,8 @@
 #include <cmath>
 #include <iostream>
 
+Vector2 P;
+
 RobotBrain::RobotBrain(Robot& robot)
     : robot(robot),
       state(State::Idle),
@@ -427,6 +429,7 @@ void RobotBrain::Update(float dt)
             robot.LookAt(targetObject->GetAnchorPoint());
             SetState(State::Reacting);
 
+            P = targetObject->GetAnchorPoint();
 
             // ------------------------------------------------
             // Ball and banana are currently recognised as
@@ -776,6 +779,7 @@ void RobotBrain::Search(float dt)
     // --------------------------------------------------------
 
     searchRayOrigin = robot.GetHeadWorldPosition();
+    searchRayOrigin.y = robot.GetHeadWorldPosition().y - robot.GetEyesYOffset() * SCALE;
 
 
     // --------------------------------------------------------
@@ -1149,4 +1153,8 @@ Object* RobotBrain::DetectCollision(
 void RobotBrain::SwingArm(std::string side, bool swinging)
 {
     robot.SwingArm(side, swinging);
+}
+
+void RobotBrain::Draw() const {
+    DrawCircle(P.x,P.y,10,BLUE);
 }

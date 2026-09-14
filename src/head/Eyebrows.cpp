@@ -50,6 +50,7 @@ void Eyebrows::Initialise()
         FRAME_HEIGHT / 2.0f
         + bodyHeight / 2.0f
         + headHeight / 2.0f
+        + neckHeight
         + foreheadOffset
     };
 
@@ -125,18 +126,20 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
     }
 }
 
-void Eyebrows::SetBodyHeadDimensions(
-    float bwidth,
-    float bHeight,
-    float hWidth,
-    float hHeight
+void Eyebrows::SetBodyHeadNeckDimensions(
+    float bW, float bH, 
+    float hW, float hH, 
+    float nW, float nH 
 )
 {
     // Store the supplied body dimensions.
-    bodyWidth = bwidth;
-    bodyHeight = bHeight;
+    bodyWidth = bW;
+    bodyHeight = bH;
 
     // Store the supplied head dimensions.
-    headWidth = hWidth;
-    headHeight = hHeight;
+    headWidth = hW;
+    headHeight = hH;
+
+    neckWidth = nW;
+    neckHeight = nH;
 }

@@ -24,5 +24,5 @@ class Neck : public Sprite
         float bodyHeight = 0;
 
         const int NECK_WIDTH = 50;
-        const int NECK_HEIGHT = 50;
+        const int NECK_HEIGHT = 30;
 };

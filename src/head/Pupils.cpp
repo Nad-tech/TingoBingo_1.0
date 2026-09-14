@@ -13,6 +13,8 @@
 #include "cmath"
 #include "raymath.h"
 
+Vector2 L;
+
 // Initialise both pupil sprites.
 void Pupils::Initialise()
 {
@@ -42,6 +44,7 @@ void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
+    DrawCircle(L.x, L.y, 10, RED);
 }
 
 // Set both pupil anchor points relative to the head.
@@ -105,15 +108,26 @@ void Pupils::LookAt(Vector2 point)
 {
     Vector2 leftEyeCentre =
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y - bodyHeight / 2 - headHeight / 2
+        headAnchorPoint.x + leftPupil.GetSideOffset() * SCALE,
+        headAnchorPoint.y -
+        (bodyHeight / 2 
+        + headHeight / 2 
+        + neckHeight 
+        + eyesYOffset) * SCALE
+
     };
 
     Vector2 rightEyeCentre =
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y - bodyHeight / 2 - headHeight / 2
+        headAnchorPoint.x - rightPupil.GetSideOffset() * SCALE,
+        headAnchorPoint.y -  
+        (bodyHeight / 2 
+        + headHeight / 2 
+        + neckHeight 
+        + eyesYOffset) * SCALE
     };
+
+    L = rightEyeCentre;
 
     // Calculate the direction from each eye to the target.
     Vector2 leftDirection =
@@ -170,6 +184,18 @@ void Pupils::SetBodyHeadNeckEyeOffsetDimensions(
     float eyesYOffset
 )
 {
+    bodyWidth = bW;
+    bodyHeight = bH;
+    headWidth = hW;
+    headHeight = hH;
+    neckWidth = nW;
+    neckHeight = nH;
+    this->eyesYOffset = eyesYOffset; 
     leftPupil.SetBodyHeadNeckEyeOffsetDimensions(bW, bH, hW, hH, nW, nH, eyesYOffset);
     rightPupil.SetBodyHeadNeckEyeOffsetDimensions(bW, bH, hW, hH, nW, nH, eyesYOffset);
+}
+
+float Pupils::GetEyesYOffset()
+{
+    return eyesYOffset;
 }

@@ -71,6 +71,7 @@ Vector2 Robot::GetHeadAnchorPoint()
 void Robot::Draw() const
 {
     body.Draw();
+    robotBrain.Draw();
 }
 
 // Release the resources owned by the robot's head.
@@ -140,4 +141,9 @@ void Robot::SwingArm(std::string side, bool swinging)
 Vector2 Robot::GetHeadWorldPosition()
 {
     return body.GetHeadWorldPosition();
+}
+
+float Robot::GetEyesYOffset()
+{
+    return body.GetEyesYOffset();
 }

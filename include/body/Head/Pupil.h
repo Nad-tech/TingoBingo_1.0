@@ -15,6 +15,8 @@ class Pupil : public Sprite
             float eyesYOffset
         );
         void SetSide(std::string side);
+        float GetSideOffset();
+        float GetEyesYOffset();
 
     private:
         float bodyWidth;

@@ -46,6 +46,8 @@ class RobotBrain
                         
         void SwingArm(std::string side, bool swinging);
 
+        void Draw() const;
+
     private:
         Robot& robot;
         State state;

@@ -8,7 +8,12 @@ class Mouth : public Sprite
     public:
         void Initialise() override;
         void UpdateMouth(float dt, bool speaking, Emotion emotion);
-        void SetBodyHeadDimensions(float bW, float bH, float hW, float hH);
+        void SetBodyHeadNeckDimensions(
+            float bW, float bH, 
+            float hW, float hH, 
+            float nW, float nH 
+        );
+
   
     private:
         int frame = 0;
@@ -22,4 +27,6 @@ class Mouth : public Sprite
         float bodyHeight = 0;
         float headWidth = 0;
         float headHeight = 0;
+        float neckWidth;
+        float neckHeight;
 };

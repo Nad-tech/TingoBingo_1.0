@@ -47,6 +47,7 @@ void Mouth::Initialise()
         FRAME_HEIGHT / 2.0f
         + bodyHeight / 2.0f
         + headHeight / 2.0f
+        + neckHeight
         + mouthDisplayOffset
     };
 
@@ -85,10 +86,20 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     }
 }
 
-void Mouth::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
+void Mouth::SetBodyHeadNeckDimensions(
+    float bW, float bH, 
+    float hW, float hH, 
+    float nW, float nH 
+)
 {
+    // Store the supplied body dimensions.
     bodyWidth = bW;
     bodyHeight = bH;
+
+    // Store the supplied head dimensions.
     headWidth = hW;
     headHeight = hH;
+
+    neckWidth = nW;
+    neckHeight = nH;
 }

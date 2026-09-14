@@ -46,6 +46,8 @@ public:
 
     Vector2 GetHeadWorldPosition();
 
+    float GetEyesYOffset();
+
 private:
     Vector2 anchorPoint;
 

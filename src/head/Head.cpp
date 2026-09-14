@@ -17,6 +17,8 @@
 #include <cmath>
 #include "Emotion.h"
 
+//TODO adjust all features of head with repect to neck
+
 // Initialise the head's transform and idle animation state.
 Head::Head() :
     rotation(0.0f),
@@ -31,27 +33,33 @@ void Head::Initialise()
 {
     headBase.Initialise();
     
-    antenna.SetBodyHeadDimensions(
+    antenna.SetBodyHeadNeckDimensions(
         bodyWidth,
         bodyHeight,
         headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
+        headBase.GetFrameHeight(),
+        neckWidth,
+        neckHeight
     );
     antenna.Initialise();
     
-    ears.SetBodyHeadDimensions(
+    ears.SetBodyHeadNeckDimensions(
         bodyWidth,
         bodyHeight,
         headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
+        headBase.GetFrameHeight(),
+        neckWidth,
+        neckHeight
     );
     ears.Initialise();
     
-    eyebrows.SetBodyHeadDimensions(
+    eyebrows.SetBodyHeadNeckDimensions(
         bodyWidth,
         bodyHeight,
         headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
+        headBase.GetFrameHeight(),
+        neckWidth,
+        neckHeight
     );
     eyebrows.Initialise();
     
@@ -68,19 +76,23 @@ void Head::Initialise()
     );
     eyes.Initialise();
     
-    mouth.SetBodyHeadDimensions(
+    mouth.SetBodyHeadNeckDimensions(
         bodyWidth, 
         bodyHeight,
         headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
+        headBase.GetFrameHeight(),
+        neckWidth,
+        neckHeight
     );
     mouth.Initialise();
     
-    nose.SetBodyHeadDimensions(
+    nose.SetBodyHeadNeckDimensions(
         bodyWidth, 
         bodyHeight, 
         headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight()
+        headBase.GetFrameHeight(),
+        neckWidth,
+        neckHeight
     );
     nose.Initialise();
     
@@ -220,4 +232,9 @@ void Head::SetBodyNeckDimensions(
 Vector2 Head::GetWorldPosition() const
 {
     return headBase.GetWorldPosition();
+}
+
+float Head::GetEyesYOffset()
+{
+    return pupils.GetEyesYOffset();
 }

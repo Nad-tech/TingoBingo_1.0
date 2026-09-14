@@ -7,11 +7,10 @@ class Ears : public Sprite
      public:
         void Initialise() override;
         void Update(float dt) override;
-        void SetBodyHeadDimensions(
-            float bwidth, 
-            float bHeigh, 
-            float hWidth, 
-            float hHeight
+        void SetBodyHeadNeckDimensions(
+            float bW, float bH, 
+            float hW, float hH, 
+            float nW, float nH 
         );
 
     private:
@@ -22,7 +21,9 @@ class Ears : public Sprite
         float bodyHeight = 0.0f;
         float headWidth = 0.0f;
         float headHeight = 0.0f;
-        
+        float neckHeight;
+        float neckWidth;
+
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0;
 };

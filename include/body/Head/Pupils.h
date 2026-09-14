@@ -60,6 +60,8 @@ public:
         float eyesYOffset
     );
 
+    float GetEyesYOffset();
+    
 private:
     // The two independently rendered pupils.
     Pupil leftPupil;
@@ -81,4 +83,5 @@ private:
     float headWidth = 0.0f;
     float neckWidth;
     float neckHeight;
+    float eyesYOffset;
 };

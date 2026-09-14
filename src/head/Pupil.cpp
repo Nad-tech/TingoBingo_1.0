@@ -93,3 +93,13 @@ void Pupil::SetSide(std::string side)
 {
     this->side = side;
 }
+
+float Pupil::GetSideOffset()
+{
+    return sideOffset;
+}
+
+float Pupil::GetEyesYOffset()
+{
+    return eyesYOffset;
+}

@@ -108,6 +108,8 @@ public:
     );
 
     Vector2 GetWorldPosition() const;
+
+    float GetEyesYOffset();
     
 private:
 

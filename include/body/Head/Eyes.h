@@ -15,6 +15,7 @@ class Eyes : public Sprite
         float GetYOffset();
 
     private:
+        // TODO: make pupils child of Eyes
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0f;
         float headWidth;
