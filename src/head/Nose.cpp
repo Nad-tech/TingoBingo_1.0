@@ -24,6 +24,9 @@
 #include <iostream>
 #include <cmath>
 
+Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 //====================================================
 // Initialise
 //====================================================
@@ -60,10 +63,10 @@ void Nose::Initialise()
     const int ROWS = 1;
 
     // Calculate the dimensions of one animation frame.
-    const int FRAME_WIDTH =
+    dimensions.noseWidth =
         texture.width / COLUMNS;
 
-    const int FRAME_HEIGHT =
+    dimensions.noseHeight =
         texture.height / ROWS;
 
     const int TOTAL_FRAMES =
@@ -74,8 +77,8 @@ void Nose::Initialise()
 
     // Initialise the animation system.
     animation.Initialise(
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.noseWidth,
+        dimensions.noseHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -113,13 +116,13 @@ void Nose::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
+        dimensions.noseWidth / 2.0f,
 
-        FRAME_HEIGHT / 2.0f
-        - bodyHeight / 2.0f
-        - headHeight / 2.0f
+        dimensions.noseHeight / 2.0f
+        - dimensions.bodyHeight / 2.0f
+        - dimensions.headHeight / 2.0f
         + slightPositionOffset
-        - neckHeight
+        - dimensions.neckHeight
     };
 
     // Store the original LOCAL offset.
@@ -256,37 +259,6 @@ void Nose::Update(float dt)
             localPositionOffset.x = homeAnchorPoint.x;
         }
     }
-}
-
-//====================================================
-// Set Body / Head Dimensions
-//====================================================
-//
-// Stores the body and head dimensions used when
-// calculating the nose's position relative to the
-// body/head anchor point.
-//
-// These values are used by Initialise() to calculate
-// localPositionOffset.
-//
-//====================================================
-
-void Nose::SetBodyHeadNeckDimensions(
-    float bW, float bH, 
-    float hW, float hH, 
-    float nW, float nH 
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bW;
-    bodyHeight = bH;
-
-    // Store the supplied head dimensions.
-    headWidth = hW;
-    headHeight = hH;
-
-    neckWidth = nW;
-    neckHeight = nH;
 }
 
 //====================================================

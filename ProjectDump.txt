@@ -336,6 +336,9 @@ class Shoulder : public Sprite
 
         const float SWING_SPEED = 10.0f;
         float swingTime = 0;
+
+        const float SHOULDER_WIDTH = 70.0f;
+        const float SHOULDER_HEIGHT = 70.0f;
 };
 
 
@@ -394,12 +397,13 @@ class UpperArm : public Sprite
 #include "Body/Pelvis.h"
 #include "Body/Head/Head.h"
 #include "Body/Neck.h"
+#include "BodyDimensions.h"
 
 class Body
 {
 public:
 
-    Body();
+    Body(BodyDimensions& dimensions);
 
     void Initialise();
     
@@ -431,7 +435,7 @@ public:
 
     void SwingArm(std::string side, bool swing);
 
-    Vector2 GetHeadWorldPosition() const;
+    Vector2 GetHeadWorldPosition();
 
 private:
     Vector2 anchorPoint;
@@ -487,6 +491,8 @@ private:
     // its idle movement.
     Vector2 homeAnchorPoint;
 
+    BodyDimensions &dimensions;
+
     BodyBase bodyBase;
 
     Neck neck;
@@ -505,15 +511,19 @@ private:
 #pragma once
 
 #include "Sprite.h"
-
+#include "BodyDimensions.h"
 class BodyBase : public Sprite 
 {
     public:
+        BodyBase(BodyDimensions& dimensions);
         void Initialise() override;
         int GetFrame() const;
         void SetRotation(float rotation);
         float GetFrameWidth() const;
         float GetFrameHeight() const;
+    
+    private:
+        BodyDimensions& dimensions;
 };
 
 
@@ -524,24 +534,22 @@ class BodyBase : public Sprite
 #pragma once
 
 #include "Sprite.h"
+#include "BodyDimensions.h"
 
 class Antenna : public Sprite 
 {
     public:
+        Antenna(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
-        void SetBodyHeadDimensions(float bW, float bH, float hW, float hH);
-    
+
     private:
+        BodyDimensions& dimensions;
         float antennaAnimationTimer = 0.0f;
         float nextAntennaAnimation = 3.0f;
 
         Vector2 localPositionOffset = {};
         float topOfHeadOffset = 46.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
-        float headWidth = 0;
-        float headHeight = 0;
 };
 
 
@@ -552,28 +560,21 @@ class Antenna : public Sprite
 #pragma once
 
 #include "Sprite.h"
+#include "BodyDimensions.h"
 
 class Ears : public Sprite
 {
      public:
+        Ears(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
-        void SetBodyHeadDimensions(
-            float bwidth, 
-            float bHeigh, 
-            float hWidth, 
-            float hHeight
-        );
 
     private:
+        BodyDimensions& dimensions;
+
         //Ears-centre translation in local head coordinates.
         Vector2 localPositionOffset = {0, 0};
 
-        float bodyWidth = 0.0f;
-        float bodyHeight = 0.0f;
-        float headWidth = 0.0f;
-        float headHeight = 0.0f;
-        
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0;
 };
@@ -587,29 +588,21 @@ class Ears : public Sprite
 
 #include "Sprite.h"
 #include "Emotion.h"
+#include "BodyDimensions.h"
 
 class Eyebrows : public Sprite
 {
     public:
+        Eyebrows(BodyDimensions& dimensions);
         void Initialise() override;
         void UpdateEyebrows(float dt, bool speaking, Emotion emotion);
-        void SetBodyHeadDimensions(
-            float bwidth, 
-            float bHeigh, 
-            float hWidth, 
-            float hHeight
-        );
-
+       
     private:
+        BodyDimensions& dimensions;
+
         // Eyebrows-centre translation in local head coordinates.
         Vector2 localPositionOffset = {0, 0};
-        float foreheadOffset = 65;
-
-        float bodyWidth = 0.0f;
-        float bodyHeight = 0.0f;
-        float headWidth = 0.0f;
-        float headHeight = 0.0f;
-        
+        float foreheadOffset = 65; 
 
         float happyAnimationTimer = 0.0f;
         float nextHappyAnimation = 3.0f;
@@ -628,24 +621,21 @@ class Eyebrows : public Sprite
 #pragma once
 
 #include "Sprite.h"
+#include "BodyDimensions.h"
 
 class Eyes : public Sprite
 {
     public:
+        Eyes(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
-        void SetHeadDimensions(float width, float height);
-        void SetBodyDimensions(float width, float height);
-        float GetYOffset();
 
     private:
+        BodyDimensions& dimensions;
+
+        // TODO: make pupils child of Eyes
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0f;
-        float headWidth;
-        float headHeight;
-        float bodyWidth;
-        float bodyHeight;
-        Vector2 eyesOffset = {0, 30.0f};
 }; 
 
 
@@ -665,6 +655,7 @@ class Eyes : public Sprite
 #include "Body/Head/Nose.h"
 #include "Body/Head/Pupils.h"
 #include "Emotion.h"
+#include "BodyDimensions.h"
 
 
 //====================================================
@@ -686,7 +677,7 @@ public:
 
     // Initialise the head's transform and idle
     // animation state.
-    Head();
+    Head(BodyDimensions& dimensions);
     
     // Load and release all head component resources.
     void Initialise();
@@ -755,8 +746,6 @@ public:
     // Return the pupils to their forward-facing anchor position.
     void LookForward();
 
-    void SetBodyDimensions(float width, float height);
-
     Vector2 GetWorldPosition() const;
     
 private:
@@ -767,6 +756,8 @@ private:
     // Current visual rotation and scale of the head.
     float rotation;
     float scale;
+
+    BodyDimensions& dimensions;
 
     //================================================
     // Head Components
@@ -784,9 +775,6 @@ private:
     Mouth mouth;
     Nose nose;
     Pupils pupils;
-
-    float bodyWidth;
-    float bodyHeight;
 };
 
 
@@ -797,21 +785,19 @@ private:
 #pragma once
 
 #include "Sprite.h"
+#include "BodyDimensions.h"
 
 class Headbase : public Sprite 
 {
     public:
+        Headbase(BodyDimensions& dimensions);
         void Initialise() override;
         int GetFrame() const;
         void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height);
-        float GetFrameWidth() const;
-        float GetFrameHeight() const;
         Vector2 GetWorldPosition() const;
-
+        
     private:
-        float bodyWidth;
-        float bodyHeight;
+        BodyDimensions& dimensions;
 };
 
 
@@ -823,26 +809,24 @@ class Headbase : public Sprite
 
 #include "Sprite.h"
 #include "Emotion.h"
+#include "BodyDimensions.h"
 
 class Mouth : public Sprite
 {
     public:
+        Mouth(BodyDimensions& dimensions);
         void Initialise() override;
         void UpdateMouth(float dt, bool speaking, Emotion emotion);
-        void SetBodyHeadDimensions(float bW, float bH, float hW, float hH);
-  
+
     private:
+        BodyDimensions& dimensions;
+
         int frame = 0;
         float frameTimer = 0.0f;
         const float FRAME_DURATION = 0.3f;
 
         Vector2 localPositionOffset = {};
         float mouthDisplayOffset = 28.0f;
-
-        float bodyWidth = 0;
-        float bodyHeight = 0;
-        float headWidth = 0;
-        float headHeight = 0;
 };
 
 
@@ -854,29 +838,22 @@ class Mouth : public Sprite
 
 #include "Sprite.h"
 #include "raylib.h"
+#include "BodyDimensions.h"
 
 class Nose : public Sprite
 {
     public:
+        Nose(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void SetBodyHeadDimensions(
-            float bwidth, 
-            float bHeigh, 
-            float hWidth, 
-            float hHeight
-        );
 
     private:
+        BodyDimensions& dimensions;
+
         // Nose-centre translation in local head coordinates.
         Vector2 localPositionOffset = {0, 0};
         float slightPositionOffset = 5.0f;
-
-        float bodyWidth = 0.0f;
-        float bodyHeight = 0.0f;
-        float headWidth = 0.0f;
-        float headHeight = 0.0f;
         
         //Idle
         float localRotation = 0.0f;
@@ -919,16 +896,22 @@ class Pupil : public Sprite
     public:
         void Initialise() override;
         void Update(float dt) override;
-        void SetHeadDimensions(float width, float height);
-        void SetBodyDimensions(float width, float height);
-        void SetEyesYOffset(float yOffset);
+        void SetBodyHeadNeckEyeOffsetDimensions(
+            float bW, float bH, 
+            float hW, float hH,
+            float nW, float nH,
+            float eyesYOffset
+        );
         void SetSide(std::string side);
+        float GetSideOffset();
 
     private:
         float bodyWidth;
         float bodyHeight;
         float headWidth;
         float headHeight;
+        float neckWidth;
+        float neckHeight;
         float eyesYOffset;
         std::string side; // "left" or "right"
         float sideOffset = 40;
@@ -944,6 +927,7 @@ class Pupil : public Sprite
 #include "Body/Head/Pupil.h"
 #include "raylib.h"
 #include "Constants.h"
+#include "BodyDimensions.h"
 
 
 //====================================================
@@ -959,6 +943,7 @@ class Pupil : public Sprite
 class Pupils
 {
 public:
+    Pupils(BodyDimensions& dimensions);
 
     // Load the pupil resources.
     void Initialise();
@@ -993,16 +978,10 @@ public:
     // Return both pupils to their normal forward-facing
     // anchor point.
     void LookForward();
-
-    void SetBodyHeadEyeOffsetDimensions(
-        float bWidth, 
-        float bHeight, 
-        float hWidth, 
-        float hHeight,
-        float eyesYOffset
-    );
-
+    
 private:
+    BodyDimensions& dimensions;
+
     // The two independently rendered pupils.
     Pupil leftPupil;
     Pupil rightPupil;
@@ -1016,11 +995,6 @@ private:
     // Current look offsets applied to each pupil.
     Vector2 leftLookOffset  = {0.0f, 0.0f};
     Vector2 rightLookOffset = {0.0f, 0.0f};
-
-    float bodyHeight = 0.0f;
-    float bodyWidth = 0.0f;
-    float headHeight = 0.0f;
-    float headWidth = 0.0f;
 };
 
 
@@ -1176,24 +1150,24 @@ class Thigh : public Sprite
 #include "Sprite.h"
 
 #include "Emotion.h"
+#include "BodyDimensions.h"
 
 class Neck : public Sprite
 {
     public:
+        Neck(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt, bool speaking, Emotion emotion);
         void Draw() const;
         void SetRotation(float rotation);
-        void SetBodyDimensions(float bW, float bH);
         void SetAnchorPoint(Vector2 anchorPoint);
-        Head& GetHead() const;
+        Head& GetHead();
         void Shutdown();
     
     private:
+        BodyDimensions& dimensions;
         Head head;
         Vector2 localPositionOffset = {};
-        float bodyWidth = 0;
-        float bodyHeight = 0;
 };
 
 
@@ -1224,6 +1198,70 @@ class Pelvis : Sprite
 
     private:
         Legs legs;
+};
+
+
+=====================================
+.\include\BodyDimensions.h
+=====================================
+
+#pragma once
+
+class BodyDimensions
+{
+public:
+    float bodyWidth;
+    float bodyHeight;
+
+    float headWidth;
+    float headHeight;
+
+    float eyesWidth;
+    float eyesHeight;
+
+    float eyesYoffset;
+
+    float antennaWidth;
+    float antennaHeight;
+
+    float earsWidth;
+    float earsHeight;
+
+    float eyeBrowsWidth;
+    float eyeBrowsHeight;
+
+    float mouthWidth;
+    float mouthHeight;
+
+    float noseWidth;
+    float noseHeight;
+
+    float neckWidth;
+    float neckHeight;
+
+    float shoulderWidth;
+    float shoulderHeight;
+
+    float upperArmWidth;
+    float upperArmHeight;
+
+    float forearmWidth;
+    float forearmHeight;
+
+    float handWidth;
+    float handHeight;
+
+    float pelvisWidth;
+    float pelvisHeight;
+
+    float thighWidth;
+    float thighHeight;
+
+    float shinWidth;
+    float shinHeight;
+
+    float footWidth;
+    float footHeight;
 };
 
 
@@ -1287,6 +1325,7 @@ enum class Emotion
 #include "Robot.h"
 #include "Input.h"
 #include "Object.h"
+#include "BodyDimensions.h"
 class Game
 {
 public:
@@ -1302,7 +1341,9 @@ private:
 	void Update(const float dt);
 	void Draw();
 	
+
 	Robot robot;
+	
 	Vector2 robotWorldPos = {
 		SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f
 	};
@@ -1391,6 +1432,7 @@ class Object : public Sprite
 #include "Object.h"
 #include "SfxController.h"
 #include "body/Body.h"
+#include "BodyDimensions.h"
 
 
 //====================================================
@@ -1410,7 +1452,6 @@ public:
 
     // Create the robot and initialise its starting state.
     Robot();
-
 
     // Update the robot's behaviour and visual state.
     void Update(float dt);
@@ -1465,15 +1506,12 @@ public:
 
     void SwingArm(std::string side, bool swinging);
 
-    Vector2 GetHeadWorldPosition() const;
+    Vector2 GetHeadWorldPosition();
 
 private:
 
     // Current world-space anchor point of the robot.
     Vector2 anchorPoint;
-
-    // Controls the robot's behaviour and state.
-    RobotBrain robotBrain;
 
     // True while the robot is currently speaking.
     // The Head uses this to drive mouth/face animation.
@@ -1481,7 +1519,12 @@ private:
 
     SfxController sfxController;
 
+    BodyDimensions dimensions;
+
     Body body;
+
+    // Controls the robot's behaviour and state.
+    RobotBrain robotBrain;
 };
 
 
@@ -1497,6 +1540,7 @@ private:
 #include <vector>
 #include "Object.h"
 #include <string>
+#include "BodyDimensions.h"
 
 class Robot;
 
@@ -1510,7 +1554,7 @@ class RobotBrain
             Reacting
         };
 
-        RobotBrain(Robot& robot);
+        RobotBrain(Robot& robot, BodyDimensions& dimensions);
 
         void Update(float dt);
 
@@ -1537,6 +1581,8 @@ class RobotBrain
                         
         void SwingArm(std::string side, bool swinging);
 
+        void Draw() const;
+
     private:
         Robot& robot;
         State state;
@@ -1556,6 +1602,8 @@ class RobotBrain
         Object* targetObject;
         Object* detectedObject;
         float detectedTimer = 0.0f;
+
+        BodyDimensions& dimensions;
 };
 
 
@@ -2173,14 +2221,15 @@ void Shoulder::Initialise()
     if(side == "left")
     {
         localPositionOffset = {
-            bodyWidth / 2 + FRAME_WIDTH,
-            -bodyHeight / 2
+            (bodyWidth / 2.0f) + SHOULDER_WIDTH / 2.0f,
+            -bodyHeight / 2.0f
+
         }; 
     }
     else if(side == "right")
     {
         localPositionOffset = {
-            -bodyWidth / 2.0f,
+            (-bodyWidth / 2.0f) - SHOULDER_WIDTH / 2.0f,
             -bodyHeight / 2.0f
         }; 
     }
@@ -2216,107 +2265,42 @@ void Shoulder::SetBodyDimensions(float width, float height, std::string side)
 
 void Shoulder::Draw() const
 {
-    // Get the current animation frame.
-    Rectangle source = animation.GetSourceRectangle();
-
-    // Calculate the scaled dimensions of the arm.
-    float width = animation.GetFrameWidth() * scale;
-    float height = animation.GetFrameHeight() * scale;
-
-    //================================================
-    // Parent Transform
-    //================================================
-    //
-    // localPositionOffset represents the arm's local
-    // position relative to the body anchor point.
-    //
-    // Rotate this local offset around the body anchor
-    // so the arm follows the body's rotation.
-    //
     Vector2 offset = localPositionOffset;
 
-    // Raylib rotation values are measured in degrees,
-    // while sinf() and cosf() require radians.
     float radians = rotation * DEG2RAD;
 
-    // Rotate the arm's local offset around the
-    // body anchor point.
     Vector2 rotatedOffset =
     {
-        offset.x * cosf(radians) - offset.y * sinf(radians),
-        offset.x * sinf(radians) + offset.y * cosf(radians)
+        (offset.x * cosf(radians) - offset.y * sinf(radians))*scale,
+        (offset.x * sinf(radians) + offset.y * cosf(radians))*scale
     };
 
-    //================================================
-    // Shoulder World Position
-    //================================================
-    //
-    // Add the rotated local offset to the body's
-    // world-space anchor point.
-    //
-    // The arm anchor point is attached to the body
-    // at the shoulder and follows the body's rotation.
-    //
     Vector2 armAnchorPosition =
     {
-        anchorPoint.x + rotatedOffset.x * scale,
-        anchorPoint.y + rotatedOffset.y * scale
+        anchorPoint.x + rotatedOffset.x,
+        anchorPoint.y + rotatedOffset.y
     };
 
-    //================================================
-    // Shoulder Destination
-    //================================================
-    //
-    // Position the shoulder sprite using its anchor point.
-    //
-    // The anchor point is at the top-centre of the
-    // shoulder sprite, where the shoulder attaches to the body.
-    //
-    Rectangle destination =
+    Rectangle shoulder =
     {
-        armAnchorPosition.x - width / 2.0f,
+        armAnchorPosition.x,
         armAnchorPosition.y,
-        width,
-        height
+        SHOULDER_WIDTH * scale,
+        SHOULDER_HEIGHT * scale
     };
-
-    //================================================
-    // Local Rotation Pivot
-    //================================================
-    //
-    // Set the rotation origin to the top-centre of the shoulder.
-    //
-    // This is the point where the shoulder attaches to the
-    // body, allowing the shoulder to rotate
-    // around the shoulder aattachment point rather than its centre.
-    //
+    
     Vector2 origin =
-    {
-        width / 2.0f,
-        0
-    };
+        {
+            SHOULDER_WIDTH * scale / 2.0f,
+            0
+        };
 
-    //================================================
-    // Draw
-    //================================================
-    //
-    // rotation:
-    //     Rotation inherited from the body.
-    //
-    // localRotation:
-    //     Independent rotation of the shoulder.
-    //
-    // Adding the two rotations allows the shoulder to
-    // follow the body while also rotating independently.
-    //
-    /*DrawTexturePro(
-        texture,
-        source,
-        destination,
+    DrawRectanglePro(
+        shoulder,
         origin,
         rotation + localRotation,
-        WHITE
-    );*/
+        BROWN
+    );
 }
 
 void Shoulder::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
@@ -2575,7 +2559,7 @@ void UpperArm::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
 #include "Emotion.h"
 
 // Initialise the body's transform and idle animation state.
-Body::Body() :
+Body::Body(BodyDimensions& dimensions) :
     rotation(0.0f),
     scale(0.0f),
 
@@ -2593,7 +2577,10 @@ Body::Body() :
     randomBodyBobSignTimer((float)GetRandomValue(5, 10)),
     bodyBobRadiusX(GetRandomValue(3, 8)),
     bodyBobRadiusY(GetRandomValue(2, 6)),
-    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f)
+    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f), 
+    dimensions(dimensions), 
+    bodyBase(dimensions),
+    neck(dimensions)
 {
 }
 
@@ -2601,14 +2588,6 @@ Body::Body() :
 void Body::Initialise()
 {
     bodyBase.Initialise();
-    
-    //neck.SetBodyDimensions() must be called before head.Initialise() 
-    // so that the head can anchor itself correctly relative to the body
-    //The same for arms and legs
-    neck.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight()
-    );
     neck.Initialise();
     
     arms.SetBodyDimensions(
@@ -2646,11 +2625,13 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    arms.Draw();
+    
     
     pelvis.Draw();
     
     bodyBase.Draw();
+
+arms.Draw();
 
     neck.Draw();
 }
@@ -2774,7 +2755,7 @@ void Body::SwingArm(std::string side,  bool swing)
     arms.SwingArm(side, swing);
 }
 
-Vector2 Body::GetHeadWorldPosition() const
+Vector2 Body::GetHeadWorldPosition()
 {
     return neck.GetHead().GetWorldPosition();
 }
@@ -2788,6 +2769,11 @@ Vector2 Body::GetHeadWorldPosition() const
 
 #include "Constants.h"
 
+BodyBase::BodyBase(BodyDimensions& dimensions) : 
+            dimensions(dimensions)
+{
+}
+
 // Load the head sprite and initialise its animation.
 void BodyBase::Initialise()
 {
@@ -2798,8 +2784,8 @@ void BodyBase::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.bodyWidth = texture.width / COLUMNS;
+    dimensions.bodyHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -2810,8 +2796,8 @@ void BodyBase::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.bodyWidth,
+        dimensions.bodyHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -2820,7 +2806,10 @@ void BodyBase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    anchorOffset = {FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f};
+    anchorOffset = {
+        dimensions.bodyWidth / 2.0f, 
+        dimensions.bodyHeight / 2.0f
+    };
 }
 
 // Return the current head animation frame.
@@ -3031,15 +3020,83 @@ void Thigh::SetBodyDimensions(float width, float height, const std::string& side
 =====================================
 
 #include "Body/Neck.h"
+#include "raylib.h"
 
-void Neck::Initialise(){}
-void Neck::Update(float dt, bool speaking, Emotion emotion){}
-void Neck::Draw() const{}
-void Neck::SetRotation(float rotation){}
-void Neck::SetBodyDimensions(float bW, float bH){}
-void Neck::SetAnchorPoint(Vector2 anchorPoint){}
-Head& Neck::GetHead() const{}
-void Neck::Shutdown(){}
+Neck::Neck(BodyDimensions& dimensions) : 
+    dimensions(dimensions),
+    head(dimensions)
+{
+}
+
+void Neck::Initialise() 
+{
+    dimensions.neckWidth = 50.0f;
+    dimensions.neckHeight = 30.0f;
+
+    head.Initialise();
+
+    rotation = 0.0f;
+    scale = SCALE;
+
+    anchorOffset = {
+        0, 
+        -dimensions.bodyHeight / 2.0f - 
+        dimensions.neckHeight / 2.0f
+    };
+}
+
+void Neck::Update(float dt, bool speaking, Emotion emotion) {
+    head.Update(dt, speaking, emotion);
+    Sprite::Update(dt);
+}
+
+void Neck::Draw() const
+{
+    Rectangle neck =
+    {
+        anchorPoint.x,
+        anchorPoint.y,
+        dimensions.neckWidth * scale,
+        dimensions.neckHeight * scale
+    };
+
+    Vector2 drawAnchorOffset = {
+        dimensions.neckWidth * scale / 2.0f - anchorOffset.x * scale,
+        dimensions.neckHeight * scale / 2.0f - anchorOffset.y * scale
+    };
+
+    DrawRectanglePro(
+        neck,
+        drawAnchorOffset,
+        rotation,
+        BROWN
+    );
+
+    head.Draw();
+}
+
+void Neck::SetRotation(float rotation)
+{
+    this->rotation = rotation;
+    head.SetRotation(rotation);
+}
+
+void Neck::SetAnchorPoint(Vector2 anchorPoint)
+{
+    this->anchorPoint = anchorPoint;
+
+    head.SetAnchorPoint(anchorPoint);
+}
+
+Head& Neck::GetHead()
+{
+    return head;
+}
+
+void Neck::Shutdown()
+{
+    head.Shutdown();
+}
 
 
 =====================================
@@ -3245,6 +3302,9 @@ void Game::Run()
 #include "Constants.h"
 #include "Animation.h"
 
+Antenna::Antenna(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 void Antenna::Initialise()
 {
     // Load the antenna sprite sheet.
@@ -3255,8 +3315,8 @@ void Antenna::Initialise()
     const int ROWS = 2;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.antennaWidth = texture.width / COLUMNS;
+    dimensions.antennaHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -3267,8 +3327,8 @@ void Antenna::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.antennaWidth,
+        dimensions.antennaHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -3279,10 +3339,11 @@ void Antenna::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
+        dimensions.antennaWidth / 2.0f,
+        dimensions.antennaHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
         + topOfHeadOffset
     };
 
@@ -3306,14 +3367,6 @@ void Antenna::Update(float dt)
     }
 }
 
-void Antenna::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
-{
-    bodyWidth = bW;
-    bodyHeight = bH;
-    headWidth = hW;
-    headHeight = hH;
-}
-
 
 =====================================
 .\src\head\Ears.cpp
@@ -3330,6 +3383,9 @@ void Antenna::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
 #include "Body/Head/Ears.h"
 #include "Constants.h"
 
+Ears::Ears(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 void Ears::Initialise()
 {
     // Load the ear sprite sheet.
@@ -3340,8 +3396,8 @@ void Ears::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.earsWidth = texture.width / COLUMNS;
+    dimensions.earsHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -3352,8 +3408,8 @@ void Ears::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.earsWidth,
+        dimensions.earsHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -3364,10 +3420,11 @@ void Ears::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
+        dimensions.earsWidth / 2.0f,
+        dimensions.earsHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
     };
 
     anchorOffset = localPositionOffset;
@@ -3390,22 +3447,6 @@ void Ears::Update(float dt)
     }
 }
 
-void Ears::SetBodyHeadDimensions(
-    float bwidth,
-    float bHeight,
-    float hWidth,
-    float hHeight
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bwidth;
-    bodyHeight = bHeight;
-
-    // Store the supplied head dimensions.
-    headWidth = hWidth;
-    headHeight = hHeight;
-}
-
 
 =====================================
 .\src\head\Eyebrows.cpp
@@ -3423,6 +3464,9 @@ void Ears::SetBodyHeadDimensions(
 #include "Emotion.h"
 #include "Animation.h"
 
+Eyebrows::Eyebrows(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 void Eyebrows::Initialise()
 {
     // Load the eyebrow sprite sheet.
@@ -3433,8 +3477,8 @@ void Eyebrows::Initialise()
     const int ROWS = 1;
 
     // Determine the dimensions of each frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.eyeBrowsWidth = texture.width / COLUMNS;
+    dimensions.eyeBrowsHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -3445,8 +3489,8 @@ void Eyebrows::Initialise()
     // Create the animation from the sprite sheet.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.eyeBrowsWidth,
+        dimensions.eyeBrowsHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -3458,11 +3502,12 @@ void Eyebrows::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
+        dimensions.eyeBrowsWidth / 2.0f,
 
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
+        dimensions.eyeBrowsHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
         + foreheadOffset
     };
 
@@ -3538,22 +3583,6 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
     }
 }
 
-void Eyebrows::SetBodyHeadDimensions(
-    float bwidth,
-    float bHeight,
-    float hWidth,
-    float hHeight
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bwidth;
-    bodyHeight = bHeight;
-
-    // Store the supplied head dimensions.
-    headWidth = hWidth;
-    headHeight = hHeight;
-}
-
 
 =====================================
 .\src\head\Eyes.cpp
@@ -3571,6 +3600,10 @@ void Eyebrows::SetBodyHeadDimensions(
 #include "Body/Head/Eyes.h"
 #include "Constants.h"
 
+Eyes::Eyes(BodyDimensions& dimensions) : dimensions(dimensions)
+{
+}
+
 void Eyes::Initialise()
 {
     // Load the eye sprite sheet.
@@ -3581,8 +3614,10 @@ void Eyes::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.eyesWidth = texture.width / COLUMNS;
+    dimensions.eyesHeight = texture.height / ROWS;
+
+    dimensions.eyesYoffset = 30.0f;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -3593,8 +3628,8 @@ void Eyes::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.eyesWidth,
+        dimensions.eyesHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -3604,11 +3639,12 @@ void Eyes::Initialise()
     scale = SCALE;
 
     anchorOffset = {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f + 
-        bodyHeight / 2.0f + 
-        headHeight / 2.0f + 
-        eyesOffset.y
+        dimensions.eyesWidth / 2.0f,
+        dimensions.eyesHeight / 2.0f + 
+        dimensions.bodyHeight / 2.0f + 
+        dimensions.headHeight / 2.0f + 
+        dimensions.neckHeight +
+        dimensions.eyesYoffset
     };
 }
 
@@ -3627,23 +3663,6 @@ void Eyes::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
-}
-
-void Eyes::SetHeadDimensions(float width, float height)
-{
-    headWidth = width;
-    headHeight = height;
-}
-
-void Eyes::SetBodyDimensions(float width, float height)
-{
-    bodyWidth = width;
-    bodyHeight = height;
-}
-
-float Eyes::GetYOffset()
-{
-    return eyesOffset.y;
 }
 
 
@@ -3670,12 +3689,21 @@ float Eyes::GetYOffset()
 #include <cmath>
 #include "Emotion.h"
 
+//TODO adjust all features of head with repect to neck
+
 // Initialise the head's transform and idle animation state.
-Head::Head() :
+Head::Head(BodyDimensions& dimensions) :
     rotation(0.0f),
     scale(0.0f),
-    bodyWidth(0.0f),
-    bodyHeight(0.0f)
+    dimensions(dimensions),
+    headBase(dimensions),
+    eyes(dimensions),
+    antenna(dimensions),
+    ears(dimensions),
+    eyebrows(dimensions),
+    mouth(dimensions),
+    nose(dimensions),
+    pupils(dimensions)
 {
 }
 
@@ -3683,67 +3711,12 @@ Head::Head() :
 void Head::Initialise()
 {
     headBase.Initialise();
-    
-    antenna.SetBodyHeadDimensions(
-        bodyWidth,
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
-    );
     antenna.Initialise();
-    
-    ears.SetBodyHeadDimensions(
-        bodyWidth,
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
-    );
     ears.Initialise();
-    
-    eyebrows.SetBodyHeadDimensions(
-        bodyWidth,
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
-    );
     eyebrows.Initialise();
-    
-    // Set the head dimensions for the eyes so they can anchor correctly.
-    //themselves correctly relative to the head base.
-    //This must be done before eyes.Initialise() is called.
-    eyes.SetHeadDimensions(
-        headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight()
-    );
-    eyes.SetBodyDimensions(
-        bodyWidth, 
-        bodyHeight
-    );
     eyes.Initialise();
-    
-    mouth.SetBodyHeadDimensions(
-        bodyWidth, 
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight()
-    );
     mouth.Initialise();
-    
-    nose.SetBodyHeadDimensions(
-        bodyWidth, 
-        bodyHeight, 
-        headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight()
-    );
     nose.Initialise();
-    
-    pupils.SetBodyHeadEyeOffsetDimensions(
-        bodyWidth, 
-        bodyHeight, 
-        headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight(),
-        eyes.GetYOffset()
-    );
     pupils.Initialise();
 }
 
@@ -3848,14 +3821,6 @@ void Head::LookForward()
     pupils.LookForward();
 }
 
-void Head::SetBodyDimensions(float width, float height)
-{
-    bodyWidth = width;
-    bodyHeight = height;
-
-    headBase.SetBodyDimensions(width, height);
-}
-
 Vector2 Head::GetWorldPosition() const
 {
     return headBase.GetWorldPosition();
@@ -3880,6 +3845,9 @@ Vector2 Head::GetWorldPosition() const
 #include "Constants.h"
 #include "raylib.h"
 
+Headbase::Headbase(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 // Load the head sprite and initialise its animation.
 void Headbase::Initialise()
 {
@@ -3890,8 +3858,8 @@ void Headbase::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.headWidth = texture.width / COLUMNS;
+    dimensions.headHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -3902,8 +3870,8 @@ void Headbase::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.headWidth,
+        dimensions.headHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -3913,9 +3881,10 @@ void Headbase::Initialise()
     scale = SCALE;
 
     anchorOffset = {
-        FRAME_WIDTH / 2.0f, 
-        (FRAME_HEIGHT / 1.0f) + 
-        (bodyHeight / 2.0f)
+        dimensions.headWidth / 2.0f, 
+        dimensions.headHeight + 
+        (dimensions.bodyHeight / 2.0f) +
+        (dimensions.neckHeight)
     };
 }
 
@@ -3931,29 +3900,14 @@ void Headbase::SetRotation(float rotation)
     Sprite::SetRotation(rotation);
 }
 
-void Headbase::SetBodyDimensions(float width, float height)
-{
-    bodyWidth = width;
-    bodyHeight = height;
-}
-
-float Headbase::GetFrameWidth() const
-{
-    return animation.GetFrameWidth();
-}
-
-float Headbase::GetFrameHeight() const
-{
-    return animation.GetFrameHeight();
-}
-
 Vector2 Headbase::GetWorldPosition() const
 {
    return {
     anchorPoint.x, 
     anchorPoint.y - 
-    (bodyHeight / 2.0f) * SCALE -
-    (animation.GetFrameHeight() / 2) * SCALE
+    (dimensions.bodyHeight / 2.0f) * SCALE -
+    (animation.GetFrameHeight() / 2) * SCALE -
+    dimensions.neckHeight * SCALE
    }; 
 }
 
@@ -3974,6 +3928,9 @@ Vector2 Headbase::GetWorldPosition() const
 #include "Constants.h"
 #include "Emotion.h"
 
+Mouth::Mouth(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 // Load the mouth sprite sheet and initialise its animation.
 void Mouth::Initialise()
 {
@@ -3984,8 +3941,8 @@ void Mouth::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.mouthWidth = texture.width / COLUMNS;
+    dimensions.mouthHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -3995,8 +3952,8 @@ void Mouth::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.mouthWidth,
+        dimensions.mouthHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -4007,10 +3964,11 @@ void Mouth::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
+        dimensions.mouthWidth / 2.0f,
+        dimensions.mouthHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
         + mouthDisplayOffset
     };
 
@@ -4049,14 +4007,6 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
     }
 }
 
-void Mouth::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
-{
-    bodyWidth = bW;
-    bodyHeight = bH;
-    headWidth = hW;
-    headHeight = hH;
-}
-
 
 =====================================
 .\src\head\Nose.cpp
@@ -4087,6 +4037,9 @@ void Mouth::SetBodyHeadDimensions(float bW, float bH, float hW, float hH)
 #include "Constants.h"
 #include <iostream>
 #include <cmath>
+
+Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
 
 //====================================================
 // Initialise
@@ -4124,10 +4077,10 @@ void Nose::Initialise()
     const int ROWS = 1;
 
     // Calculate the dimensions of one animation frame.
-    const int FRAME_WIDTH =
+    dimensions.noseWidth =
         texture.width / COLUMNS;
 
-    const int FRAME_HEIGHT =
+    dimensions.noseHeight =
         texture.height / ROWS;
 
     const int TOTAL_FRAMES =
@@ -4138,8 +4091,8 @@ void Nose::Initialise()
 
     // Initialise the animation system.
     animation.Initialise(
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.noseWidth,
+        dimensions.noseHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -4177,12 +4130,13 @@ void Nose::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
+        dimensions.noseWidth / 2.0f,
 
-        FRAME_HEIGHT / 2.0f
-        - bodyHeight / 2.0f
-        - headHeight / 2.0f
+        dimensions.noseHeight / 2.0f
+        - dimensions.bodyHeight / 2.0f
+        - dimensions.headHeight / 2.0f
         + slightPositionOffset
+        - dimensions.neckHeight
     };
 
     // Store the original LOCAL offset.
@@ -4319,35 +4273,6 @@ void Nose::Update(float dt)
             localPositionOffset.x = homeAnchorPoint.x;
         }
     }
-}
-
-//====================================================
-// Set Body / Head Dimensions
-//====================================================
-//
-// Stores the body and head dimensions used when
-// calculating the nose's position relative to the
-// body/head anchor point.
-//
-// These values are used by Initialise() to calculate
-// localPositionOffset.
-//
-//====================================================
-
-void Nose::SetBodyHeadDimensions(
-    float bwidth,
-    float bHeight,
-    float hWidth,
-    float hHeight
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bwidth;
-    bodyHeight = bHeight;
-
-    // Store the supplied head dimensions.
-    headWidth = hWidth;
-    headHeight = hHeight;
 }
 
 //====================================================
@@ -4553,6 +4478,7 @@ void Pupil::Initialise()
             FRAME_HEIGHT / 2.0f + 
             bodyHeight / 2.0f + 
             headHeight / 2.0f +
+            neckHeight +
             eyesYOffset
         };
     }
@@ -4563,6 +4489,7 @@ void Pupil::Initialise()
             FRAME_HEIGHT / 2.0f + 
             bodyHeight / 2.0f + 
             headHeight / 2.0f +
+            neckHeight +
             eyesYOffset
         };
     }
@@ -4574,26 +4501,30 @@ void Pupil::Update(float dt)
     Sprite::Update(dt);
 }
 
-void Pupil::SetBodyDimensions(float width, float height)
+void Pupil::SetBodyHeadNeckEyeOffsetDimensions(
+            float bW, float bH, 
+            float hW, float hH,
+            float nW, float nH,
+            float eyesYOffset
+     )
 {
-    bodyWidth = width;
-    bodyHeight = height;
-}
-
-void Pupil::SetHeadDimensions(float width, float height)
-{
-    headWidth = width;
-    headHeight = height;
-}
-
-void Pupil::SetEyesYOffset(float yOffset)
-{
-    eyesYOffset = yOffset;
+    bodyWidth = bW;
+    bodyHeight = bH;
+    headWidth = hW;
+    headHeight = hH;
+    neckWidth = nW;
+    neckHeight = nH;
+    this->eyesYOffset = eyesYOffset; 
 }
 
 void Pupil::SetSide(std::string side)
 {
     this->side = side;
+}
+
+float Pupil::GetSideOffset()
+{
+    return sideOffset;
 }
 
 
@@ -4615,6 +4546,11 @@ void Pupil::SetSide(std::string side)
 #include "raylib.h"
 #include "cmath"
 #include "raymath.h"
+
+Vector2 L;
+
+Pupils::Pupils(BodyDimensions& BodyDimensions) : dimensions(dimensions)
+{}
 
 // Initialise both pupil sprites.
 void Pupils::Initialise()
@@ -4645,6 +4581,7 @@ void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
+    //DrawCircle(L.x, L.y, 10, RED);
 }
 
 // Set both pupil anchor points relative to the head.
@@ -4708,15 +4645,26 @@ void Pupils::LookAt(Vector2 point)
 {
     Vector2 leftEyeCentre =
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y - bodyHeight / 2 - headHeight / 2
+        headAnchorPoint.x + leftPupil.GetSideOffset() * SCALE,
+        headAnchorPoint.y -
+        (dimensions.bodyHeight / 2 
+        + dimensions.headHeight / 2 
+        + dimensions.neckHeight 
+        + dimensions.eyesYoffset) * SCALE
+
     };
 
     Vector2 rightEyeCentre =
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y - bodyHeight / 2 - headHeight / 2
+        headAnchorPoint.x - rightPupil.GetSideOffset() * SCALE,
+        headAnchorPoint.y -  
+        (dimensions.bodyHeight / 2 
+        + dimensions.headHeight / 2 
+        + dimensions.neckHeight 
+        + dimensions.eyesYoffset) * SCALE
     };
+
+    L = rightEyeCentre;
 
     // Calculate the direction from each eye to the target.
     Vector2 leftDirection =
@@ -4764,26 +4712,6 @@ void Pupils::LookForward()
         headAnchorPoint.x,
         headAnchorPoint.y
     });
-}
-
-void Pupils::SetBodyHeadEyeOffsetDimensions(
-    float bWidth, 
-    float bHeight, 
-    float hWidth, 
-    float hHeight,
-    float eyesYOffset
-)
-{
-    bodyWidth = bWidth;
-    bodyHeight = bHeight;
-    headWidth = hWidth;
-    headHeight = hHeight;
-    leftPupil.SetBodyDimensions(bWidth, bHeight);
-    rightPupil.SetBodyDimensions(bWidth, bHeight);
-    leftPupil.SetHeadDimensions(hWidth, hHeight);
-    rightPupil.SetHeadDimensions(hWidth, hHeight);
-    leftPupil.SetEyesYOffset(eyesYOffset);
-    rightPupil.SetEyesYOffset(eyesYOffset);
 }
 
 
@@ -5657,7 +5585,11 @@ std::string Object::GetName()
 #include "SfxController.h"
 
 // Initialise the robot's brain 
-Robot::Robot() : robotBrain(*this){}
+Robot::Robot() : 
+    dimensions(),
+    body(dimensions),
+    robotBrain(*this, dimensions)
+{}
 
 // Initialise the robot's head and place it at the
 // robot's starting anchor point.
@@ -5721,6 +5653,7 @@ Vector2 Robot::GetHeadAnchorPoint()
 void Robot::Draw() const
 {
     body.Draw();
+    robotBrain.Draw();
 }
 
 // Release the resources owned by the robot's head.
@@ -5787,7 +5720,7 @@ void Robot::SwingArm(std::string side, bool swinging)
     body.SwingArm(side, swinging);
 }
 
-Vector2 Robot::GetHeadWorldPosition() const
+Vector2 Robot::GetHeadWorldPosition()
 {
     return body.GetHeadWorldPosition();
 }
@@ -5875,13 +5808,17 @@ Vector2 Robot::GetHeadWorldPosition() const
 #include "Emotion.h"
 #include <cmath>
 #include <iostream>
+#include "BodyDimensions.h"
 
-RobotBrain::RobotBrain(Robot& robot)
+Vector2 P;
+
+RobotBrain::RobotBrain(Robot& robot, BodyDimensions& dimensions)
     : robot(robot),
       state(State::Idle),
       emotion(Emotion::Neutral),
       targetObject(nullptr),
-      detectedObject(nullptr)
+      detectedObject(nullptr),
+      dimensions(dimensions)
 {
 }
 
@@ -6226,6 +6163,7 @@ void RobotBrain::Update(float dt)
             robot.LookAt(targetObject->GetAnchorPoint());
             SetState(State::Reacting);
 
+            P = targetObject->GetAnchorPoint();
 
             // ------------------------------------------------
             // Ball and banana are currently recognised as
@@ -6575,6 +6513,7 @@ void RobotBrain::Search(float dt)
     // --------------------------------------------------------
 
     searchRayOrigin = robot.GetHeadWorldPosition();
+    searchRayOrigin.y = robot.GetHeadWorldPosition().y - dimensions.eyesYoffset * SCALE;
 
 
     // --------------------------------------------------------
@@ -6948,6 +6887,10 @@ Object* RobotBrain::DetectCollision(
 void RobotBrain::SwingArm(std::string side, bool swinging)
 {
     robot.SwingArm(side, swinging);
+}
+
+void RobotBrain::Draw() const {
+    //DrawCircle(P.x,P.y,10,BLUE);
 }
 
 

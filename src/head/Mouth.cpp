@@ -10,6 +10,9 @@
 #include "Constants.h"
 #include "Emotion.h"
 
+Mouth::Mouth(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 // Load the mouth sprite sheet and initialise its animation.
 void Mouth::Initialise()
 {
@@ -20,8 +23,8 @@ void Mouth::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.mouthWidth = texture.width / COLUMNS;
+    dimensions.mouthHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -31,8 +34,8 @@ void Mouth::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.mouthWidth,
+        dimensions.mouthHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -43,11 +46,11 @@ void Mouth::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
-        + neckHeight
+        dimensions.mouthWidth / 2.0f,
+        dimensions.mouthHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
         + mouthDisplayOffset
     };
 
@@ -84,22 +87,4 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
     }
-}
-
-void Mouth::SetBodyHeadNeckDimensions(
-    float bW, float bH, 
-    float hW, float hH, 
-    float nW, float nH 
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bW;
-    bodyHeight = bH;
-
-    // Store the supplied head dimensions.
-    headWidth = hW;
-    headHeight = hH;
-
-    neckWidth = nW;
-    neckHeight = nH;
 }

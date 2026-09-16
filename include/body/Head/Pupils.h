@@ -3,6 +3,7 @@
 #include "Body/Head/Pupil.h"
 #include "raylib.h"
 #include "Constants.h"
+#include "BodyDimensions.h"
 
 
 //====================================================
@@ -18,6 +19,7 @@
 class Pupils
 {
 public:
+    Pupils(BodyDimensions& dimensions);
 
     // Load the pupil resources.
     void Initialise();
@@ -52,17 +54,10 @@ public:
     // Return both pupils to their normal forward-facing
     // anchor point.
     void LookForward();
-
-    void SetBodyHeadNeckEyeOffsetDimensions(
-        float bW, float bH, 
-        float hW, float hH,
-        float nW, float nH,
-        float eyesYOffset
-    );
-
-    float GetEyesYOffset();
     
 private:
+    BodyDimensions& dimensions;
+
     // The two independently rendered pupils.
     Pupil leftPupil;
     Pupil rightPupil;
@@ -76,12 +71,4 @@ private:
     // Current look offsets applied to each pupil.
     Vector2 leftLookOffset  = {0.0f, 0.0f};
     Vector2 rightLookOffset = {0.0f, 0.0f};
-
-    float bodyHeight = 0.0f;
-    float bodyWidth = 0.0f;
-    float headHeight = 0.0f;
-    float headWidth = 0.0f;
-    float neckWidth;
-    float neckHeight;
-    float eyesYOffset;
 };

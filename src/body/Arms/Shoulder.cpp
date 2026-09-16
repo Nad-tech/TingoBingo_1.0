@@ -41,14 +41,15 @@ void Shoulder::Initialise()
     if(side == "left")
     {
         localPositionOffset = {
-            bodyWidth / 2 + FRAME_WIDTH,
-            -bodyHeight / 2
+            (bodyWidth / 2.0f) + SHOULDER_WIDTH / 2.0f,
+            -bodyHeight / 2.0f
+
         }; 
     }
     else if(side == "right")
     {
         localPositionOffset = {
-            -bodyWidth / 2.0f,
+            (-bodyWidth / 2.0f) - SHOULDER_WIDTH / 2.0f,
             -bodyHeight / 2.0f
         }; 
     }
@@ -84,107 +85,42 @@ void Shoulder::SetBodyDimensions(float width, float height, std::string side)
 
 void Shoulder::Draw() const
 {
-    // Get the current animation frame.
-    Rectangle source = animation.GetSourceRectangle();
-
-    // Calculate the scaled dimensions of the arm.
-    float width = animation.GetFrameWidth() * scale;
-    float height = animation.GetFrameHeight() * scale;
-
-    //================================================
-    // Parent Transform
-    //================================================
-    //
-    // localPositionOffset represents the arm's local
-    // position relative to the body anchor point.
-    //
-    // Rotate this local offset around the body anchor
-    // so the arm follows the body's rotation.
-    //
     Vector2 offset = localPositionOffset;
 
-    // Raylib rotation values are measured in degrees,
-    // while sinf() and cosf() require radians.
     float radians = rotation * DEG2RAD;
 
-    // Rotate the arm's local offset around the
-    // body anchor point.
     Vector2 rotatedOffset =
     {
-        offset.x * cosf(radians) - offset.y * sinf(radians),
-        offset.x * sinf(radians) + offset.y * cosf(radians)
+        (offset.x * cosf(radians) - offset.y * sinf(radians))*scale,
+        (offset.x * sinf(radians) + offset.y * cosf(radians))*scale
     };
 
-    //================================================
-    // Shoulder World Position
-    //================================================
-    //
-    // Add the rotated local offset to the body's
-    // world-space anchor point.
-    //
-    // The arm anchor point is attached to the body
-    // at the shoulder and follows the body's rotation.
-    //
     Vector2 armAnchorPosition =
     {
-        anchorPoint.x + rotatedOffset.x * scale,
-        anchorPoint.y + rotatedOffset.y * scale
+        anchorPoint.x + rotatedOffset.x,
+        anchorPoint.y + rotatedOffset.y
     };
 
-    //================================================
-    // Shoulder Destination
-    //================================================
-    //
-    // Position the shoulder sprite using its anchor point.
-    //
-    // The anchor point is at the top-centre of the
-    // shoulder sprite, where the shoulder attaches to the body.
-    //
-    Rectangle destination =
+    Rectangle shoulder =
     {
-        armAnchorPosition.x - width / 2.0f,
+        armAnchorPosition.x,
         armAnchorPosition.y,
-        width,
-        height
+        SHOULDER_WIDTH * scale,
+        SHOULDER_HEIGHT * scale
     };
-
-    //================================================
-    // Local Rotation Pivot
-    //================================================
-    //
-    // Set the rotation origin to the top-centre of the shoulder.
-    //
-    // This is the point where the shoulder attaches to the
-    // body, allowing the shoulder to rotate
-    // around the shoulder aattachment point rather than its centre.
-    //
+    
     Vector2 origin =
-    {
-        width / 2.0f,
-        0
-    };
+        {
+            SHOULDER_WIDTH * scale / 2.0f,
+            0
+        };
 
-    //================================================
-    // Draw
-    //================================================
-    //
-    // rotation:
-    //     Rotation inherited from the body.
-    //
-    // localRotation:
-    //     Independent rotation of the shoulder.
-    //
-    // Adding the two rotations allows the shoulder to
-    // follow the body while also rotating independently.
-    //
-    /*DrawTexturePro(
-        texture,
-        source,
-        destination,
+    DrawRectanglePro(
+        shoulder,
         origin,
         rotation + localRotation,
-        WHITE
-    );*/
+        BROWN
+    );
 }
 
 void Shoulder::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)

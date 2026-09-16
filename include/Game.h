@@ -3,6 +3,7 @@
 #include "Robot.h"
 #include "Input.h"
 #include "Object.h"
+#include "BodyDimensions.h"
 class Game
 {
 public:
@@ -18,7 +19,9 @@ private:
 	void Update(const float dt);
 	void Draw();
 	
+
 	Robot robot;
+	
 	Vector2 robotWorldPos = {
 		SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f
 	};

@@ -10,6 +10,10 @@
 #include "Body/Head/Eyes.h"
 #include "Constants.h"
 
+Eyes::Eyes(BodyDimensions& dimensions) : dimensions(dimensions)
+{
+}
+
 void Eyes::Initialise()
 {
     // Load the eye sprite sheet.
@@ -20,8 +24,10 @@ void Eyes::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.eyesWidth = texture.width / COLUMNS;
+    dimensions.eyesHeight = texture.height / ROWS;
+
+    dimensions.eyesYoffset = 30.0f;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -32,8 +38,8 @@ void Eyes::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.eyesWidth,
+        dimensions.eyesHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -43,12 +49,12 @@ void Eyes::Initialise()
     scale = SCALE;
 
     anchorOffset = {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f + 
-        bodyHeight / 2.0f + 
-        headHeight / 2.0f + 
-        neckHeight +
-        eyesOffset.y
+        dimensions.eyesWidth / 2.0f,
+        dimensions.eyesHeight / 2.0f + 
+        dimensions.bodyHeight / 2.0f + 
+        dimensions.headHeight / 2.0f + 
+        dimensions.neckHeight +
+        dimensions.eyesYoffset
     };
 }
 
@@ -67,23 +73,4 @@ void Eyes::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
-}
-
-void Eyes::SetBodyHeadNeckDimensions(
-            float bW, float bH,
-            float hW, float hH,
-            float nW, float nH
-        )
-{
-    bodyWidth = bW;
-    bodyHeight = bH;
-    headWidth = hW;
-    headHeight = hH;
-    neckWidth = nW;
-    neckHeight = nH;
-}
-
-float Eyes::GetYOffset()
-{
-    return eyesOffset.y;
 }

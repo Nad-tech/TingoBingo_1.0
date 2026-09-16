@@ -1,14 +1,17 @@
 #include "Body/Neck.h"
 #include "raylib.h"
 
+Neck::Neck(BodyDimensions& dimensions) : 
+    dimensions(dimensions),
+    head(dimensions)
+{
+}
+
 void Neck::Initialise() 
 {
-    head.SetBodyNeckDimensions(
-        bodyWidth,
-        bodyHeight,
-        NECK_WIDTH,
-        NECK_HEIGHT
-    );
+    dimensions.neckWidth = 50.0f;
+    dimensions.neckHeight = 30.0f;
+
     head.Initialise();
 
     rotation = 0.0f;
@@ -16,8 +19,8 @@ void Neck::Initialise()
 
     anchorOffset = {
         0, 
-        -bodyHeight / 2.0f - 
-        NECK_HEIGHT / 2.0f
+        -dimensions.bodyHeight / 2.0f - 
+        dimensions.neckHeight / 2.0f
     };
 }
 
@@ -32,13 +35,13 @@ void Neck::Draw() const
     {
         anchorPoint.x,
         anchorPoint.y,
-        NECK_WIDTH * scale,
-        NECK_HEIGHT * scale
+        dimensions.neckWidth * scale,
+        dimensions.neckHeight * scale
     };
 
     Vector2 drawAnchorOffset = {
-        NECK_WIDTH * scale / 2.0f - anchorOffset.x * scale,
-        NECK_HEIGHT * scale / 2.0f - anchorOffset.y * scale
+        dimensions.neckWidth * scale / 2.0f - anchorOffset.x * scale,
+        dimensions.neckHeight * scale / 2.0f - anchorOffset.y * scale
     };
 
     DrawRectanglePro(
@@ -56,13 +59,7 @@ void Neck::SetRotation(float rotation)
     this->rotation = rotation;
     head.SetRotation(rotation);
 }
-void Neck::SetBodyDimensions(float bW, float bH)
-{
-    bodyWidth = bW;
-    bodyHeight = bH;
 
-    head.SetBodyNeckDimensions(bW, bH, NECK_WIDTH, NECK_HEIGHT);
-}
 void Neck::SetAnchorPoint(Vector2 anchorPoint)
 {
     this->anchorPoint = anchorPoint;

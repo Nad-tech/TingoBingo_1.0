@@ -1,28 +1,19 @@
 #pragma once
 
 #include "Sprite.h"
+#include "BodyDimensions.h"
 
 class Eyes : public Sprite
 {
     public:
+        Eyes(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
-        void SetBodyHeadNeckDimensions(
-            float bW, float bH,
-            float hW, float hH,
-            float nW, float nH
-        );
-        float GetYOffset();
 
     private:
+        BodyDimensions& dimensions;
+
         // TODO: make pupils child of Eyes
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0f;
-        float headWidth;
-        float headHeight;
-        float bodyWidth;
-        float bodyHeight;
-        float neckWidth;
-        float neckHeight;
-        Vector2 eyesOffset = {0, 30.0f};
 }; 

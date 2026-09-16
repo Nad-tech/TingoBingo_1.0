@@ -9,6 +9,9 @@
 #include "Body/Head/Ears.h"
 #include "Constants.h"
 
+Ears::Ears(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 void Ears::Initialise()
 {
     // Load the ear sprite sheet.
@@ -19,8 +22,8 @@ void Ears::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.earsWidth = texture.width / COLUMNS;
+    dimensions.earsHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -31,8 +34,8 @@ void Ears::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.earsWidth,
+        dimensions.earsHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -43,11 +46,11 @@ void Ears::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
-        + neckHeight
+        dimensions.earsWidth / 2.0f,
+        dimensions.earsHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
     };
 
     anchorOffset = localPositionOffset;
@@ -68,22 +71,4 @@ void Ears::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
-}
-
-void Ears::SetBodyHeadNeckDimensions(
-    float bW, float bH, 
-    float hW, float hH, 
-    float nW, float nH 
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bW;
-    bodyHeight = bH;
-
-    // Store the supplied head dimensions.
-    headWidth = hW;
-    headHeight = hH;
-
-    neckWidth = nW;
-    neckHeight = nH;
 }

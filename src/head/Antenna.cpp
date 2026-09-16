@@ -10,6 +10,9 @@
 #include "Constants.h"
 #include "Animation.h"
 
+Antenna::Antenna(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 void Antenna::Initialise()
 {
     // Load the antenna sprite sheet.
@@ -20,8 +23,8 @@ void Antenna::Initialise()
     const int ROWS = 2;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.antennaWidth = texture.width / COLUMNS;
+    dimensions.antennaHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -32,8 +35,8 @@ void Antenna::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.antennaWidth,
+        dimensions.antennaHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -44,11 +47,11 @@ void Antenna::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
-        + neckHeight
+        dimensions.antennaWidth / 2.0f,
+        dimensions.antennaHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
         + topOfHeadOffset
     };
 
@@ -70,22 +73,4 @@ void Antenna::Update(float dt)
         antennaAnimationTimer = 0.0f;
         nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
-}
-
-void Antenna::SetBodyHeadNeckDimensions(
-    float bW, float bH, 
-    float hW, float hH, 
-    float nW, float nH 
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bW;
-    bodyHeight = bH;
-
-    // Store the supplied head dimensions.
-    headWidth = hW;
-    headHeight = hH;
-
-    neckWidth = nW;
-    neckHeight = nH;
 }

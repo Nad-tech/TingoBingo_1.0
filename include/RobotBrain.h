@@ -6,6 +6,7 @@
 #include <vector>
 #include "Object.h"
 #include <string>
+#include "BodyDimensions.h"
 
 class Robot;
 
@@ -19,7 +20,7 @@ class RobotBrain
             Reacting
         };
 
-        RobotBrain(Robot& robot);
+        RobotBrain(Robot& robot, BodyDimensions& dimensions);
 
         void Update(float dt);
 
@@ -67,4 +68,6 @@ class RobotBrain
         Object* targetObject;
         Object* detectedObject;
         float detectedTimer = 0.0f;
+
+        BodyDimensions& dimensions;
 };

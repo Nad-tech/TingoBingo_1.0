@@ -10,6 +10,7 @@
 #include "Body/Head/Nose.h"
 #include "Body/Head/Pupils.h"
 #include "Emotion.h"
+#include "BodyDimensions.h"
 
 
 //====================================================
@@ -31,7 +32,7 @@ public:
 
     // Initialise the head's transform and idle
     // animation state.
-    Head();
+    Head(BodyDimensions& dimensions);
     
     // Load and release all head component resources.
     void Initialise();
@@ -100,16 +101,7 @@ public:
     // Return the pupils to their forward-facing anchor position.
     void LookForward();
 
-    void SetBodyNeckDimensions(
-        float bWidth, 
-        float bHeight,
-        float nWidth,
-        float nHeight
-    );
-
     Vector2 GetWorldPosition() const;
-
-    float GetEyesYOffset();
     
 private:
 
@@ -119,6 +111,8 @@ private:
     // Current visual rotation and scale of the head.
     float rotation;
     float scale;
+
+    BodyDimensions& dimensions;
 
     //================================================
     // Head Components
@@ -136,9 +130,4 @@ private:
     Mouth mouth;
     Nose nose;
     Pupils pupils;
-
-    float bodyWidth;
-    float bodyHeight;
-    float neckWidth;
-    float neckHeight;
 };

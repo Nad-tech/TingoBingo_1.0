@@ -11,6 +11,10 @@
 #include "Constants.h"
 #include <string>
 
+Pupil::Pupil(BodyDimensions& dimensions) :
+    dimensions(dimensions)
+{}
+
 // Load the pupil sprite and initialise its animation.
 void Pupil::Initialise()
 {
@@ -21,8 +25,8 @@ void Pupil::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.pupilWidth = texture.width / COLUMNS;
+    dimensions.pupilHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -33,8 +37,8 @@ void Pupil::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.pupilWidth,
+        dimensions.pupilHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -46,23 +50,23 @@ void Pupil::Initialise()
     if(side == "left")
     {
         anchorOffset = {
-            FRAME_WIDTH / 2.0f - sideOffset, 
-            FRAME_HEIGHT / 2.0f + 
-            bodyHeight / 2.0f + 
-            headHeight / 2.0f +
-            neckHeight +
-            eyesYOffset
+            dimensions.pupilWidth / 2.0f - sideOffset, 
+            dimensions.pupilHeight / 2.0f + 
+            dimensions.bodyHeight / 2.0f + 
+            dimensions.headHeight / 2.0f +
+            dimensions.neckHeight +
+            dimensions.eyesYoffset
         };
     }
     else if(side == "right")
     {
         anchorOffset = {
-            FRAME_WIDTH / 2.0f + sideOffset, 
-            FRAME_HEIGHT / 2.0f + 
-            bodyHeight / 2.0f + 
-            headHeight / 2.0f +
-            neckHeight +
-            eyesYOffset
+            dimensions.pupilWidth / 2.0f + sideOffset, 
+            dimensions.pupilHeight / 2.0f + 
+            dimensions.bodyHeight / 2.0f + 
+            dimensions.headHeight / 2.0f +
+            dimensions.neckHeight +
+            dimensions.eyesYoffset
         };
     }
 }
@@ -73,22 +77,6 @@ void Pupil::Update(float dt)
     Sprite::Update(dt);
 }
 
-void Pupil::SetBodyHeadNeckEyeOffsetDimensions(
-            float bW, float bH, 
-            float hW, float hH,
-            float nW, float nH,
-            float eyesYOffset
-     )
-{
-    bodyWidth = bW;
-    bodyHeight = bH;
-    headWidth = hW;
-    headHeight = hH;
-    neckWidth = nW;
-    neckHeight = nH;
-    this->eyesYOffset = eyesYOffset; 
-}
-
 void Pupil::SetSide(std::string side)
 {
     this->side = side;
@@ -97,9 +85,4 @@ void Pupil::SetSide(std::string side)
 float Pupil::GetSideOffset()
 {
     return sideOffset;
-}
-
-float Pupil::GetEyesYOffset()
-{
-    return eyesYOffset;
 }

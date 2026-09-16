@@ -7,12 +7,13 @@
 #include "Body/Pelvis.h"
 #include "Body/Head/Head.h"
 #include "Body/Neck.h"
+#include "BodyDimensions.h"
 
 class Body
 {
 public:
 
-    Body();
+    Body(BodyDimensions& dimensions);
 
     void Initialise();
     
@@ -45,8 +46,6 @@ public:
     void SwingArm(std::string side, bool swing);
 
     Vector2 GetHeadWorldPosition();
-
-    float GetEyesYOffset();
 
 private:
     Vector2 anchorPoint;
@@ -101,6 +100,8 @@ private:
     // Anchor point the body returns to after applying
     // its idle movement.
     Vector2 homeAnchorPoint;
+
+    BodyDimensions &dimensions;
 
     BodyBase bodyBase;
 

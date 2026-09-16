@@ -20,11 +20,18 @@
 //TODO adjust all features of head with repect to neck
 
 // Initialise the head's transform and idle animation state.
-Head::Head() :
+Head::Head(BodyDimensions& dimensions) :
     rotation(0.0f),
     scale(0.0f),
-    bodyWidth(0.0f),
-    bodyHeight(0.0f)
+    dimensions(dimensions),
+    headBase(dimensions),
+    eyes(dimensions),
+    antenna(dimensions),
+    ears(dimensions),
+    eyebrows(dimensions),
+    mouth(dimensions),
+    nose(dimensions),
+    pupils(dimensions)
 {
 }
 
@@ -32,79 +39,12 @@ Head::Head() :
 void Head::Initialise()
 {
     headBase.Initialise();
-    
-    antenna.SetBodyHeadNeckDimensions(
-        bodyWidth,
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight(),
-        neckWidth,
-        neckHeight
-    );
     antenna.Initialise();
-    
-    ears.SetBodyHeadNeckDimensions(
-        bodyWidth,
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight(),
-        neckWidth,
-        neckHeight
-    );
     ears.Initialise();
-    
-    eyebrows.SetBodyHeadNeckDimensions(
-        bodyWidth,
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight(),
-        neckWidth,
-        neckHeight
-    );
     eyebrows.Initialise();
-    
-    // Set the head dimensions for the eyes so they can anchor correctly.
-    //themselves correctly relative to the head base.
-    //This must be done before eyes.Initialise() is called.
-    eyes.SetBodyHeadNeckDimensions(
-        bodyWidth,
-        bodyHeight,
-        headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight(),
-        neckWidth,
-        neckHeight
-    );
     eyes.Initialise();
-    
-    mouth.SetBodyHeadNeckDimensions(
-        bodyWidth, 
-        bodyHeight,
-        headBase.GetFrameWidth(),
-        headBase.GetFrameHeight(),
-        neckWidth,
-        neckHeight
-    );
     mouth.Initialise();
-    
-    nose.SetBodyHeadNeckDimensions(
-        bodyWidth, 
-        bodyHeight, 
-        headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight(),
-        neckWidth,
-        neckHeight
-    );
     nose.Initialise();
-    
-    pupils.SetBodyHeadNeckEyeOffsetDimensions(
-        bodyWidth, 
-        bodyHeight, 
-        headBase.GetFrameWidth(), 
-        headBase.GetFrameHeight(),
-        neckWidth,
-        neckHeight,
-        eyes.GetYOffset()
-    );
     pupils.Initialise();
 }
 
@@ -209,32 +149,7 @@ void Head::LookForward()
     pupils.LookForward();
 }
 
-void Head::SetBodyNeckDimensions(
-    float bWidth, 
-    float bHeight,
-    float nWidth,
-    float nHeight
-)
-{
-    bodyWidth = bWidth;
-    bodyHeight = bHeight;
-    neckWidth = nWidth;
-    neckHeight = nHeight;
-
-    headBase.SetBodyNeckDimensions(
-        bodyWidth, 
-        bodyHeight,
-        neckWidth,
-        neckHeight
-    );
-}
-
 Vector2 Head::GetWorldPosition() const
 {
     return headBase.GetWorldPosition();
-}
-
-float Head::GetEyesYOffset()
-{
-    return pupils.GetEyesYOffset();
 }

@@ -12,6 +12,9 @@
 #include "Constants.h"
 #include "raylib.h"
 
+Headbase::Headbase(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 // Load the head sprite and initialise its animation.
 void Headbase::Initialise()
 {
@@ -22,8 +25,8 @@ void Headbase::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.headWidth = texture.width / COLUMNS;
+    dimensions.headHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -34,8 +37,8 @@ void Headbase::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.headWidth,
+        dimensions.headHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -45,10 +48,10 @@ void Headbase::Initialise()
     scale = SCALE;
 
     anchorOffset = {
-        FRAME_WIDTH / 2.0f, 
-        (FRAME_HEIGHT / 1.0f) + 
-        (bodyHeight / 2.0f) +
-        (neckHeight)
+        dimensions.headWidth / 2.0f, 
+        dimensions.headHeight + 
+        (dimensions.bodyHeight / 2.0f) +
+        (dimensions.neckHeight)
     };
 }
 
@@ -64,31 +67,13 @@ void Headbase::SetRotation(float rotation)
     Sprite::SetRotation(rotation);
 }
 
-void Headbase::SetBodyNeckDimensions(float bW, float bH, float nW, float nH)
-{
-    bodyWidth = bW;
-    bodyHeight = bH;
-    neckWidth = nW;
-    neckHeight = nH;
-}
-
-float Headbase::GetFrameWidth() const
-{
-    return animation.GetFrameWidth();
-}
-
-float Headbase::GetFrameHeight() const
-{
-    return animation.GetFrameHeight();
-}
-
 Vector2 Headbase::GetWorldPosition() const
 {
    return {
     anchorPoint.x, 
     anchorPoint.y - 
-    (bodyHeight / 2.0f) * SCALE -
+    (dimensions.bodyHeight / 2.0f) * SCALE -
     (animation.GetFrameHeight() / 2) * SCALE -
-    neckHeight * SCALE
+    dimensions.neckHeight * SCALE
    }; 
 }

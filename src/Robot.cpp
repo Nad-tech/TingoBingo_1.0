@@ -7,7 +7,11 @@
 #include "SfxController.h"
 
 // Initialise the robot's brain 
-Robot::Robot() : robotBrain(*this){}
+Robot::Robot() : 
+    dimensions(),
+    body(dimensions),
+    robotBrain(*this, dimensions)
+{}
 
 // Initialise the robot's head and place it at the
 // robot's starting anchor point.
@@ -141,9 +145,4 @@ void Robot::SwingArm(std::string side, bool swinging)
 Vector2 Robot::GetHeadWorldPosition()
 {
     return body.GetHeadWorldPosition();
-}
-
-float Robot::GetEyesYOffset()
-{
-    return body.GetEyesYOffset();
 }

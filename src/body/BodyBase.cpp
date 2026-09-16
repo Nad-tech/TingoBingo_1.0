@@ -2,6 +2,11 @@
 
 #include "Constants.h"
 
+BodyBase::BodyBase(BodyDimensions& dimensions) : 
+            dimensions(dimensions)
+{
+}
+
 // Load the head sprite and initialise its animation.
 void BodyBase::Initialise()
 {
@@ -12,8 +17,8 @@ void BodyBase::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.bodyWidth = texture.width / COLUMNS;
+    dimensions.bodyHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -24,8 +29,8 @@ void BodyBase::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.bodyWidth,
+        dimensions.bodyHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -34,7 +39,10 @@ void BodyBase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    anchorOffset = {FRAME_WIDTH / 2.0f, FRAME_HEIGHT / 2.0f};
+    anchorOffset = {
+        dimensions.bodyWidth / 2.0f, 
+        dimensions.bodyHeight / 2.0f
+    };
 }
 
 // Return the current head animation frame.

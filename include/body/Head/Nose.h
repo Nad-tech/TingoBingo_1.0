@@ -2,31 +2,22 @@
 
 #include "Sprite.h"
 #include "raylib.h"
+#include "BodyDimensions.h"
 
 class Nose : public Sprite
 {
     public:
+        Nose(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
-        void SetBodyHeadNeckDimensions(
-                float bW, float bH, 
-                float hW, float hH, 
-                float nW, float nH 
-            );
-
 
     private:
+        BodyDimensions& dimensions;
+
         // Nose-centre translation in local head coordinates.
         Vector2 localPositionOffset = {0, 0};
         float slightPositionOffset = 5.0f;
-
-        float bodyWidth = 0.0f;
-        float bodyHeight = 0.0f;
-        float headWidth = 0.0f;
-        float headHeight = 0.0f;
-        float neckWidth;
-        float neckHeight;
         
         //Idle
         float localRotation = 0.0f;

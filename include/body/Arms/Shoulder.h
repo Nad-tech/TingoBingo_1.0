@@ -30,4 +30,7 @@ class Shoulder : public Sprite
 
         const float SWING_SPEED = 10.0f;
         float swingTime = 0;
+
+        const float SHOULDER_WIDTH = 70.0f;
+        const float SHOULDER_HEIGHT = 70.0f;
 };

@@ -3,7 +3,7 @@
 #include "Emotion.h"
 
 // Initialise the body's transform and idle animation state.
-Body::Body() :
+Body::Body(BodyDimensions& dimensions) :
     rotation(0.0f),
     scale(0.0f),
 
@@ -21,7 +21,10 @@ Body::Body() :
     randomBodyBobSignTimer((float)GetRandomValue(5, 10)),
     bodyBobRadiusX(GetRandomValue(3, 8)),
     bodyBobRadiusY(GetRandomValue(2, 6)),
-    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f)
+    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f), 
+    dimensions(dimensions), 
+    bodyBase(dimensions),
+    neck(dimensions)
 {
 }
 
@@ -29,14 +32,6 @@ Body::Body() :
 void Body::Initialise()
 {
     bodyBase.Initialise();
-    
-    //neck.SetBodyDimensions() must be called before head.Initialise() 
-    // so that the head can anchor itself correctly relative to the body
-    //The same for arms and legs
-    neck.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight()
-    );
     neck.Initialise();
     
     arms.SetBodyDimensions(
@@ -74,11 +69,13 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    arms.Draw();
+    
     
     pelvis.Draw();
     
     bodyBase.Draw();
+
+arms.Draw();
 
     neck.Draw();
 }
@@ -205,9 +202,4 @@ void Body::SwingArm(std::string side,  bool swing)
 Vector2 Body::GetHeadWorldPosition()
 {
     return neck.GetHead().GetWorldPosition();
-}
-
-float Body::GetEyesYOffset()
-{
-    return GetHead().GetEyesYOffset();
 }

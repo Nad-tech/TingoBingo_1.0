@@ -2,30 +2,20 @@
 
 #include "Sprite.h"
 #include <string>
+#include "BodyDimensions.h"
 
 class Pupil : public Sprite
 {
     public:
+        Pupil(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
-        void SetBodyHeadNeckEyeOffsetDimensions(
-            float bW, float bH, 
-            float hW, float hH,
-            float nW, float nH,
-            float eyesYOffset
-        );
         void SetSide(std::string side);
         float GetSideOffset();
-        float GetEyesYOffset();
 
     private:
-        float bodyWidth;
-        float bodyHeight;
-        float headWidth;
-        float headHeight;
-        float neckWidth;
-        float neckHeight;
-        float eyesYOffset;
+        BodyDimensions& dimensions;
+
         std::string side; // "left" or "right"
         float sideOffset = 40;
 };

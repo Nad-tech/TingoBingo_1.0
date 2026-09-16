@@ -7,6 +7,7 @@
 #include "Object.h"
 #include "SfxController.h"
 #include "body/Body.h"
+#include "BodyDimensions.h"
 
 
 //====================================================
@@ -26,7 +27,6 @@ public:
 
     // Create the robot and initialise its starting state.
     Robot();
-
 
     // Update the robot's behaviour and visual state.
     void Update(float dt);
@@ -83,15 +83,10 @@ public:
 
     Vector2 GetHeadWorldPosition();
 
-    float GetEyesYOffset();
-
 private:
 
     // Current world-space anchor point of the robot.
     Vector2 anchorPoint;
-
-    // Controls the robot's behaviour and state.
-    RobotBrain robotBrain;
 
     // True while the robot is currently speaking.
     // The Head uses this to drive mouth/face animation.
@@ -99,5 +94,10 @@ private:
 
     SfxController sfxController;
 
+    BodyDimensions dimensions;
+
     Body body;
+
+    // Controls the robot's behaviour and state.
+    RobotBrain robotBrain;
 };

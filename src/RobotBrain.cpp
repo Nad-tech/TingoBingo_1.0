@@ -76,15 +76,17 @@
 #include "Emotion.h"
 #include <cmath>
 #include <iostream>
+#include "BodyDimensions.h"
 
 Vector2 P;
 
-RobotBrain::RobotBrain(Robot& robot)
+RobotBrain::RobotBrain(Robot& robot, BodyDimensions& dimensions)
     : robot(robot),
       state(State::Idle),
       emotion(Emotion::Neutral),
       targetObject(nullptr),
-      detectedObject(nullptr)
+      detectedObject(nullptr),
+      dimensions(dimensions)
 {
 }
 
@@ -779,7 +781,7 @@ void RobotBrain::Search(float dt)
     // --------------------------------------------------------
 
     searchRayOrigin = robot.GetHeadWorldPosition();
-    searchRayOrigin.y = robot.GetHeadWorldPosition().y - robot.GetEyesYOffset() * SCALE;
+    searchRayOrigin.y = robot.GetHeadWorldPosition().y - dimensions.eyesYoffset * SCALE;
 
 
     // --------------------------------------------------------
@@ -1156,5 +1158,5 @@ void RobotBrain::SwingArm(std::string side, bool swinging)
 }
 
 void RobotBrain::Draw() const {
-    DrawCircle(P.x,P.y,10,BLUE);
+    //DrawCircle(P.x,P.y,10,BLUE);
 }

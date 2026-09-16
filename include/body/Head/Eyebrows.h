@@ -2,30 +2,21 @@
 
 #include "Sprite.h"
 #include "Emotion.h"
+#include "BodyDimensions.h"
 
 class Eyebrows : public Sprite
 {
     public:
+        Eyebrows(BodyDimensions& dimensions);
         void Initialise() override;
         void UpdateEyebrows(float dt, bool speaking, Emotion emotion);
-        void SetBodyHeadNeckDimensions(
-            float bW, float bH, 
-            float hW, float hH, 
-            float nW, float nH 
-        );
-
+       
     private:
+        BodyDimensions& dimensions;
+
         // Eyebrows-centre translation in local head coordinates.
         Vector2 localPositionOffset = {0, 0};
-        float foreheadOffset = 65;
-
-        float bodyWidth = 0.0f;
-        float bodyHeight = 0.0f;
-        float headWidth = 0.0f;
-        float headHeight = 0.0f;
-        float neckWidth;
-        float neckHeight;
-        
+        float foreheadOffset = 65; 
 
         float happyAnimationTimer = 0.0f;
         float nextHappyAnimation = 3.0f;

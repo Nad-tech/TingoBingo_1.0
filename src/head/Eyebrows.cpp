@@ -10,6 +10,9 @@
 #include "Emotion.h"
 #include "Animation.h"
 
+Eyebrows::Eyebrows(BodyDimensions& dimensions) : dimensions(dimensions)
+{}
+
 void Eyebrows::Initialise()
 {
     // Load the eyebrow sprite sheet.
@@ -20,8 +23,8 @@ void Eyebrows::Initialise()
     const int ROWS = 1;
 
     // Determine the dimensions of each frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.eyeBrowsWidth = texture.width / COLUMNS;
+    dimensions.eyeBrowsHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -32,8 +35,8 @@ void Eyebrows::Initialise()
     // Create the animation from the sprite sheet.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.eyeBrowsWidth,
+        dimensions.eyeBrowsHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -45,12 +48,12 @@ void Eyebrows::Initialise()
 
     localPositionOffset =
     {
-        FRAME_WIDTH / 2.0f,
+        dimensions.eyeBrowsWidth / 2.0f,
 
-        FRAME_HEIGHT / 2.0f
-        + bodyHeight / 2.0f
-        + headHeight / 2.0f
-        + neckHeight
+        dimensions.eyeBrowsHeight / 2.0f
+        + dimensions.bodyHeight / 2.0f
+        + dimensions.headHeight / 2.0f
+        + dimensions.neckHeight
         + foreheadOffset
     };
 
@@ -124,22 +127,4 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
     }
-}
-
-void Eyebrows::SetBodyHeadNeckDimensions(
-    float bW, float bH, 
-    float hW, float hH, 
-    float nW, float nH 
-)
-{
-    // Store the supplied body dimensions.
-    bodyWidth = bW;
-    bodyHeight = bH;
-
-    // Store the supplied head dimensions.
-    headWidth = hW;
-    headHeight = hH;
-
-    neckWidth = nW;
-    neckHeight = nH;
 }
