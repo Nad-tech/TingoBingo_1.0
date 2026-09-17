@@ -2,8 +2,8 @@
 
 Legs::Legs(BodyDimensions& dimensions) :
     dimensions(dimensions),
-    leftThigh(dimensions),
-    rightThigh(dimensions)
+    leftThigh(dimensions, "left"),
+    rightThigh(dimensions, "right")
 {}
 
 void Legs::Initialise()

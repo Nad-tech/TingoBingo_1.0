@@ -9,8 +9,9 @@
 class Thigh : public Sprite
 {
     public:
-        Thigh(BodyDimensions& dimensions);
+        Thigh(BodyDimensions& dimensions, std::string side);
         void Initialise() override;
+        void Draw() const;
         int GetFrame() const;
         void SetRotation(float rotation);
 

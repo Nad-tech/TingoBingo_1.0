@@ -1,4 +1,5 @@
 #include "Body/Pelvis.h"
+#include "raymath.h"
 
 Pelvis::Pelvis(BodyDimensions& dimensions) :
     dimensions(dimensions),
@@ -6,8 +7,8 @@ Pelvis::Pelvis(BodyDimensions& dimensions) :
 {}
 void Pelvis::Initialise()
 {
-    dimensions.pelvisWidth = 240.0f;
-    dimensions.pelvisHeight = 100.0f;
+    dimensions.pelvisWidth = 260.0f;
+    dimensions.pelvisHeight = 70.0f;
 
     rotation = 0;
     scale = SCALE;
@@ -24,6 +25,7 @@ void Pelvis::Initialise()
 void Pelvis::Update(float dt)
 {
     Sprite::Update(dt);
+    legs.Update(dt);
 }
 
 void Pelvis::Draw() const
@@ -41,12 +43,15 @@ void Pelvis::Draw() const
         dimensions.pelvisHeight * scale / 2.0f - anchorOffset.y * scale
     };
 
+    legs.Draw();
+
     DrawRectanglePro(
         pelvis,
         drawAnchorOffset,
         rotation,
         BROWN
     );
+    //DrawCircle(anchorPoint.x + anchorOffset.x*scale, anchorPoint.y + anchorOffset.y*scale, 10, RED);
 }
 
 void Pelvis::SetRotation(float rotation)
@@ -59,6 +64,7 @@ void Pelvis::SetRotation(float rotation)
 void Pelvis::SetAnchorPoint(Vector2 anchorPoint)
 {
     this->anchorPoint = anchorPoint;
+
     legs.SetAnchorPoint(anchorPoint);
 }
 

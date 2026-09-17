@@ -28,8 +28,8 @@ void UpperArm::Initialise()
     dimensions.upperArmHeight = texture.height / ROWS;
 
     // Debug output for checking the calculated dimensions.
-    // std::cout << dimensions.upperArmWidth << " * "
-    //           << dimensions.upperArmHeight << "\n";
+     std::cout << dimensions.upperArmWidth << " * "
+               << dimensions.upperArmHeight << "\n";
 
     // Calculate the total number of animation frames.
     const int TOTAL_FRAMES = COLUMNS * ROWS;
