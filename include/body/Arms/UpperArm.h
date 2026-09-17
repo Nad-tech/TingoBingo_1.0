@@ -22,7 +22,6 @@ class UpperArm : public Sprite
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {0, 0};
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
         std::string side = "";

@@ -1,7 +1,8 @@
 #include "Body/Pelvis.h"
 
 Pelvis::Pelvis(BodyDimensions& dimensions) :
-    dimensions(dimensions)
+    dimensions(dimensions),
+    legs(dimensions)
 {}
 void Pelvis::Initialise()
 {
@@ -16,6 +17,8 @@ void Pelvis::Initialise()
         dimensions.bodyHeight / 2.0f +
         dimensions.pelvisHeight / 2.0f
     };
+
+    legs.Initialise();
 }
 
 void Pelvis::Update(float dt)
@@ -49,13 +52,17 @@ void Pelvis::Draw() const
 void Pelvis::SetRotation(float rotation)
 {
     this->rotation = rotation;
+    legs.SetRotation(rotation);
+
 }
 
 void Pelvis::SetAnchorPoint(Vector2 anchorPoint)
 {
     this->anchorPoint = anchorPoint;
+    legs.SetAnchorPoint(anchorPoint);
 }
+
 void Pelvis::Shutdown()
 {
-
+    legs.Shutdown();
 }

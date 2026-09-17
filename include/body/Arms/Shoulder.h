@@ -21,7 +21,6 @@ class Shoulder : public Sprite
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {0, 0};
         Vector2 armAnchorPosition;
 
         std::string side = "";

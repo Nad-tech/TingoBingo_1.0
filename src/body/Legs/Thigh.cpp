@@ -3,17 +3,21 @@
 #include <string>
 
 // Load the head sprite and initialise its animation.
+Thigh::Thigh(BodyDimensions& dimensions) :
+    dimensions(dimensions)
+{}
+
 void Thigh::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/body/Leg.png");
+    //texture = LoadTexture("assets/images/TingoBingo/body/Leg.png");
 
     // Sprite sheet layout.
     const int COLUMNS = 1;
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.thighWidth = texture.width / COLUMNS;
+    dimensions.thighHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -24,8 +28,8 @@ void Thigh::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.thighWidth,
+        dimensions.thighHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -37,15 +41,15 @@ void Thigh::Initialise()
     if(side == "left")
     {
         anchorOffset = {
-            bodyWidth / 2, 
-            -bodyHeight / 2
+            0, 
+            0
         };
     }
     else if(side == "right")
     {
         anchorOffset = {
-            -bodyWidth / 2 + FRAME_WIDTH, 
-            -bodyHeight / 2
+            0, 
+            0
         };
     }
 }
@@ -60,11 +64,4 @@ int Thigh::GetFrame() const
 void Thigh::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
-}
-
-void Thigh::SetBodyDimensions(float width, float height, const std::string& side)
-{
-    bodyWidth = width;
-    bodyHeight = height;
-    this->side = side;
 }

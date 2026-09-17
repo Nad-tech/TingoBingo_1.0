@@ -14,8 +14,6 @@ class Eyebrows : public Sprite
     private:
         BodyDimensions& dimensions;
 
-        // Eyebrows-centre translation in local head coordinates.
-        Vector2 localPositionOffset = {0, 0};
         float foreheadOffset = 65; 
 
         float happyAnimationTimer = 0.0f;

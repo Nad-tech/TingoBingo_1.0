@@ -14,7 +14,5 @@ class Antenna : public Sprite
         BodyDimensions& dimensions;
         float antennaAnimationTimer = 0.0f;
         float nextAntennaAnimation = 3.0f;
-
-        Vector2 localPositionOffset = {};
         float topOfHeadOffset = 46.0f;
 };

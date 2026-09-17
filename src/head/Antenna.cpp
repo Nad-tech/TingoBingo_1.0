@@ -45,7 +45,7 @@ void Antenna::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.antennaWidth / 2.0f,
         dimensions.antennaHeight / 2.0f
@@ -54,8 +54,6 @@ void Antenna::Initialise()
         + dimensions.neckHeight
         + topOfHeadOffset
     };
-
-    anchorOffset = localPositionOffset;
 }
 
 void Antenna::Update(float dt)

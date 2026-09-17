@@ -66,7 +66,7 @@ void UpperArm::Initialise()
     // Y:
     //     Position the upper arm below the shoulder using the
     //     shared shoulder height.
-    localPositionOffset = {
+    anchorOffset = {
         dimensions.upperArmWidth / 2.0f,
         dimensions.shoulderHeight / 2.0f
     };
@@ -114,7 +114,7 @@ void UpperArm::Draw() const
     // The offset is rotated so that the upper arm follows
     // the rotation of its parent.
     //
-    Vector2 offset = localPositionOffset;
+    Vector2 offset = anchorOffset;
 
     // Raylib uses degrees for rotation, while sinf() and
     // cosf() require radians.

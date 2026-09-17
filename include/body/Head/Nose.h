@@ -14,9 +14,6 @@ class Nose : public Sprite
 
     private:
         BodyDimensions& dimensions;
-
-        // Nose-centre translation in local head coordinates.
-        Vector2 localPositionOffset = {0, 0};
         float slightPositionOffset = 5.0f;
         
         //Idle

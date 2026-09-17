@@ -1,19 +1,21 @@
 #pragma once
 
 #include "body/Legs/Thigh.h"
+#include "BodyDimensions.h"
 
 class Legs
 {
     public:
+        Legs(BodyDimensions& dimensions);
         void Initialise();
         void Shutdown();
         void Update(float dt);
         void Draw() const;
         void SetAnchorPoint(Vector2 anchorPoint);
         void SetRotation(float rotation);
-        void SetBodyDimension(float bodyWidth, float bodyHeight);
 
     private:
+        BodyDimensions& dimensions;
         Thigh rightThigh;
         Thigh leftThigh;
 };

@@ -114,7 +114,7 @@ void Nose::Initialise()
     //
     //================================================
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.noseWidth / 2.0f,
 
@@ -130,7 +130,7 @@ void Nose::Initialise()
     // This is deliberately not a world-space position.
     // The wiggle animation uses this as the nose's
     // permanent home position.
-    homeAnchorPoint = localPositionOffset;
+    homeAnchorPoint = anchorOffset;
 }
 
 //====================================================
@@ -242,7 +242,7 @@ void Nose::Update(float dt)
         // Using homeAnchorPoint as the starting position
         // prevents the wiggle from accumulating movement
         // from one frame to the next.
-        localPositionOffset.x =
+        anchorOffset.x =
             homeAnchorPoint.x + wiggleOffSetX;
 
         // The wiggle lasts for one second.
@@ -256,7 +256,7 @@ void Nose::Update(float dt)
             wiggleOffSetX = 0.0f;
 
             // Restore the original LOCAL anchor position.
-            localPositionOffset.x = homeAnchorPoint.x;
+            anchorOffset.x = homeAnchorPoint.x;
         }
     }
 }
@@ -313,7 +313,7 @@ void Nose::Draw() const
     // Rotate this local offset around the parent anchor
     // so the nose follows the head when it rotates.
     //
-    Vector2 offset = localPositionOffset;
+    Vector2 offset = anchorOffset;
 
     // Raylib rotation values are measured in degrees,
     // while sinf() and cosf() require radians.

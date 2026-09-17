@@ -68,7 +68,7 @@ void Shoulder::Initialise()
     // the body.
     if(side == "left")
     {
-        localPositionOffset = {
+        anchorOffset = {
             (dimensions.bodyWidth / 2.0f) +
             (dimensions.shoulderWidth / 2.0f),
 
@@ -77,7 +77,7 @@ void Shoulder::Initialise()
     }
     else if(side == "right")
     {
-        localPositionOffset = {
+        anchorOffset = {
             (-dimensions.bodyWidth / 2.0f) -
             (dimensions.shoulderWidth / 2.0f),
 
@@ -99,7 +99,7 @@ void Shoulder::Update(float dt)
     Sprite::Update(dt);
 
     // Start with the shoulder's local position relative to the body.
-    Vector2 offset = localPositionOffset;
+    Vector2 offset = anchorOffset;
 
     // Convert the shoulder's rotation from degrees to radians
     // for use with the trigonometric functions.

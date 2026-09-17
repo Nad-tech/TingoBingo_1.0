@@ -21,5 +21,4 @@ class Neck : public Sprite
     private:
         BodyDimensions& dimensions;
         Head head;
-        Vector2 localPositionOffset = {};
 };

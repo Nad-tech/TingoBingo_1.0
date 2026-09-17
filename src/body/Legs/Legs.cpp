@@ -1,5 +1,11 @@
 #include "body/Legs/Legs.h"
 
+Legs::Legs(BodyDimensions& dimensions) :
+    dimensions(dimensions),
+    leftThigh(dimensions),
+    rightThigh(dimensions)
+{}
+
 void Legs::Initialise()
 {
     leftThigh.Initialise();
@@ -26,8 +32,8 @@ void Legs::Draw() const
 
 void Legs::SetAnchorPoint(Vector2 anchorPoint)
 {
-    leftThigh.SetAnchorPoint({anchorPoint.x, anchorPoint.y});
-    rightThigh.SetAnchorPoint({anchorPoint.x, anchorPoint.y}); 
+    leftThigh.SetAnchorPoint(anchorPoint);
+    rightThigh.SetAnchorPoint(anchorPoint); 
 }
 
 void Legs::SetRotation(float rotation)
@@ -36,17 +42,3 @@ void Legs::SetRotation(float rotation)
     rightThigh.SetRotation(rotation);
 }
 
-void Legs::SetBodyDimension(float bodyWidth, float bodyHeight)
-{
-    leftThigh.SetBodyDimensions(
-        bodyWidth,
-        bodyHeight,
-        "left"
-    );
-
-    rightThigh.SetBodyDimensions(
-        bodyWidth,
-        bodyHeight,
-        "right"
-    );
-}

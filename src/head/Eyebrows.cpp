@@ -46,7 +46,7 @@ void Eyebrows::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.eyeBrowsWidth / 2.0f,
 
@@ -56,8 +56,6 @@ void Eyebrows::Initialise()
         + dimensions.neckHeight
         + foreheadOffset
     };
-
-    anchorOffset = localPositionOffset;
 }
 
 void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
