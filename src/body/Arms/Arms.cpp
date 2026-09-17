@@ -1,15 +1,16 @@
 #include "body/Arms/Arms.h"
 
+Arms::Arms(BodyDimensions& dimensions)
+    : dimensions(dimensions),
+      leftShoulder(dimensions, "left"),
+      rightShoulder(dimensions, "right")
+{
+}
+
 void Arms::Initialise()
 {
     leftShoulder.Initialise();
     rightShoulder.Initialise();
-}
-
-void Arms::SetBodyDimensions(float bodyWidth, float bodyHeight)
-{
-    leftShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "left");
-    rightShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "right");
 }
 
 void Arms::Shutdown()

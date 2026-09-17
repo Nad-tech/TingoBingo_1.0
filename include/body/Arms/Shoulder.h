@@ -2,35 +2,28 @@
 
 #include "Sprite.h"
 #include "UpperArm.h"
+#include "BodyDimensions.h"
 
 class Shoulder : public Sprite
 {
     public:
+        Shoulder(BodyDimensions& dimensions, std::string side);
+
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
         
         int GetFrame() const;
-        
+        void SetAnchorPoint(Vector2 anchorPoint);
         void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, std::string side);
 
         void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {0, 0};
-        float localRotation = 0.0f;
-        float homeRotation = 0.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
+        Vector2 armAnchorPosition;
+
         std::string side = "";
-        
-        UpperArm leftUpperArm;
-        UpperArm rightUpperArm;
-
-        const float SWING_SPEED = 10.0f;
-        float swingTime = 0;
-
-        const float SHOULDER_WIDTH = 70.0f;
-        const float SHOULDER_HEIGHT = 70.0f;
+        UpperArm upperArm;
 };

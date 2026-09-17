@@ -3,6 +3,12 @@
 #include <cmath>
 #include <iostream>
 
+UpperArm::UpperArm(BodyDimensions& dimensions, std::string side)
+    : dimensions(dimensions),
+      side(side)
+{
+}
+
 // Load the arm sprite and initialise its animation.
 void UpperArm::Initialise()
 {
@@ -13,8 +19,10 @@ void UpperArm::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.upperArmWidth = texture.width / COLUMNS;
+    dimensions.upperArmHeight = texture.height / ROWS;
+
+    //std::cout << dimensions.upperArmWidth << " * " << dimensions.upperArmHeight << "\n";
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -25,8 +33,8 @@ void UpperArm::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.upperArmWidth,
+        dimensions.upperArmHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -38,20 +46,10 @@ void UpperArm::Initialise()
     // Position the arm's anchor point relative to the body.
     // The anchor point represents where the arm attaches
     // to the body at the shoulder.
-    if(side == "left")
-    {
-        localPositionOffset = {
-            bodyWidth / 2 + FRAME_WIDTH,
-            -bodyHeight / 2
-        }; 
-    }
-    else if(side == "right")
-    {
-        localPositionOffset = {
-            -bodyWidth / 2.0f,
-            -bodyHeight / 2.0f
-        }; 
-    }
+    localPositionOffset = {
+        dimensions.upperArmWidth / 2.0f,
+        dimensions.shoulderHeight / 2.0f
+    };
 
     homeRotation = rotation;
 }
@@ -71,15 +69,6 @@ int UpperArm::GetFrame() const
 void UpperArm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
-}
-
-// Set the dimensions of the body so the arm can be positioned
-// correctly relative to the body.
-void UpperArm::SetBodyDimensions(float width, float height, std::string side)
-{
-    bodyWidth = width;
-    bodyHeight = height;
-    this->side = side; 
 }
 
 void UpperArm::Draw() const
@@ -111,7 +100,7 @@ void UpperArm::Draw() const
     // body anchor point.
     Vector2 rotatedOffset =
     {
-        offset.x * cosf(radians) - offset.y * sinf(radians),
+        (offset.x * cosf(radians) - offset.y * sinf(radians)),
         offset.x * sinf(radians) + offset.y * cosf(radians)
     };
 

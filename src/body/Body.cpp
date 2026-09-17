@@ -24,7 +24,8 @@ Body::Body(BodyDimensions& dimensions) :
     bodyBobSpeed(GetRandomValue(6, 14) / 10.0f), 
     dimensions(dimensions), 
     bodyBase(dimensions),
-    neck(dimensions)
+    neck(dimensions),
+    arms(dimensions)
 {
 }
 
@@ -34,10 +35,6 @@ void Body::Initialise()
     bodyBase.Initialise();
     neck.Initialise();
     
-    arms.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight()
-        );
     arms.Initialise();
     
     pelvis.SetBodyDimensions(
@@ -70,12 +67,11 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 void Body::Draw() const
 {
     
-    
     pelvis.Draw();
     
     bodyBase.Draw();
 
-arms.Draw();
+    arms.Draw();
 
     neck.Draw();
 }

@@ -170,28 +170,29 @@ private:
 #pragma once
 
 #include "Shoulder.h"
+#include "BodyDimensions.h"
 
 class Arms
 {
     public:
+        Arms(BodyDimensions& dimensions);
+
         void Initialise();
         void Update(float dt);
         void Draw() const;
         void SetAnchorPoint(Vector2 anchorPoint);
         void SetRotation(float rotation);
-        void SetBodyDimensions(float bodyWidth, float bodyHeight);
         void SwingArm(std::string side, bool swing);
         void Shutdown();
 
     private:
+        BodyDimensions& dimensions;
+
         Shoulder leftShoulder;
         Shoulder rightShoulder;
 
         bool swingLeftArm = false;
         bool swingRightArm = false;
-
-        float bodyWidth;
-        float bodyHeight;
 };
 
 
@@ -308,37 +309,30 @@ class Hand : public Sprite
 
 #include "Sprite.h"
 #include "UpperArm.h"
+#include "BodyDimensions.h"
 
 class Shoulder : public Sprite
 {
     public:
+        Shoulder(BodyDimensions& dimensions, std::string side);
+
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
         
         int GetFrame() const;
-        
+        void SetAnchorPoint(Vector2 anchorPoint);
         void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, std::string side);
 
         void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {0, 0};
-        float localRotation = 0.0f;
-        float homeRotation = 0.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
+
         std::string side = "";
         
-        UpperArm leftUpperArm;
-        UpperArm rightUpperArm;
-
-        const float SWING_SPEED = 10.0f;
-        float swingTime = 0;
-
-        const float SHOULDER_WIDTH = 70.0f;
-        const float SHOULDER_HEIGHT = 70.0f;
+        UpperArm upperArm;
 };
 
 
@@ -351,10 +345,13 @@ class Shoulder : public Sprite
 
 #include "Sprite.h"
 #include "Body/Arms/Elbow.h"
+#include "BodyDimensions.h"
 
 class UpperArm : public Sprite
 {
     public:
+        UpperArm(BodyDimensions& dimensions, std::string side);
+
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
@@ -362,16 +359,14 @@ class UpperArm : public Sprite
         int GetFrame() const;
         
         void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, std::string side);
 
         void SwingArm(float dt, float swingMinAngle, float swingMaxAngle);
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {0, 0};
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
         std::string side = "";
 
         const float SWING_MIN = 0.0f;
@@ -890,29 +885,20 @@ class Nose : public Sprite
 
 #include "Sprite.h"
 #include <string>
+#include "BodyDimensions.h"
 
 class Pupil : public Sprite
 {
     public:
+        Pupil(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
-        void SetBodyHeadNeckEyeOffsetDimensions(
-            float bW, float bH, 
-            float hW, float hH,
-            float nW, float nH,
-            float eyesYOffset
-        );
         void SetSide(std::string side);
         float GetSideOffset();
 
     private:
-        float bodyWidth;
-        float bodyHeight;
-        float headWidth;
-        float headHeight;
-        float neckWidth;
-        float neckHeight;
-        float eyesYOffset;
+        BodyDimensions& dimensions;
+
         std::string side; // "left" or "right"
         float sideOffset = 40;
 };
@@ -1220,6 +1206,9 @@ public:
     float eyesHeight;
 
     float eyesYoffset;
+
+    float pupilWidth;
+    float pupilHeight;
 
     float antennaWidth;
     float antennaHeight;
@@ -2052,16 +2041,17 @@ void Animation::Stop()
 
 #include "body/Arms/Arms.h"
 
+Arms::Arms(BodyDimensions& dimensions)
+    : dimensions(dimensions),
+      leftShoulder(dimensions, "left"),
+      rightShoulder(dimensions, "right")
+{
+}
+
 void Arms::Initialise()
 {
     leftShoulder.Initialise();
     rightShoulder.Initialise();
-}
-
-void Arms::SetBodyDimensions(float bodyWidth, float bodyHeight)
-{
-    leftShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "left");
-    rightShoulder.SetBodyDimensions(bodyWidth, bodyHeight, "right");
 }
 
 void Arms::Shutdown()
@@ -2182,6 +2172,14 @@ void Hand::SetBodyDimensions(float width, float height, std::string side){}
 #include "Constants.h"
 #include <cmath>
 #include <iostream>
+#include "raymath.h"
+
+Shoulder::Shoulder(BodyDimensions& dimensions, std::string side)
+    : dimensions(dimensions),
+      side(side),
+      upperArm(dimensions, "left")
+{
+}
 
 // Load the shoulder sprite and initialise its animation.
 void Shoulder::Initialise()
@@ -2193,8 +2191,10 @@ void Shoulder::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = 100;//texture.width / COLUMNS;
-    const int FRAME_HEIGHT = 100;//texture.height / ROWS;
+    // Keep the shoulder dimensions aligned with the original sprite size
+    // so the shared BodyDimensions values still produce the correct scale.
+    dimensions.shoulderWidth = 70.0f;//texture.width / COLUMNS;
+    dimensions.shoulderHeight = 70.0f;//texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -2205,8 +2205,8 @@ void Shoulder::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.shoulderWidth,
+        dimensions.shoulderHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -2221,25 +2221,25 @@ void Shoulder::Initialise()
     if(side == "left")
     {
         localPositionOffset = {
-            (bodyWidth / 2.0f) + SHOULDER_WIDTH / 2.0f,
-            -bodyHeight / 2.0f
-
+            (dimensions.bodyWidth / 2.0f) + (dimensions.shoulderWidth / 2.0f),
+            -dimensions.bodyHeight / 2.0f
         }; 
     }
     else if(side == "right")
     {
         localPositionOffset = {
-            (-bodyWidth / 2.0f) - SHOULDER_WIDTH / 2.0f,
-            -bodyHeight / 2.0f
+            (-dimensions.bodyWidth / 2.0f) - (dimensions.shoulderWidth / 2.0f),
+            -dimensions.bodyHeight / 2.0f
         }; 
     }
 
-    homeRotation = rotation;
+    upperArm.Initialise();
 }
 
 void Shoulder::Update(float dt)
 {
     Sprite::Update(dt);
+    upperArm.Update(dt);
 }
 
 // Return the current shoulder animation frame.
@@ -2252,15 +2252,7 @@ int Shoulder::GetFrame() const
 void Shoulder::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
-}
-
-// Set the dimensions of the body so the shoulder can be positioned
-// correctly relative to the body.
-void Shoulder::SetBodyDimensions(float width, float height, std::string side)
-{
-    bodyWidth = width;
-    bodyHeight = height;
-    this->side = side; 
+    upperArm.SetRotation(rotation);
 }
 
 void Shoulder::Draw() const
@@ -2285,48 +2277,36 @@ void Shoulder::Draw() const
     {
         armAnchorPosition.x,
         armAnchorPosition.y,
-        SHOULDER_WIDTH * scale,
-        SHOULDER_HEIGHT * scale
+        dimensions.shoulderWidth * scale,
+        dimensions.shoulderHeight * scale
     };
     
     Vector2 origin =
         {
-            SHOULDER_WIDTH * scale / 2.0f,
+            dimensions.shoulderWidth * scale / 2.0f,
             0
         };
+
+    upperArm.Draw();
 
     DrawRectanglePro(
         shoulder,
         origin,
-        rotation + localRotation,
+        rotation,
         BROWN
     );
 }
 
+void Shoulder::SetAnchorPoint(Vector2 anchorPoint)
+{
+    this->anchorPoint = anchorPoint;
+    
+    upperArm.SetAnchorPoint(anchorPoint);
+}
+
 void Shoulder::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
 {
-    swingTime += dt * SWING_SPEED;
-
-    if (swingTime >= 2.0f * PI)
-    {
-        swingTime -= 2.0f * PI;
-    }
-
-    float unitAngle = 0;
-    
-    if(side == "left")
-    {
-        unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
-    }
-
-    if(side == "right")
-    {
-        unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
-    }
-
-    localRotation =
-            swingMinAngle +
-            unitAngle * (swingMaxAngle - swingMinAngle);
+    upperArm.SwingArm(dt, swingMinAngle, swingMaxAngle);
 }
 
 
@@ -2339,6 +2319,12 @@ void Shoulder::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
 #include <cmath>
 #include <iostream>
 
+UpperArm::UpperArm(BodyDimensions& dimensions, std::string side)
+    : dimensions(dimensions),
+      side(side)
+{
+}
+
 // Load the arm sprite and initialise its animation.
 void UpperArm::Initialise()
 {
@@ -2349,8 +2335,8 @@ void UpperArm::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.upperArmWidth = texture.width / COLUMNS;
+    dimensions.upperArmHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -2361,8 +2347,8 @@ void UpperArm::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.upperArmWidth,
+        dimensions.upperArmHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -2377,15 +2363,15 @@ void UpperArm::Initialise()
     if(side == "left")
     {
         localPositionOffset = {
-            bodyWidth / 2 + FRAME_WIDTH,
-            -bodyHeight / 2
+            (dimensions.bodyWidth / 2.0f) + (dimensions.upperArmWidth / 2.0f),
+            -dimensions.bodyHeight / 2.0f
         }; 
     }
     else if(side == "right")
     {
         localPositionOffset = {
-            -bodyWidth / 2.0f,
-            -bodyHeight / 2.0f
+            (-dimensions.bodyWidth / 2.0f) - (dimensions.upperArmWidth / 2.0f),
+            -dimensions.bodyHeight / 2.0f
         }; 
     }
 
@@ -2407,15 +2393,6 @@ int UpperArm::GetFrame() const
 void UpperArm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
-}
-
-// Set the dimensions of the body so the arm can be positioned
-// correctly relative to the body.
-void UpperArm::SetBodyDimensions(float width, float height, std::string side)
-{
-    bodyWidth = width;
-    bodyHeight = height;
-    this->side = side; 
 }
 
 void UpperArm::Draw() const
@@ -2580,7 +2557,8 @@ Body::Body(BodyDimensions& dimensions) :
     bodyBobSpeed(GetRandomValue(6, 14) / 10.0f), 
     dimensions(dimensions), 
     bodyBase(dimensions),
-    neck(dimensions)
+    neck(dimensions),
+    arms(dimensions)
 {
 }
 
@@ -2590,10 +2568,6 @@ void Body::Initialise()
     bodyBase.Initialise();
     neck.Initialise();
     
-    arms.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight()
-        );
     arms.Initialise();
     
     pelvis.SetBodyDimensions(
@@ -2626,12 +2600,11 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 void Body::Draw() const
 {
     
-    
     pelvis.Draw();
     
     bodyBase.Draw();
 
-arms.Draw();
+    arms.Draw();
 
     neck.Draw();
 }
@@ -4439,6 +4412,10 @@ void Nose::Draw() const
 #include "Constants.h"
 #include <string>
 
+Pupil::Pupil(BodyDimensions& dimensions) :
+    dimensions(dimensions)
+{}
+
 // Load the pupil sprite and initialise its animation.
 void Pupil::Initialise()
 {
@@ -4449,8 +4426,8 @@ void Pupil::Initialise()
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.pupilWidth = texture.width / COLUMNS;
+    dimensions.pupilHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -4461,8 +4438,8 @@ void Pupil::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.pupilWidth,
+        dimensions.pupilHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -4474,23 +4451,23 @@ void Pupil::Initialise()
     if(side == "left")
     {
         anchorOffset = {
-            FRAME_WIDTH / 2.0f - sideOffset, 
-            FRAME_HEIGHT / 2.0f + 
-            bodyHeight / 2.0f + 
-            headHeight / 2.0f +
-            neckHeight +
-            eyesYOffset
+            dimensions.pupilWidth / 2.0f - sideOffset, 
+            dimensions.pupilHeight / 2.0f + 
+            dimensions.bodyHeight / 2.0f + 
+            dimensions.headHeight / 2.0f +
+            dimensions.neckHeight +
+            dimensions.eyesYoffset
         };
     }
     else if(side == "right")
     {
         anchorOffset = {
-            FRAME_WIDTH / 2.0f + sideOffset, 
-            FRAME_HEIGHT / 2.0f + 
-            bodyHeight / 2.0f + 
-            headHeight / 2.0f +
-            neckHeight +
-            eyesYOffset
+            dimensions.pupilWidth / 2.0f + sideOffset, 
+            dimensions.pupilHeight / 2.0f + 
+            dimensions.bodyHeight / 2.0f + 
+            dimensions.headHeight / 2.0f +
+            dimensions.neckHeight +
+            dimensions.eyesYoffset
         };
     }
 }
@@ -4499,22 +4476,6 @@ void Pupil::Initialise()
 void Pupil::Update(float dt)
 {
     Sprite::Update(dt);
-}
-
-void Pupil::SetBodyHeadNeckEyeOffsetDimensions(
-            float bW, float bH, 
-            float hW, float hH,
-            float nW, float nH,
-            float eyesYOffset
-     )
-{
-    bodyWidth = bW;
-    bodyHeight = bH;
-    headWidth = hW;
-    headHeight = hH;
-    neckWidth = nW;
-    neckHeight = nH;
-    this->eyesYOffset = eyesYOffset; 
 }
 
 void Pupil::SetSide(std::string side)
@@ -4549,7 +4510,10 @@ float Pupil::GetSideOffset()
 
 Vector2 L;
 
-Pupils::Pupils(BodyDimensions& BodyDimensions) : dimensions(dimensions)
+Pupils::Pupils(BodyDimensions& dimensions) : 
+    dimensions(dimensions),
+    leftPupil(dimensions),
+    rightPupil(dimensions)
 {}
 
 // Initialise both pupil sprites.
