@@ -13,9 +13,6 @@ class Ears : public Sprite
     private:
         BodyDimensions& dimensions;
 
-        //Ears-centre translation in local head coordinates.
-        Vector2 localPositionOffset = {0, 0};
-
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0;
 };

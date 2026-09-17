@@ -3,34 +3,42 @@
 #include <cmath>
 #include <iostream>
 
+// Construct the upper arm using the shared body dimensions
+// and the side of the body that the arm belongs to.
 UpperArm::UpperArm(BodyDimensions& dimensions, std::string side)
     : dimensions(dimensions),
       side(side)
 {
 }
 
-// Load the arm sprite and initialise its animation.
+// Initialise the upper arm and its animation.
 void UpperArm::Initialise()
 {
+    // Load the upper arm texture.
     texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
 
     // Sprite sheet layout.
+    // The upper arm currently consists of a single frame.
     const int COLUMNS = 1;
     const int ROWS = 1;
 
-    // Calculate the size of a single animation frame.
+    // Calculate the dimensions of a single animation frame
+    // from the loaded texture.
     dimensions.upperArmWidth = texture.width / COLUMNS;
     dimensions.upperArmHeight = texture.height / ROWS;
 
-    //std::cout << dimensions.upperArmWidth << " * " << dimensions.upperArmHeight << "\n";
+    // Debug output for checking the calculated dimensions.
+    // std::cout << dimensions.upperArmWidth << " * "
+    //           << dimensions.upperArmHeight << "\n";
 
+    // Calculate the total number of animation frames.
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
     // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.02f;
 
-    // Initialise the animation using the sprite sheet information.
+    // Initialise the animation using the calculated frame dimensions.
     animation.Initialise
     (
         dimensions.upperArmWidth,
@@ -40,43 +48,59 @@ void UpperArm::Initialise()
         FRAME_DURATION
     );
 
+    // Set the initial rotation and drawing scale.
     rotation = ROTATION;
     scale = SCALE;
 
-    // Position the arm's anchor point relative to the body.
-    // The anchor point represents where the arm attaches
-    // to the body at the shoulder.
+    // Position the upper arm relative to its parent shoulder.
+    //
+    // The Shoulder passes its world-space position to the
+    // UpperArm through SetAnchorPoint().
+    //
+    // localPositionOffset therefore represents the upper arm's
+    // position relative to the shoulder rather than the body.
+    //
+    // X:
+    //     Move the anchor to the centre of the upper arm.
+    //
+    // Y:
+    //     Position the upper arm below the shoulder using the
+    //     shared shoulder height.
     localPositionOffset = {
         dimensions.upperArmWidth / 2.0f,
         dimensions.shoulderHeight / 2.0f
     };
 
+    // Store the initial rotation so the arm has a known
+    // home rotation.
     homeRotation = rotation;
 }
 
+// Update the upper arm and its animation state.
 void UpperArm::Update(float dt)
 {
     Sprite::Update(dt);
 }
 
-// Return the current arm animation frame.
+// Return the current animation frame of the upper arm.
 int UpperArm::GetFrame() const
 {
     return animation.GetFrame();
 }
 
-// Apply a rotation to the arm.
+// Set the upper arm's base rotation.
 void UpperArm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
 
+// Draw the upper arm.
 void UpperArm::Draw() const
 {
-    // Get the current animation frame.
+    // Get the source rectangle for the current animation frame.
     Rectangle source = animation.GetSourceRectangle();
 
-    // Calculate the scaled dimensions of the arm.
+    // Calculate the scaled dimensions of the current frame.
     float width = animation.GetFrameWidth() * scale;
     float height = animation.GetFrameHeight() * scale;
 
@@ -84,35 +108,38 @@ void UpperArm::Draw() const
     // Parent Transform
     //================================================
     //
-    // localPositionOffset represents the arm's local
-    // position relative to the body anchor point.
+    // localPositionOffset represents the upper arm's
+    // position relative to its parent shoulder.
     //
-    // Rotate this local offset around the body anchor
-    // so the arm follows the body's rotation.
+    // The offset is rotated so that the upper arm follows
+    // the rotation of its parent.
     //
     Vector2 offset = localPositionOffset;
 
-    // Raylib rotation values are measured in degrees,
-    // while sinf() and cosf() require radians.
+    // Raylib uses degrees for rotation, while sinf() and
+    // cosf() require radians.
     float radians = rotation * DEG2RAD;
 
-    // Rotate the arm's local offset around the
-    // body anchor point.
+    // Rotate the local position around the shoulder's
+    // anchor point.
     Vector2 rotatedOffset =
     {
-        (offset.x * cosf(radians) - offset.y * sinf(radians)),
-        offset.x * sinf(radians) + offset.y * cosf(radians)
+        (offset.x * cosf(radians) -
+         offset.y * sinf(radians)),
+
+        offset.x * sinf(radians) +
+        offset.y * cosf(radians)
     };
 
     //================================================
     // Arm World Position
     //================================================
     //
-    // Add the rotated local offset to the body's
+    // Add the rotated local offset to the shoulder's
     // world-space anchor point.
     //
-    // The arm anchor point is attached to the body
-    // at the shoulder and follows the body's rotation.
+    // anchorPoint is now supplied by the parent Shoulder,
+    // rather than directly representing the body position.
     //
     Vector2 armAnchorPosition =
     {
@@ -124,10 +151,14 @@ void UpperArm::Draw() const
     // Arm Destination
     //================================================
     //
-    // Position the arm sprite using its anchor point.
+    // Position the upper arm using its anchor point.
     //
-    // The anchor point is at the top-centre of the
-    // arm sprite, where the arm attaches to the shoulder.
+    // The X position is adjusted by half the arm width
+    // so that the anchor is located at the top-centre
+    // of the sprite.
+    //
+    // The Y position starts at the anchor point and the
+    // arm extends downward from there.
     //
     Rectangle destination =
     {
@@ -141,11 +172,12 @@ void UpperArm::Draw() const
     // Local Rotation Pivot
     //================================================
     //
-    // Set the rotation origin to the top-centre of the arm.
+    // Set the rotation origin to the top-centre of the
+    // upper arm.
     //
-    // This is the point where the arm attaches to the
-    // body at the shoulder, allowing the arm to rotate
-    // around the shoulder rather than its centre.
+    // This allows the arm to rotate around its attachment
+    // point at the shoulder instead of rotating around
+    // its centre.
     //
     Vector2 origin =
     {
@@ -158,13 +190,13 @@ void UpperArm::Draw() const
     //================================================
     //
     // rotation:
-    //     Rotation inherited from the body.
+    //     Rotation inherited from the parent transform.
     //
     // localRotation:
-    //     Independent rotation of the arm.
+    //     Independent rotation applied to the upper arm.
     //
-    // Adding the two rotations allows the arm to
-    // follow the body while also rotating independently.
+    // Combining the two allows the upper arm to follow
+    // the body while still having its own articulation.
     //
     DrawTexturePro(
         texture,
@@ -176,28 +208,50 @@ void UpperArm::Draw() const
     );
 }
 
-void UpperArm::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
+// Swing the upper arm between the supplied minimum
+// and maximum angles.
+void UpperArm::SwingArm(
+    float dt,
+    float swingMinAngle,
+    float swingMaxAngle
+)
 {
+    // Advance the swing timer based on elapsed time
+    // and the configured swing speed.
     swingTime += dt * SWING_SPEED;
 
+    // Keep the timer within one complete sine-wave cycle.
     if (swingTime >= 2.0f * PI)
     {
         swingTime -= 2.0f * PI;
     }
 
+    // Normalised value used to convert the sine wave
+    // into the requested swing angle range.
     float unitAngle = 0;
-    
+
+    // Reverse the swing direction for the left arm.
     if(side == "left")
     {
         unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
     }
 
+    // Use the normal swing direction for the right arm.
     if(side == "right")
     {
         unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
     }
 
+    // Convert the normalised sine-wave value into the
+    // requested rotation range.
+    //
+    // For example:
+    //
+    // swingMinAngle = 0
+    // swingMaxAngle = 180
+    //
+    // produces a smooth swing between 0 and 180 degrees.
     localRotation =
-            swingMinAngle +
-            unitAngle * (swingMaxAngle - swingMinAngle);
+        swingMinAngle +
+        unitAngle * (swingMaxAngle - swingMinAngle);
 }

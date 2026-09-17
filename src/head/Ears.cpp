@@ -44,7 +44,7 @@ void Ears::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.earsWidth / 2.0f,
         dimensions.earsHeight / 2.0f
@@ -52,8 +52,6 @@ void Ears::Initialise()
         + dimensions.headHeight / 2.0f
         + dimensions.neckHeight
     };
-
-    anchorOffset = localPositionOffset;
 }
 
 void Ears::Update(float dt)

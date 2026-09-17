@@ -1,6 +1,7 @@
 #include "body/BodyBase.h"
 
 #include "Constants.h"
+#include <iostream>
 
 BodyBase::BodyBase(BodyDimensions& dimensions) : 
             dimensions(dimensions)
@@ -19,6 +20,8 @@ void BodyBase::Initialise()
     // Calculate the size of a single animation frame.
     dimensions.bodyWidth = texture.width / COLUMNS;
     dimensions.bodyHeight = texture.height / ROWS;
+
+    std::cout << dimensions.bodyWidth << " x " << dimensions.bodyHeight << "\n";
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 

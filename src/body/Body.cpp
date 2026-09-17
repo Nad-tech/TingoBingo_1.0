@@ -25,7 +25,8 @@ Body::Body(BodyDimensions& dimensions) :
     dimensions(dimensions), 
     bodyBase(dimensions),
     neck(dimensions),
-    arms(dimensions)
+    arms(dimensions),
+    pelvis(dimensions)
 {
 }
 
@@ -34,13 +35,7 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     neck.Initialise();
-    
     arms.Initialise();
-    
-    pelvis.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight()
-    );
     pelvis.Initialise();
 }
 
@@ -66,13 +61,9 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    
     pelvis.Draw();
-    
     bodyBase.Draw();
-
     arms.Draw();
-
     neck.Draw();
 }
 

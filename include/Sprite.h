@@ -13,7 +13,8 @@ protected:
     // World-space position of the sprite's anchor point.
     Vector2 anchorPoint = {0,0};
 
-    // Local offset from the sprite's anchor point used for drawing and rotation.
+    // Local offset from the sprite's anchor point used for drawing and rotation
+    //and calculating world space coordinates.
     Vector2 anchorOffset = {0,0};
 
     float rotation = 0.0f;
