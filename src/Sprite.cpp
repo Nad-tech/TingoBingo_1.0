@@ -99,8 +99,7 @@ void Sprite::Draw() const
         animation.GetFrameHeight() * transform.scale
     };
 
-    // Draw the selected animation frame at the anchor point,
-    // using the anchor offset as the drawing and rotation pivot.
+    // Draw the selected animation frame at the position
     DrawTexturePro(
         texture,
         source,

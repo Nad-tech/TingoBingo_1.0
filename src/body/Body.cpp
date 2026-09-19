@@ -77,11 +77,6 @@ void Body::SetTransform(MyTransform transform)
     //pelvis.SetTransform(this->transform);
 }
 
-MyTransform Body::GetTransform() const
-{
-    return transform;
-}
-
 void Body::SetRotation(float rotation)
 {
     transform.rotation = rotation;
@@ -91,11 +86,6 @@ void Body::SetRotation(float rotation)
 
     pelvis.SetRotation(rotation);
     neck.SetRotation(rotation);
-}
-
-float Body::GetRotation()
-{
-    return transform.rotation;
 }
 
 /*void Body::PlayIdleBodyTransform(float dt)

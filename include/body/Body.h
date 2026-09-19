@@ -17,13 +17,16 @@ public:
     Body(BodyDimensions& dimensions);
     void Initialise();
     void Shutdown();
+    
     void Update(float dt, bool speaking, Emotion emotion);
     void Draw() const;
+    
     void SetTransform(MyTransform transform);
-    MyTransform GetTransform() const;
+    
     void SetRotation(float rotation);
+    
     Head& GetHead();
-    float GetRotation();
+    
     //void PlayIdleBodyTransform(float dt);
     //void PlayBodyWiggle(float dt);
     //void PlayBodyBob(float dt);
@@ -32,12 +35,18 @@ public:
 private:
     BodyDimensions &dimensions;
     MyTransform transform;
+    
     BodyBase bodyBase;
     Neck neck;
     Pelvis pelvis;
     Arms arms;
+    
     Vector2 homeAnchorPoint;
     float homeRotation;
+
+    //================================================
+    // Body Wiggle State
+    //================================================
 
     // Tracks the progress of the current wiggle.
     float bodyWiggleTimer;

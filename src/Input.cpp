@@ -56,3 +56,8 @@ bool Input::LeftMouseButtonPressed() const
 {
     return IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
 }
+
+bool Input::G_Pressed() const
+{
+    return IsKeyDown(KEY_G);
+}

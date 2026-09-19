@@ -10,4 +10,5 @@ public:
     Vector2 MousePosition() const;
     bool H_Pressed() const;
     bool LeftMouseButtonPressed() const;
+    bool G_Pressed() const;
 };

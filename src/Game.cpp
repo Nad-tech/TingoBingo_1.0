@@ -34,6 +34,33 @@
 #include "Emotion.h"
 #include "MyTransform.h"
 
+bool drawGrid = false;
+
+void DrawDebugGrid()
+{
+    const int gridSize = 100;
+
+    const int originX = SCREEN_WIDTH / 2;
+    const int originY = SCREEN_HEIGHT / 2;
+
+    // Vertical grid lines
+    for (int x = originX; x <= SCREEN_WIDTH; x += gridSize)
+        DrawLine(x, 0, x, SCREEN_HEIGHT, LIGHTGRAY);
+
+    for (int x = originX - gridSize; x >= 0; x -= gridSize)
+        DrawLine(x, 0, x, SCREEN_HEIGHT, LIGHTGRAY);
+
+    // Horizontal grid lines
+    for (int y = originY; y <= SCREEN_HEIGHT; y += gridSize)
+        DrawLine(0, y, SCREEN_WIDTH, y, LIGHTGRAY);
+
+    for (int y = originY - gridSize; y >= 0; y -= gridSize)
+        DrawLine(0, y, SCREEN_WIDTH, y, LIGHTGRAY);
+
+    // Cartesian axes
+    DrawLine(0, originY, SCREEN_WIDTH, originY, DARKGRAY);
+    DrawLine(originX, 0, originX, SCREEN_HEIGHT, DARKGRAY);
+}
 
 // Initialise the game and load required resources.
 void Game::Initialise()
@@ -92,6 +119,11 @@ void Game::HandleInput()
 	if(input.RightPressed()){
 
 	}
+
+	if(input.G_Pressed())
+	{
+		drawGrid = !drawGrid;
+	}
 }
 
 // Update the game state.
@@ -136,6 +168,10 @@ void Game::Draw()
 	banana.Draw();
 	
 	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
+
+	if(drawGrid) {
+		DrawDebugGrid();
+	}
 }
 
 // Release resources before exiting.
