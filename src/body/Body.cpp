@@ -2,16 +2,14 @@
 #include <cmath>
 #include "Emotion.h"
 
-// Initialise the body's transform and idle animation state.
 Body::Body(BodyDimensions& dimensions) :
     dimensions(dimensions),
-    transform(), 
+    transform(),
+    homeTransform(), 
     bodyBase(dimensions),
     neck(dimensions),
     pelvis(dimensions),
     arms(dimensions),
-    homeAnchorPoint(0,0),    
-    homeRotation(0.0f),
     bodyWiggleTimer(0.0f),
     bodyWiggleAmplitude(0.0f),
     bodyWiggling(false),
@@ -27,16 +25,15 @@ Body::Body(BodyDimensions& dimensions) :
     bodyBobSpeed(GetRandomValue(6, 14) / 10.0f)
 {}
 
-// Initialise every component that makes up the robot's body.
 void Body::Initialise()
 {
+    homeTransform = transform;
     bodyBase.Initialise();
     neck.Initialise();
     arms.Initialise();
     pelvis.Initialise();
 }
 
-// Release resources used by each body component.
 void Body::Shutdown()
 {
     neck.Shutdown();
@@ -45,7 +42,6 @@ void Body::Shutdown()
     pelvis.Shutdown();
 }
 
-// Update every animated body component.
 void Body::Update(float dt, bool speaking, Emotion emotion)
 {
     neck.Update(dt, speaking, emotion);
@@ -53,7 +49,7 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     arms.Update(dt);
     pelvis.Update(dt);
     
-    //PlayIdleBodyTransform(dt);
+    PlayIdleBodyTransform(dt);
 }
 
 void Body::Draw() const
@@ -82,19 +78,16 @@ void Body::SetRotation(float rotation)
     transform.rotation = rotation;
 
     bodyBase.SetRotation(rotation);
-    arms.SetRotation(rotation);
+    //arms.SetRotation(rotation);
 
-    pelvis.SetRotation(rotation);
-    neck.SetRotation(rotation);
+    //pelvis.SetRotation(rotation);
+    //neck.SetRotation(rotation);
 }
 
-/*void Body::PlayIdleBodyTransform(float dt)
+void Body::PlayIdleBodyTransform(float dt)
 {
     PlayBodyBob(dt);
-    ApplyAnchorPoint(anchorPoint);
-
     PlayBodyWiggle(dt);
-    ApplyRotation(rotation);
 }
 
 void Body::PlayBodyWiggle(float dt)
@@ -114,7 +107,7 @@ void Body::PlayBodyWiggle(float dt)
     {
         bodyWiggleTimer += dt;
 
-        rotation = sin(bodyWiggleTimer * bodyWiggleFrequency) * bodyWiggleAmplitude;
+        transform.rotation = sin(bodyWiggleTimer * bodyWiggleFrequency) * bodyWiggleAmplitude;
 
         // Gradually reduce the wiggle until the body settles.
         bodyWiggleAmplitude -= 8.0f * dt;
@@ -122,8 +115,9 @@ void Body::PlayBodyWiggle(float dt)
         if (bodyWiggleAmplitude <= 0.0f)
         {
             bodyWiggling = false;
-            rotation = homeRotation;
+            transform.rotation = homeTransform.rotation;
         }
+        bodyBase.SetTransform(transform);
     }
 }
 
@@ -147,21 +141,21 @@ void Body::PlayBodyBob(float dt)
     bodyBobOffset.x = cos(bodyBobAngle) * bodyBobRadiusX;
     bodyBobOffset.y = sin(bodyBobAngle) * bodyBobRadiusY;
 
-    anchorPoint.x = homeAnchorPoint.x + bodyBobOffset.x;
-    anchorPoint.y = homeAnchorPoint.y + bodyBobOffset.y;
-}*/
+    transform.position.x = homeTransform.position.x + bodyBobOffset.x;
+    transform.position.y = homeTransform.position.y + bodyBobOffset.y;
+
+    bodyBase.SetTransform(transform);
+}
 
 Head& Body::GetHead()
 {
     return neck.GetHead();
 }
 
-/*void Body::SwingArm(std::string side,  bool swing)
+/*
+void Body::SwingArm(std::string side,  bool swing)
 {
     arms.SwingArm(side, swing);
-}
-
-Vector2 Body::GetHeadWorldPosition()
-{
-    return neck.GetHead().GetWorldPosition();
 }*/
+
+
