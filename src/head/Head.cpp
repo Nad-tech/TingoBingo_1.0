@@ -97,14 +97,14 @@ void Head::ApplyAnchorPoint(Vector2 anchorPoint)
 {
     this->anchorPoint = anchorPoint;
 
-    headBase.SetAnchorPoint(anchorPoint);
+    /*headBase.SetAnchorPoint(anchorPoint);
     antenna.SetAnchorPoint(anchorPoint);
     ears.SetAnchorPoint(anchorPoint);
     eyebrows.SetAnchorPoint(anchorPoint);
     eyes.SetAnchorPoint(anchorPoint);
     mouth.SetAnchorPoint(anchorPoint);
     nose.SetAnchorPoint(anchorPoint);
-    pupils.SetAnchorPoint(anchorPoint);
+    pupils.SetAnchorPoint(anchorPoint);*/
 }
 
 Vector2 Head::GetAnchorPoint()

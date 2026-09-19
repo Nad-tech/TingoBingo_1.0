@@ -206,12 +206,14 @@ class Arms
 
 #include "Sprite.h"
 #include "ForeArm.h"
+#include "BodyDimensions.h"
 
 #include <string>
 
 class Elbow : public Sprite
 {
     public:
+        Elbow(BodyDimensions& dimensions, std::string side);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
@@ -219,18 +221,14 @@ class Elbow : public Sprite
         int GetFrame() const;
         
         void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, std::string side);
 
     private:
-        Vector2 localPositionOffset = {0, 0};
+        BodyDimensions& dimensions;
         float localRotation = 0.0f;
         float homeRotation = 0.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
         std::string side = "";
 
-        ForeArm leftForeArm;
-        ForeArm rightForeArm;
+        ForeArm foreArm;
 };
 
 
@@ -328,10 +326,9 @@ class Shoulder : public Sprite
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {0, 0};
+        Vector2 armAnchorPosition;
 
         std::string side = "";
-        
         UpperArm upperArm;
 };
 
@@ -364,18 +361,16 @@ class UpperArm : public Sprite
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {0, 0};
+        Vector2 armAnchorPosition;
         float localRotation = 0.0f;
-        float homeRotation = 0.0f;
         std::string side = "";
 
         const float SWING_MIN = 0.0f;
         const float SWING_MAX = 180.0f;
-        const float SWING_SPEED = 10.0f;
+        const float SWING_SPEED = 1.0f;
         float swingTime = 0;
 
-        Elbow leftElbow;
-        Elbow rightElbow;
+        Elbow elbow;
 };
 
 
@@ -514,8 +509,6 @@ class BodyBase : public Sprite
         void Initialise() override;
         int GetFrame() const;
         void SetRotation(float rotation);
-        float GetFrameWidth() const;
-        float GetFrameHeight() const;
     
     private:
         BodyDimensions& dimensions;
@@ -542,8 +535,6 @@ class Antenna : public Sprite
         BodyDimensions& dimensions;
         float antennaAnimationTimer = 0.0f;
         float nextAntennaAnimation = 3.0f;
-
-        Vector2 localPositionOffset = {};
         float topOfHeadOffset = 46.0f;
 };
 
@@ -566,9 +557,6 @@ class Ears : public Sprite
 
     private:
         BodyDimensions& dimensions;
-
-        //Ears-centre translation in local head coordinates.
-        Vector2 localPositionOffset = {0, 0};
 
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0;
@@ -595,8 +583,6 @@ class Eyebrows : public Sprite
     private:
         BodyDimensions& dimensions;
 
-        // Eyebrows-centre translation in local head coordinates.
-        Vector2 localPositionOffset = {0, 0};
         float foreheadOffset = 65; 
 
         float happyAnimationTimer = 0.0f;
@@ -845,9 +831,6 @@ class Nose : public Sprite
 
     private:
         BodyDimensions& dimensions;
-
-        // Nose-centre translation in local head coordinates.
-        Vector2 localPositionOffset = {0, 0};
         float slightPositionOffset = 5.0f;
         
         //Idle
@@ -1048,19 +1031,21 @@ class Knee : public Sprite
 #pragma once
 
 #include "body/Legs/Thigh.h"
+#include "BodyDimensions.h"
 
 class Legs
 {
     public:
+        Legs(BodyDimensions& dimensions);
         void Initialise();
         void Shutdown();
         void Update(float dt);
         void Draw() const;
         void SetAnchorPoint(Vector2 anchorPoint);
         void SetRotation(float rotation);
-        void SetBodyDimension(float bodyWidth, float bodyHeight);
 
     private:
+        BodyDimensions& dimensions;
         Thigh rightThigh;
         Thigh leftThigh;
 };
@@ -1105,24 +1090,23 @@ class Shin : public Sprite
 
 #include "Sprite.h"
 #include "Knee.h"
+#include "BodyDimensions.h"
 
 #include <string>
 
 class Thigh : public Sprite
 {
     public:
+        Thigh(BodyDimensions& dimensions, std::string side);
         void Initialise() override;
+        void Draw() const;
         int GetFrame() const;
         void SetRotation(float rotation);
-        void SetBodyDimensions(float width, float height, const std::string& side);
 
     private:
-        float bodyWidth;
-        float bodyHeight;
+        BodyDimensions& dimensions;
         std::string side;
-
-        Knee leftKnee;
-        Knee rightKnee;
+        Knee knee;
 };
 
 
@@ -1141,6 +1125,7 @@ class Thigh : public Sprite
 class Neck : public Sprite
 {
     public:
+        using Sprite::Update;
         Neck(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt, bool speaking, Emotion emotion);
@@ -1153,7 +1138,6 @@ class Neck : public Sprite
     private:
         BodyDimensions& dimensions;
         Head head;
-        Vector2 localPositionOffset = {};
 };
 
 
@@ -1164,25 +1148,21 @@ class Neck : public Sprite
 #pragma once
 #include "body/Legs/Legs.h"
 #include "Sprite.h"
+#include "BodyDimensions.h"
 class Pelvis : Sprite
 {
     public:
-        public:
+        Pelvis(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const;
         void SetRotation(float rotation);
-        void SetBodyDimensions(float bW, float bH);
         void SetAnchorPoint(Vector2 anchorPoint);
         void Shutdown();
 
     private:
+        BodyDimensions& dimensions;
         Vector2 localPositionOffset = {};
-        float topOfHeadOffset = 46.0f;
-        float bodyWidth = 0;
-        float bodyHeight = 0;
-
-    private:
         Legs legs;
 };
 
@@ -1234,6 +1214,9 @@ public:
     float upperArmWidth;
     float upperArmHeight;
 
+    float elbowWidth;
+    float elbowHeight;
+
     float forearmWidth;
     float forearmHeight;
 
@@ -1271,6 +1254,8 @@ public:
 
 #pragma once
 
+#include "raylib.h"
+
 constexpr int SCREEN_WIDTH = 700;
 constexpr int SCREEN_HEIGHT = 700;
 constexpr char WINDOW_TITLE[] = "Tingo Bingo";
@@ -1278,7 +1263,11 @@ constexpr int TARGET_FPS = 60;
 
 constexpr int ROBOT_WIDTH = 0;
 constexpr int ROBOT_HEIGHT = 0;
-constexpr float SCALE = 0.8f;
+constexpr float SCALE = 0.7f;
+
+constexpr Color CARDBOARD_LIGHT = { 181, 150, 105, 255 };
+constexpr Color CARDBOARD = { 150, 120, 80, 255 };
+constexpr Color CARDBOARD_DARK = { 105, 80, 55, 255 };
 
 
 =====================================
@@ -1822,7 +1811,8 @@ protected:
     // World-space position of the sprite's anchor point.
     Vector2 anchorPoint = {0,0};
 
-    // Local offset from the sprite's anchor point used for drawing and rotation.
+    // Local offset from the sprite's anchor point used for drawing and rotation
+    //and calculating world space coordinates.
     Vector2 anchorOffset = {0,0};
 
     float rotation = 0.0f;
@@ -2121,15 +2111,59 @@ void Arms::SwingArm(std::string side, bool swing)
 =====================================
 
 #include "Body/Arms/Elbow.h"
+#include <cmath>
+#include <iostream>
 
-void Elbow::Initialise(){}
-void Elbow::Update(float dt){}
-void Elbow::Draw()const {}
+Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
+    dimensions(dimensions),
+    side(side)
+{}
 
-int Elbow::GetFrame() const{}
+void Elbow::Initialise()
+{
+    dimensions.elbowWidth = 50.0f;
+    dimensions.elbowHeight = 50.0f;
 
-void Elbow::SetRotation(float rotation){}
-void Elbow::SetBodyDimensions(float width, float height, std::string side){}
+    rotation = 0.0f;
+
+    scale = SCALE;
+}
+void Elbow::Update(float dt)
+{
+    Sprite::Update(dt);
+}
+
+void Elbow::Draw()const 
+{
+    Rectangle elbow = {
+        anchorPoint.x,
+        anchorPoint.y,
+        dimensions.elbowWidth * SCALE,
+        dimensions.elbowHeight * SCALE
+    };
+
+    Vector2 localPivot =
+    {
+        dimensions.elbowWidth / 2.0f,
+        0
+    };
+
+    DrawRectanglePro(
+        elbow,
+        localPivot,
+        rotation + localRotation,
+        WHITE
+    );
+}
+
+int Elbow::GetFrame() const
+{
+    return 0;
+}
+
+void Elbow::SetRotation(float rotation) {
+    this->rotation = rotation;
+}
 
 
 =====================================
@@ -2174,35 +2208,45 @@ void Hand::SetBodyDimensions(float width, float height, std::string side){}
 #include <iostream>
 #include "raymath.h"
 
+// Construct a shoulder using the shared body dimensions
+// and the side of the body that the shoulder belongs to.
 Shoulder::Shoulder(BodyDimensions& dimensions, std::string side)
     : dimensions(dimensions),
       side(side),
-      upperArm(dimensions, "left")
+      upperArm(dimensions, side)
 {
 }
 
-// Load the shoulder sprite and initialise its animation.
+// Initialise the shoulder and its child upper arm.
 void Shoulder::Initialise()
 {
-    //texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
+    // Texture loading is currently disabled because
+    // the shoulder is being drawn as a rectangle while
+    // the body articulation system is being developed.
+    // texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
 
     // Sprite sheet layout.
+    // The shoulder currently consists of a single frame.
     const int COLUMNS = 1;
     const int ROWS = 1;
 
-    // Calculate the size of a single animation frame.
-    // Keep the shoulder dimensions aligned with the original sprite size
-    // so the shared BodyDimensions values still produce the correct scale.
-    dimensions.shoulderWidth = 70.0f;//texture.width / COLUMNS;
-    dimensions.shoulderHeight = 70.0f;//texture.height / ROWS;
+    // Set the shoulder dimensions.
+    // These values are stored in the shared BodyDimensions object
+    // so other body parts can use the shoulder's dimensions when
+    // calculating their own positions.
+    dimensions.shoulderWidth = 75.0f;
+    dimensions.shoulderHeight = 75.0f;
 
+    // Calculate the total number of animation frames.
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
-    // Animation settings.
+    // Default shoulder rotation.
     const float ROTATION = 0.0f;
+
+    // Duration of each animation frame.
     const float FRAME_DURATION = 0.02f;
 
-    // Initialise the animation using the sprite sheet information.
+    // Initialise the shoulder animation using the shared dimensions.
     animation.Initialise
     (
         dimensions.shoulderWidth,
@@ -2212,33 +2256,93 @@ void Shoulder::Initialise()
         FRAME_DURATION
     );
 
+    // Set the initial rotation and drawing scale.
     rotation = ROTATION;
     scale = SCALE;
 
-    // Position the shoulder's anchor point relative to the body.
-    // The anchor point represents where the shoulder attaches
-    // to the body.
+    // Calculate the shoulder's local position relative to the body.
+    //
+    // The shoulder is positioned at the upper-left or upper-right
+    // edge of the body depending on which side it belongs to.
+    //
+    // The X position places the centre of the shoulder just outside
+    // the corresponding edge of the body.
+    //
+    // The Y position places the top of the shoulder at the top of
+    // the body.
     if(side == "left")
     {
-        localPositionOffset = {
-            (dimensions.bodyWidth / 2.0f) + (dimensions.shoulderWidth / 2.0f),
+        anchorOffset = {
+            (dimensions.bodyWidth / 2.0f) +
+            (dimensions.shoulderWidth / 2.0f),
+
             -dimensions.bodyHeight / 2.0f
         }; 
     }
     else if(side == "right")
     {
-        localPositionOffset = {
-            (-dimensions.bodyWidth / 2.0f) - (dimensions.shoulderWidth / 2.0f),
+        anchorOffset = {
+            (-dimensions.bodyWidth / 2.0f) -
+            (dimensions.shoulderWidth / 2.0f),
+
             -dimensions.bodyHeight / 2.0f
         }; 
     }
 
+    // Initialise the upper arm.
+    // The upper arm is a child of the shoulder and receives
+    // the same shared BodyDimensions object.
     upperArm.Initialise();
 }
 
+// Update the shoulder and its child upper arm.
 void Shoulder::Update(float dt)
 {
+    // Update the base Sprite state, including animation
+    // and any rotation-related state.
     Sprite::Update(dt);
+
+    // Start with the shoulder's local position relative to the body.
+    Vector2 offset = anchorOffset;
+
+    // Convert the shoulder's rotation from degrees to radians
+    // for use with the trigonometric functions.
+    float radians = rotation * DEG2RAD;
+
+    // Rotate the local offset around the body's anchor point.
+    //
+    // This allows the shoulder to maintain its correct position
+    // relative to the body when the body or shoulder is rotated.
+    Vector2 rotatedOffset =
+    {
+        (offset.x * cosf(radians) -
+         offset.y * sinf(radians)) * scale,
+
+        (offset.x * sinf(radians) +
+         offset.y * cosf(radians)) * scale
+    };
+
+    // Convert the rotated local position into a world-space position.
+    //
+    // armAnchorPosition represents the shoulder's actual position
+    // in the world and is used as the anchor point for the upper arm.
+    armAnchorPosition =
+    {
+        anchorPoint.x + rotatedOffset.x,
+        anchorPoint.y + rotatedOffset.y
+    };
+
+    // Pass the shoulder's world-space position to the upper arm.
+    //
+    // This establishes the parent-child relationship:
+    //
+    // Body -> Shoulder -> UpperArm
+    //
+    // The upper arm can now position itself relative to the shoulder
+    // instead of calculating its position directly from the body.
+    upperArm.SetAnchorPoint(armAnchorPosition);
+
+    // Update the child upper arm.
     upperArm.Update(dt);
 }
 
@@ -2248,31 +2352,23 @@ int Shoulder::GetFrame() const
     return animation.GetFrame();
 }
 
-// Apply a rotation to the shoulder.
+// Set the shoulder rotation and pass the rotation
+// down to the child upper arm.
 void Shoulder::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+
+    // Keep the upper arm aligned with the shoulder's rotation.
     upperArm.SetRotation(rotation);
 }
 
+// Draw the shoulder and its child upper arm.
 void Shoulder::Draw() const
 {
-    Vector2 offset = localPositionOffset;
-
-    float radians = rotation * DEG2RAD;
-
-    Vector2 rotatedOffset =
-    {
-        (offset.x * cosf(radians) - offset.y * sinf(radians))*scale,
-        (offset.x * sinf(radians) + offset.y * cosf(radians))*scale
-    };
-
-    Vector2 armAnchorPosition =
-    {
-        anchorPoint.x + rotatedOffset.x,
-        anchorPoint.y + rotatedOffset.y
-    };
-
+    // Define the shoulder's destination rectangle.
+    //
+    // armAnchorPosition represents the top-centre of the shoulder
+    // because the drawing origin is positioned at the top-centre below.
     Rectangle shoulder =
     {
         armAnchorPosition.x,
@@ -2281,14 +2377,21 @@ void Shoulder::Draw() const
         dimensions.shoulderHeight * scale
     };
     
+    // Set the drawing origin to the top-centre of the shoulder.
+    //
+    // This makes the shoulder rotate around its attachment point
+    // rather than around its centre.
     Vector2 origin =
-        {
-            dimensions.shoulderWidth * scale / 2.0f,
-            0
-        };
+    {
+        dimensions.shoulderWidth * scale / 2.0f,
+        0
+    };
 
+    // Draw the upper arm first so that the shoulder is rendered
+    // over the top of it.
     upperArm.Draw();
 
+    // Draw the shoulder on top of the upper arm.
     DrawRectanglePro(
         shoulder,
         origin,
@@ -2297,14 +2400,21 @@ void Shoulder::Draw() const
     );
 }
 
+// Set the body's anchor point used by the shoulder.
+//
+// The shoulder uses this point as the parent position from which
+// its local offset is calculated.
 void Shoulder::SetAnchorPoint(Vector2 anchorPoint)
 {
     this->anchorPoint = anchorPoint;
-    
-    upperArm.SetAnchorPoint(anchorPoint);
 }
 
-void Shoulder::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
+// Start or control the upper arm's swinging movement.
+void Shoulder::SwingArm(
+    float dt,
+    float swingMinAngle,
+    float swingMaxAngle
+)
 {
     upperArm.SwingArm(dt, swingMinAngle, swingMaxAngle);
 }
@@ -2319,32 +2429,43 @@ void Shoulder::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
 #include <cmath>
 #include <iostream>
 
+// Construct the upper arm using the shared body dimensions
+// and the side of the body that the arm belongs to.
 UpperArm::UpperArm(BodyDimensions& dimensions, std::string side)
     : dimensions(dimensions),
-      side(side)
+      side(side),
+      elbow(dimensions, side)
 {
 }
 
-// Load the arm sprite and initialise its animation.
+// Initialise the upper arm and its animation.
 void UpperArm::Initialise()
 {
+    // Load the upper arm texture.
     texture = LoadTexture("assets/images/TingoBingo/body/Arm.png");
 
     // Sprite sheet layout.
+    // The upper arm currently consists of a single frame.
     const int COLUMNS = 1;
     const int ROWS = 1;
 
-    // Calculate the size of a single animation frame.
+    // Calculate the dimensions of a single animation frame
+    // from the loaded texture.
     dimensions.upperArmWidth = texture.width / COLUMNS;
     dimensions.upperArmHeight = texture.height / ROWS;
 
+    // Debug output for checking the calculated dimensions.
+     std::cout << dimensions.upperArmWidth << " * "
+               << dimensions.upperArmHeight << "\n";
+
+    // Calculate the total number of animation frames.
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
     // Animation settings.
     const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.02f;
 
-    // Initialise the animation using the sprite sheet information.
+    // Initialise the animation using the calculated frame dimensions.
     animation.Initialise
     (
         dimensions.upperArmWidth,
@@ -2354,105 +2475,105 @@ void UpperArm::Initialise()
         FRAME_DURATION
     );
 
+    // Set the initial rotation and drawing scale.
     rotation = ROTATION;
     scale = SCALE;
 
-    // Position the arm's anchor point relative to the body.
-    // The anchor point represents where the arm attaches
-    // to the body at the shoulder.
-    if(side == "left")
-    {
-        localPositionOffset = {
-            (dimensions.bodyWidth / 2.0f) + (dimensions.upperArmWidth / 2.0f),
-            -dimensions.bodyHeight / 2.0f
-        }; 
-    }
-    else if(side == "right")
-    {
-        localPositionOffset = {
-            (-dimensions.bodyWidth / 2.0f) - (dimensions.upperArmWidth / 2.0f),
-            -dimensions.bodyHeight / 2.0f
-        }; 
-    }
+    // Position the upper arm relative to its parent shoulder.
+    //
+    // The Shoulder passes its world-space position to the
+    // UpperArm through SetAnchorPoint().
+    //
+    // localPositionOffset therefore represents the upper arm's
+    // position relative to the shoulder rather than the body.
+    //
+    // X:
+    //     Move the anchor to the centre of the upper arm.
+    //
+    // Y:
+    //     Position the upper arm below the shoulder using the
+    //     shared shoulder height.
+    anchorOffset = {
+        dimensions.upperArmWidth / 2.0f,
+        dimensions.shoulderHeight / 2.0f
+    };
 
-    homeRotation = rotation;
+    elbow.Initialise();
 }
 
+// Update the upper arm and its animation state.
 void UpperArm::Update(float dt)
 {
     Sprite::Update(dt);
-}
 
-// Return the current arm animation frame.
-int UpperArm::GetFrame() const
-{
-    return animation.GetFrame();
-}
+    Vector2 offset = anchorOffset;
 
-// Apply a rotation to the arm.
-void UpperArm::SetRotation(float rotation)
-{
-    Sprite::SetRotation(rotation);
-}
-
-void UpperArm::Draw() const
-{
-    // Get the current animation frame.
-    Rectangle source = animation.GetSourceRectangle();
-
-    // Calculate the scaled dimensions of the arm.
-    float width = animation.GetFrameWidth() * scale;
-    float height = animation.GetFrameHeight() * scale;
-
-    //================================================
-    // Parent Transform
-    //================================================
-    //
-    // localPositionOffset represents the arm's local
-    // position relative to the body anchor point.
-    //
-    // Rotate this local offset around the body anchor
-    // so the arm follows the body's rotation.
-    //
-    Vector2 offset = localPositionOffset;
-
-    // Raylib rotation values are measured in degrees,
-    // while sinf() and cosf() require radians.
     float radians = rotation * DEG2RAD;
 
-    // Rotate the arm's local offset around the
-    // body anchor point.
     Vector2 rotatedOffset =
     {
-        offset.x * cosf(radians) - offset.y * sinf(radians),
-        offset.x * sinf(radians) + offset.y * cosf(radians)
+        (offset.x * cosf(radians) -
+         offset.y * sinf(radians)),
+
+        offset.x * sinf(radians) +
+        offset.y * cosf(radians)
     };
 
-    //================================================
-    // Arm World Position
-    //================================================
-    //
-    // Add the rotated local offset to the body's
-    // world-space anchor point.
-    //
-    // The arm anchor point is attached to the body
-    // at the shoulder and follows the body's rotation.
-    //
-    Vector2 armAnchorPosition =
+    armAnchorPosition =
     {
         anchorPoint.x + rotatedOffset.x * scale,
         anchorPoint.y + rotatedOffset.y * scale
     };
 
-    //================================================
-    // Arm Destination
-    //================================================
-    //
-    // Position the arm sprite using its anchor point.
-    //
-    // The anchor point is at the top-centre of the
-    // arm sprite, where the arm attaches to the shoulder.
-    //
+    Vector2 elbowOffset =
+    {
+        0,
+        dimensions.upperArmHeight
+    };
+
+    Vector2 rotatedElbowOffset =
+    {
+        elbowOffset.x * cosf(radians) -
+        elbowOffset.y * sinf(radians),
+
+        elbowOffset.x * sinf(radians) +
+        elbowOffset.y * cosf(radians)
+    };
+
+    Vector2 elbowAnchorPosition =
+    {
+        armAnchorPosition.x + rotatedElbowOffset.x * scale,
+        armAnchorPosition.y + rotatedElbowOffset.y * scale
+    };
+
+    elbow.SetAnchorPoint(elbowAnchorPosition);
+
+    elbow.Update(dt);
+}
+
+// Return the current animation frame of the upper arm.
+int UpperArm::GetFrame() const
+{
+    return animation.GetFrame();
+}
+
+// Set the upper arm's base rotation.
+void UpperArm::SetRotation(float rotation)
+{
+    Sprite::SetRotation(rotation);
+    elbow.SetRotation(rotation + localRotation);
+}
+
+// Draw the upper arm.
+void UpperArm::Draw() const
+{
+    // Get the source rectangle for the current animation frame.
+    Rectangle source = animation.GetSourceRectangle();
+
+    // Calculate the scaled dimensions of the current frame.
+    float width = animation.GetFrameWidth() * scale;
+    float height = animation.GetFrameHeight() * scale;
+
     Rectangle destination =
     {
         armAnchorPosition.x - width / 2.0f,
@@ -2461,35 +2582,12 @@ void UpperArm::Draw() const
         height
     };
 
-    //================================================
-    // Local Rotation Pivot
-    //================================================
-    //
-    // Set the rotation origin to the top-centre of the arm.
-    //
-    // This is the point where the arm attaches to the
-    // body at the shoulder, allowing the arm to rotate
-    // around the shoulder rather than its centre.
-    //
     Vector2 origin =
     {
         width / 2.0f,
         0
     };
 
-    //================================================
-    // Draw
-    //================================================
-    //
-    // rotation:
-    //     Rotation inherited from the body.
-    //
-    // localRotation:
-    //     Independent rotation of the arm.
-    //
-    // Adding the two rotations allows the arm to
-    // follow the body while also rotating independently.
-    //
     DrawTexturePro(
         texture,
         source,
@@ -2498,32 +2596,56 @@ void UpperArm::Draw() const
         rotation + localRotation,
         WHITE
     );
+
+    elbow.Draw();
 }
 
-void UpperArm::SwingArm(float dt, float swingMinAngle, float swingMaxAngle)
+// Swing the upper arm between the supplied minimum
+// and maximum angles.
+void UpperArm::SwingArm(
+    float dt,
+    float swingMinAngle,
+    float swingMaxAngle
+)
 {
+    // Advance the swing timer based on elapsed time
+    // and the configured swing speed.
     swingTime += dt * SWING_SPEED;
 
+    // Keep the timer within one complete sine-wave cycle.
     if (swingTime >= 2.0f * PI)
     {
         swingTime -= 2.0f * PI;
     }
 
+    // Normalised value used to convert the sine wave
+    // into the requested swing angle range.
     float unitAngle = 0;
-    
+
+    // Reverse the swing direction for the left arm.
     if(side == "left")
     {
         unitAngle = -(sinf(swingTime) + 1.0f) / 2.0f;
     }
 
+    // Use the normal swing direction for the right arm.
     if(side == "right")
     {
         unitAngle = (sinf(swingTime) + 1.0f) / 2.0f;
     }
 
+    // Convert the normalised sine-wave value into the
+    // requested rotation range.
+    //
+    // For example:
+    //
+    // swingMinAngle = 0
+    // swingMaxAngle = 180
+    //
+    // produces a smooth swing between 0 and 180 degrees.
     localRotation =
-            swingMinAngle +
-            unitAngle * (swingMaxAngle - swingMinAngle);
+        swingMinAngle +
+        unitAngle * (swingMaxAngle - swingMinAngle);
 }
 
 
@@ -2558,7 +2680,8 @@ Body::Body(BodyDimensions& dimensions) :
     dimensions(dimensions), 
     bodyBase(dimensions),
     neck(dimensions),
-    arms(dimensions)
+    arms(dimensions),
+    pelvis(dimensions)
 {
 }
 
@@ -2567,13 +2690,7 @@ void Body::Initialise()
 {
     bodyBase.Initialise();
     neck.Initialise();
-    
     arms.Initialise();
-    
-    pelvis.SetBodyDimensions(
-        bodyBase.GetFrameWidth(), 
-        bodyBase.GetFrameHeight()
-    );
     pelvis.Initialise();
 }
 
@@ -2599,13 +2716,9 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    
     pelvis.Draw();
-    
     bodyBase.Draw();
-
     arms.Draw();
-
     neck.Draw();
 }
 
@@ -2741,6 +2854,7 @@ Vector2 Body::GetHeadWorldPosition()
 #include "body/BodyBase.h"
 
 #include "Constants.h"
+#include <iostream>
 
 BodyBase::BodyBase(BodyDimensions& dimensions) : 
             dimensions(dimensions)
@@ -2779,10 +2893,7 @@ void BodyBase::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    anchorOffset = {
-        dimensions.bodyWidth / 2.0f, 
-        dimensions.bodyHeight / 2.0f
-    };
+    anchorOffset = {0,0};
 }
 
 // Return the current head animation frame.
@@ -2796,17 +2907,6 @@ void BodyBase::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
 }
-
-float BodyBase::GetFrameWidth() const
-{
-    return animation.GetFrameWidth();
-}
-
-float BodyBase::GetFrameHeight() const
-{
-    return animation.GetFrameHeight();
-}
-
 
 
 =====================================
@@ -2845,6 +2945,12 @@ void Knee::Shutdown(){}
 
 #include "body/Legs/Legs.h"
 
+Legs::Legs(BodyDimensions& dimensions) :
+    dimensions(dimensions),
+    leftThigh(dimensions, "left"),
+    rightThigh(dimensions, "right")
+{}
+
 void Legs::Initialise()
 {
     leftThigh.Initialise();
@@ -2871,8 +2977,8 @@ void Legs::Draw() const
 
 void Legs::SetAnchorPoint(Vector2 anchorPoint)
 {
-    leftThigh.SetAnchorPoint({anchorPoint.x, anchorPoint.y});
-    rightThigh.SetAnchorPoint({anchorPoint.x, anchorPoint.y}); 
+    leftThigh.SetAnchorPoint(anchorPoint);
+    rightThigh.SetAnchorPoint(anchorPoint); 
 }
 
 void Legs::SetRotation(float rotation)
@@ -2881,20 +2987,6 @@ void Legs::SetRotation(float rotation)
     rightThigh.SetRotation(rotation);
 }
 
-void Legs::SetBodyDimension(float bodyWidth, float bodyHeight)
-{
-    leftThigh.SetBodyDimensions(
-        bodyWidth,
-        bodyHeight,
-        "left"
-    );
-
-    rightThigh.SetBodyDimensions(
-        bodyWidth,
-        bodyHeight,
-        "right"
-    );
-}
 
 
 =====================================
@@ -2921,17 +3013,22 @@ void Shin::Shutdown(){}
 #include <string>
 
 // Load the head sprite and initialise its animation.
+Thigh::Thigh(BodyDimensions& dimensions, std::string side) :
+    dimensions(dimensions),
+    side(side)
+{}
+
 void Thigh::Initialise()
 {
-    texture = LoadTexture("assets/images/TingoBingo/body/Leg.png");
+    //texture = LoadTexture("assets/images/TingoBingo/body/Leg.png");
 
     // Sprite sheet layout.
     const int COLUMNS = 1;
     const int ROWS = 1;
 
     // Calculate the size of a single animation frame.
-    const int FRAME_WIDTH = texture.width / COLUMNS;
-    const int FRAME_HEIGHT = texture.height / ROWS;
+    dimensions.thighWidth = 80.0f; //texture.width / COLUMNS;
+    dimensions.thighHeight = 250.0f; //texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
@@ -2942,8 +3039,8 @@ void Thigh::Initialise()
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
-        FRAME_WIDTH,
-        FRAME_HEIGHT,
+        dimensions.thighWidth,
+        dimensions.thighHeight,
         TOTAL_FRAMES,
         COLUMNS,
         FRAME_DURATION
@@ -2955,15 +3052,15 @@ void Thigh::Initialise()
     if(side == "left")
     {
         anchorOffset = {
-            bodyWidth / 2, 
-            -bodyHeight / 2
+            dimensions.bodyWidth / 2.0f - dimensions.thighWidth / 2.0f, 
+            dimensions.bodyHeight + dimensions.pelvisHeight / 2.0f
         };
     }
     else if(side == "right")
     {
         anchorOffset = {
-            -bodyWidth / 2 + FRAME_WIDTH, 
-            -bodyHeight / 2
+            -dimensions.bodyWidth / 2.0f + dimensions.thighWidth / 2.0f, 
+            dimensions.bodyHeight + dimensions.pelvisHeight / 2.0f
         };
     }
 }
@@ -2980,11 +3077,29 @@ void Thigh::SetRotation(float rotation)
     Sprite::SetRotation(rotation);
 }
 
-void Thigh::SetBodyDimensions(float width, float height, const std::string& side)
+void Thigh::Draw() const
 {
-    bodyWidth = width;
-    bodyHeight = height;
-    this->side = side;
+    Rectangle thigh =
+    {
+        anchorPoint.x,
+        anchorPoint.y,
+        dimensions.thighWidth * scale,
+        dimensions.thighHeight * scale
+    };
+
+    Vector2 drawAnchorOffset = {
+        dimensions.thighWidth * scale / 2.0f - anchorOffset.x * scale,
+        dimensions.thighHeight * scale / 2.0f - anchorOffset.y * scale
+    };
+
+    DrawRectanglePro(
+        thigh,
+        drawAnchorOffset,
+        rotation,
+        CARDBOARD_DARK
+    ); 
+
+    DrawCircle(anchorPoint.x, anchorPoint.y, 10, RED);
 }
 
 
@@ -3077,14 +3192,79 @@ void Neck::Shutdown()
 =====================================
 
 #include "Body/Pelvis.h"
+#include "raymath.h"
 
-void Pelvis::Initialise(){}
-void Pelvis::Update(float dt){}
-void Pelvis::Draw() const{}
-void Pelvis::SetRotation(float rotation){}
-void Pelvis::SetBodyDimensions(float bW, float bH){}
-void Pelvis::SetAnchorPoint(Vector2 anchorPoint){}
-void Pelvis::Shutdown(){}
+Pelvis::Pelvis(BodyDimensions& dimensions) :
+    dimensions(dimensions),
+    legs(dimensions)
+{}
+void Pelvis::Initialise()
+{
+    dimensions.pelvisWidth = 260.0f;
+    dimensions.pelvisHeight = 70.0f;
+
+    rotation = 0;
+    scale = SCALE;
+
+    anchorOffset = {
+        0,
+        dimensions.bodyHeight / 2.0f +
+        dimensions.pelvisHeight / 2.0f
+    };
+
+    legs.Initialise();
+}
+
+void Pelvis::Update(float dt)
+{
+    Sprite::Update(dt);
+    legs.Update(dt);
+}
+
+void Pelvis::Draw() const
+{
+    Rectangle pelvis =
+    {
+        anchorPoint.x,
+        anchorPoint.y,
+        dimensions.pelvisWidth * scale,
+        dimensions.pelvisHeight * scale
+    };
+
+    Vector2 drawAnchorOffset = {
+        dimensions.pelvisWidth * scale / 2.0f - anchorOffset.x * scale,
+        dimensions.pelvisHeight * scale / 2.0f - anchorOffset.y * scale
+    };
+
+    legs.Draw();
+
+    DrawRectanglePro(
+        pelvis,
+        drawAnchorOffset,
+        rotation,
+        BROWN
+    );
+    //DrawCircle(anchorPoint.x + anchorOffset.x*scale, anchorPoint.y + anchorOffset.y*scale, 10, RED);
+}
+
+void Pelvis::SetRotation(float rotation)
+{
+    this->rotation = rotation;
+    legs.SetRotation(rotation);
+
+}
+
+void Pelvis::SetAnchorPoint(Vector2 anchorPoint)
+{
+    this->anchorPoint = anchorPoint;
+
+    legs.SetAnchorPoint(anchorPoint);
+}
+
+void Pelvis::Shutdown()
+{
+    legs.Shutdown();
+}
 
 
 =====================================
@@ -3213,13 +3393,13 @@ void Game::Draw()
 
 	robot.Draw();
 	
-	ball.DrawCollisionBox();
+	//ball.DrawCollisionBox();
 	ball.Draw();
 	
-	banana.DrawCollisionBox();
+	//banana.DrawCollisionBox();
 	banana.Draw();
 	
-	DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
+	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 }
 
 // Release resources before exiting.
@@ -3310,7 +3490,7 @@ void Antenna::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.antennaWidth / 2.0f,
         dimensions.antennaHeight / 2.0f
@@ -3319,8 +3499,6 @@ void Antenna::Initialise()
         + dimensions.neckHeight
         + topOfHeadOffset
     };
-
-    anchorOffset = localPositionOffset;
 }
 
 void Antenna::Update(float dt)
@@ -3391,7 +3569,7 @@ void Ears::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.earsWidth / 2.0f,
         dimensions.earsHeight / 2.0f
@@ -3399,8 +3577,6 @@ void Ears::Initialise()
         + dimensions.headHeight / 2.0f
         + dimensions.neckHeight
     };
-
-    anchorOffset = localPositionOffset;
 }
 
 void Ears::Update(float dt)
@@ -3473,7 +3649,7 @@ void Eyebrows::Initialise()
     rotation = ROTATION;
     scale = SCALE;
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.eyeBrowsWidth / 2.0f,
 
@@ -3483,8 +3659,6 @@ void Eyebrows::Initialise()
         + dimensions.neckHeight
         + foreheadOffset
     };
-
-    anchorOffset = localPositionOffset;
 }
 
 void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
@@ -4101,7 +4275,7 @@ void Nose::Initialise()
     //
     //================================================
 
-    localPositionOffset =
+    anchorOffset =
     {
         dimensions.noseWidth / 2.0f,
 
@@ -4117,7 +4291,7 @@ void Nose::Initialise()
     // This is deliberately not a world-space position.
     // The wiggle animation uses this as the nose's
     // permanent home position.
-    homeAnchorPoint = localPositionOffset;
+    homeAnchorPoint = anchorOffset;
 }
 
 //====================================================
@@ -4229,7 +4403,7 @@ void Nose::Update(float dt)
         // Using homeAnchorPoint as the starting position
         // prevents the wiggle from accumulating movement
         // from one frame to the next.
-        localPositionOffset.x =
+        anchorOffset.x =
             homeAnchorPoint.x + wiggleOffSetX;
 
         // The wiggle lasts for one second.
@@ -4243,7 +4417,7 @@ void Nose::Update(float dt)
             wiggleOffSetX = 0.0f;
 
             // Restore the original LOCAL anchor position.
-            localPositionOffset.x = homeAnchorPoint.x;
+            anchorOffset.x = homeAnchorPoint.x;
         }
     }
 }
@@ -4300,7 +4474,7 @@ void Nose::Draw() const
     // Rotate this local offset around the parent anchor
     // so the nose follows the head when it rotates.
     //
-    Vector2 offset = localPositionOffset;
+    Vector2 offset = anchorOffset;
 
     // Raylib rotation values are measured in degrees,
     // while sinf() and cosf() require radians.

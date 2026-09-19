@@ -58,7 +58,7 @@ void Pupils::SetAnchorPoint(Vector2 anchorPoint)
 {
     headAnchorPoint = anchorPoint;
 
-    leftPupil.SetAnchorPoint(
+    /*leftPupil.SetAnchorPoint(
     {
         anchorPoint.x,
         anchorPoint.y
@@ -68,7 +68,7 @@ void Pupils::SetAnchorPoint(Vector2 anchorPoint)
     {
         anchorPoint.x,
         anchorPoint.y
-    });
+    });*/
 }
 
 // Rotate an anchor offset around the anchor point.
@@ -92,7 +92,7 @@ void Pupils::SetRotation(float rotation)
     Vector2 rotatedRight =
         RotateVector(rightLookOffset, rotation);
 
-    leftPupil.SetAnchorPoint(
+    /*leftPupil.SetAnchorPoint(
     {
         headAnchorPoint.x + rotatedLeft.x,
         headAnchorPoint.y + rotatedLeft.y
@@ -102,7 +102,7 @@ void Pupils::SetRotation(float rotation)
     {
         headAnchorPoint.x + rotatedRight.x,
         headAnchorPoint.y + rotatedRight.y
-    });
+    });*/
 
     leftPupil.SetRotation(rotation);
     rightPupil.SetRotation(rotation);
@@ -170,7 +170,7 @@ void Pupils::LookForward()
     leftLookOffset = {0.0f, 0.0f};
     rightLookOffset = {0.0f, 0.0f};
 
-    leftPupil.SetAnchorPoint(
+   /* leftPupil.SetAnchorPoint(
     {
         headAnchorPoint.x,
         headAnchorPoint.y
@@ -180,5 +180,5 @@ void Pupils::LookForward()
     {
         headAnchorPoint.x,
         headAnchorPoint.y
-    });
+    });*/
 }

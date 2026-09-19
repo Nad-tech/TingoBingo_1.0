@@ -1,10 +1,55 @@
 #include "Body/Arms/Elbow.h"
+#include <cmath>
+#include <iostream>
 
-void Elbow::Initialise(){}
-void Elbow::Update(float dt){}
-void Elbow::Draw()const {}
+Elbow::Elbow(BodyDimensions& dimensions, std::string side) :
+    dimensions(dimensions),
+    side(side)
+{}
 
-int Elbow::GetFrame() const{}
+void Elbow::Initialise()
+{
+    dimensions.elbowWidth = 50.0f;
+    dimensions.elbowHeight = 50.0f;
 
-void Elbow::SetRotation(float rotation){}
-void Elbow::SetBodyDimensions(float width, float height, std::string side){}
+    //rotation = 0.0f;
+
+    //scale = SCALE;
+}
+
+void Elbow::Update(float dt)
+{
+    Sprite::Update(dt);
+}
+
+void Elbow::Draw()const 
+{
+    /*Rectangle elbow = {
+        anchorPoint.x,
+        anchorPoint.y,
+        dimensions.elbowWidth * SCALE,
+        dimensions.elbowHeight * SCALE
+    };
+
+    Vector2 localPivot =
+    {
+        dimensions.elbowWidth / 2.0f,
+        0
+    };
+
+    DrawRectanglePro(
+        elbow,
+        localPivot,
+        rotation + localRotation,
+        WHITE
+    );*/
+}
+
+int Elbow::GetFrame() const
+{
+    return 0;
+}
+
+void Elbow::SetRotation(float rotation) {
+    //this->rotation = rotation;
+}

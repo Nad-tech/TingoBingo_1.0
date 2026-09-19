@@ -53,7 +53,7 @@ void Shoulder::Initialise()
     );
 
     // Set the initial rotation and drawing scale.
-    rotation = ROTATION;
+    /*rotation = ROTATION;
     scale = SCALE;
 
     // Calculate the shoulder's local position relative to the body.
@@ -88,7 +88,7 @@ void Shoulder::Initialise()
     // Initialise the upper arm.
     // The upper arm is a child of the shoulder and receives
     // the same shared BodyDimensions object.
-    upperArm.Initialise();
+    upperArm.Initialise();*/
 }
 
 // Update the shoulder and its child upper arm.
@@ -99,7 +99,7 @@ void Shoulder::Update(float dt)
     Sprite::Update(dt);
 
     // Start with the shoulder's local position relative to the body.
-    Vector2 offset = anchorOffset;
+   /* Vector2 offset = anchorOffset;
 
     // Convert the shoulder's rotation from degrees to radians
     // for use with the trigonometric functions.
@@ -139,7 +139,7 @@ void Shoulder::Update(float dt)
     upperArm.SetAnchorPoint(armAnchorPosition);
 
     // Update the child upper arm.
-    upperArm.Update(dt);
+    upperArm.Update(dt);*/
 }
 
 // Return the current shoulder animation frame.
@@ -165,7 +165,7 @@ void Shoulder::Draw() const
     //
     // armAnchorPosition represents the top-centre of the shoulder
     // because the drawing origin is positioned at the top-centre below.
-    Rectangle shoulder =
+    /*Rectangle shoulder =
     {
         armAnchorPosition.x,
         armAnchorPosition.y,
@@ -193,7 +193,7 @@ void Shoulder::Draw() const
         origin,
         rotation,
         BROWN
-    );
+    );*/
 }
 
 // Set the body's anchor point used by the shoulder.
@@ -202,7 +202,7 @@ void Shoulder::Draw() const
 // its local offset is calculated.
 void Shoulder::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->anchorPoint = anchorPoint;
+    //this->anchorPoint = anchorPoint;
 }
 
 // Start or control the upper arm's swinging movement.

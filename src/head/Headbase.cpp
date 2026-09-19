@@ -43,7 +43,7 @@ void Headbase::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
-
+    /*
     rotation = ROTATION;
     scale = SCALE;
 
@@ -52,7 +52,7 @@ void Headbase::Initialise()
         dimensions.headHeight + 
         (dimensions.bodyHeight / 2.0f) +
         (dimensions.neckHeight)
-    };
+    };*/
 }
 
 // Return the current head animation frame.
@@ -69,11 +69,11 @@ void Headbase::SetRotation(float rotation)
 
 Vector2 Headbase::GetWorldPosition() const
 {
-   return {
+   return {};/* {
     anchorPoint.x, 
     anchorPoint.y - 
     (dimensions.bodyHeight / 2.0f) * SCALE -
     (animation.GetFrameHeight() / 2) * SCALE -
     dimensions.neckHeight * SCALE
-   }; 
+   }; */
 }

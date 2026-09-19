@@ -7,7 +7,8 @@
 // and the side of the body that the arm belongs to.
 UpperArm::UpperArm(BodyDimensions& dimensions, std::string side)
     : dimensions(dimensions),
-      side(side)
+      side(side),
+      elbow(dimensions, side)
 {
 }
 
@@ -49,7 +50,7 @@ void UpperArm::Initialise()
     );
 
     // Set the initial rotation and drawing scale.
-    rotation = ROTATION;
+    /*rotation = ROTATION;
     scale = SCALE;
 
     // Position the upper arm relative to its parent shoulder.
@@ -71,15 +72,57 @@ void UpperArm::Initialise()
         dimensions.shoulderHeight / 2.0f
     };
 
-    // Store the initial rotation so the arm has a known
-    // home rotation.
-    homeRotation = rotation;
+    elbow.Initialise();*/
 }
 
 // Update the upper arm and its animation state.
 void UpperArm::Update(float dt)
 {
     Sprite::Update(dt);
+
+    /*Vector2 offset = anchorOffset;
+
+    float radians = rotation * DEG2RAD;
+
+    Vector2 rotatedOffset =
+    {
+        (offset.x * cosf(radians) -
+         offset.y * sinf(radians)),
+
+        offset.x * sinf(radians) +
+        offset.y * cosf(radians)
+    };
+
+    armAnchorPosition =
+    {
+        anchorPoint.x + rotatedOffset.x * scale,
+        anchorPoint.y + rotatedOffset.y * scale
+    };
+
+    Vector2 elbowOffset =
+    {
+        0,
+        dimensions.upperArmHeight
+    };
+
+    Vector2 rotatedElbowOffset =
+    {
+        elbowOffset.x * cosf(radians) -
+        elbowOffset.y * sinf(radians),
+
+        elbowOffset.x * sinf(radians) +
+        elbowOffset.y * cosf(radians)
+    };
+
+    Vector2 elbowAnchorPosition =
+    {
+        armAnchorPosition.x + rotatedElbowOffset.x * scale,
+        armAnchorPosition.y + rotatedElbowOffset.y * scale
+    };
+
+    //elbow.SetAnchorPoint(elbowAnchorPosition);
+
+    elbow.Update(dt);*/
 }
 
 // Return the current animation frame of the upper arm.
@@ -92,6 +135,7 @@ int UpperArm::GetFrame() const
 void UpperArm::SetRotation(float rotation)
 {
     Sprite::SetRotation(rotation);
+    elbow.SetRotation(rotation + localRotation);
 }
 
 // Draw the upper arm.
@@ -99,67 +143,11 @@ void UpperArm::Draw() const
 {
     // Get the source rectangle for the current animation frame.
     Rectangle source = animation.GetSourceRectangle();
-
+/*
     // Calculate the scaled dimensions of the current frame.
     float width = animation.GetFrameWidth() * scale;
     float height = animation.GetFrameHeight() * scale;
 
-    //================================================
-    // Parent Transform
-    //================================================
-    //
-    // localPositionOffset represents the upper arm's
-    // position relative to its parent shoulder.
-    //
-    // The offset is rotated so that the upper arm follows
-    // the rotation of its parent.
-    //
-    Vector2 offset = anchorOffset;
-
-    // Raylib uses degrees for rotation, while sinf() and
-    // cosf() require radians.
-    float radians = rotation * DEG2RAD;
-
-    // Rotate the local position around the shoulder's
-    // anchor point.
-    Vector2 rotatedOffset =
-    {
-        (offset.x * cosf(radians) -
-         offset.y * sinf(radians)),
-
-        offset.x * sinf(radians) +
-        offset.y * cosf(radians)
-    };
-
-    //================================================
-    // Arm World Position
-    //================================================
-    //
-    // Add the rotated local offset to the shoulder's
-    // world-space anchor point.
-    //
-    // anchorPoint is now supplied by the parent Shoulder,
-    // rather than directly representing the body position.
-    //
-    Vector2 armAnchorPosition =
-    {
-        anchorPoint.x + rotatedOffset.x * scale,
-        anchorPoint.y + rotatedOffset.y * scale
-    };
-
-    //================================================
-    // Arm Destination
-    //================================================
-    //
-    // Position the upper arm using its anchor point.
-    //
-    // The X position is adjusted by half the arm width
-    // so that the anchor is located at the top-centre
-    // of the sprite.
-    //
-    // The Y position starts at the anchor point and the
-    // arm extends downward from there.
-    //
     Rectangle destination =
     {
         armAnchorPosition.x - width / 2.0f,
@@ -168,36 +156,12 @@ void UpperArm::Draw() const
         height
     };
 
-    //================================================
-    // Local Rotation Pivot
-    //================================================
-    //
-    // Set the rotation origin to the top-centre of the
-    // upper arm.
-    //
-    // This allows the arm to rotate around its attachment
-    // point at the shoulder instead of rotating around
-    // its centre.
-    //
     Vector2 origin =
     {
         width / 2.0f,
         0
     };
 
-    //================================================
-    // Draw
-    //================================================
-    //
-    // rotation:
-    //     Rotation inherited from the parent transform.
-    //
-    // localRotation:
-    //     Independent rotation applied to the upper arm.
-    //
-    // Combining the two allows the upper arm to follow
-    // the body while still having its own articulation.
-    //
     DrawTexturePro(
         texture,
         source,
@@ -206,6 +170,8 @@ void UpperArm::Draw() const
         rotation + localRotation,
         WHITE
     );
+
+    elbow.Draw();*/
 }
 
 // Swing the upper arm between the supplied minimum

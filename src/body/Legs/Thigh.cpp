@@ -36,6 +36,7 @@ void Thigh::Initialise()
         FRAME_DURATION
     );
 
+    /*
     rotation = ROTATION;
     scale = SCALE;
 
@@ -52,7 +53,7 @@ void Thigh::Initialise()
             -dimensions.bodyWidth / 2.0f + dimensions.thighWidth / 2.0f, 
             dimensions.bodyHeight + dimensions.pelvisHeight / 2.0f
         };
-    }
+    }*/
 }
 
 // Return the current head animation frame.
@@ -68,7 +69,7 @@ void Thigh::SetRotation(float rotation)
 }
 
 void Thigh::Draw() const
-{
+{/*
     Rectangle thigh =
     {
         anchorPoint.x,
@@ -89,5 +90,5 @@ void Thigh::Draw() const
         CARDBOARD_DARK
     ); 
 
-    DrawCircle(anchorPoint.x, anchorPoint.y, 10, RED);
+    DrawCircle(anchorPoint.x, anchorPoint.y, 10, RED);*/
 }

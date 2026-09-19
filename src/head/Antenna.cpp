@@ -42,10 +42,10 @@ void Antenna::Initialise()
         FRAME_DURATION
     );
 
-    rotation = ROTATION;
-    scale = SCALE;
+    //rotation = ROTATION;
+    //scale = SCALE;
 
-    anchorOffset =
+    /*anchorOffset =
     {
         dimensions.antennaWidth / 2.0f,
         dimensions.antennaHeight / 2.0f
@@ -53,7 +53,7 @@ void Antenna::Initialise()
         + dimensions.headHeight / 2.0f
         + dimensions.neckHeight
         + topOfHeadOffset
-    };
+    };*/
 }
 
 void Antenna::Update(float dt)

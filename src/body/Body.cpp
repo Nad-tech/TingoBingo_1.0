@@ -4,16 +4,19 @@
 
 // Initialise the body's transform and idle animation state.
 Body::Body(BodyDimensions& dimensions) :
-    rotation(0.0f),
-    scale(0.0f),
-
-    homeRotation(rotation),
+    dimensions(dimensions),
+    transform(), 
+    bodyBase(dimensions),
+    neck(dimensions),
+    pelvis(dimensions),
+    arms(dimensions),
+    homeAnchorPoint(0,0),    
+    homeRotation(0.0f),
     bodyWiggleTimer(0.0f),
     bodyWiggleAmplitude(0.0f),
     bodyWiggling(false),
     nextBodyWiggle((float)GetRandomValue(5, 7)),
     bodyWiggleFrequency(0.0f),
-
     bodyBobOffset({0.0f, 0.0f}),
     bodyBobScale(7.0f),
     bodyBobAngle(0.0f),
@@ -21,14 +24,8 @@ Body::Body(BodyDimensions& dimensions) :
     randomBodyBobSignTimer((float)GetRandomValue(5, 10)),
     bodyBobRadiusX(GetRandomValue(3, 8)),
     bodyBobRadiusY(GetRandomValue(2, 6)),
-    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f), 
-    dimensions(dimensions), 
-    bodyBase(dimensions),
-    neck(dimensions),
-    arms(dimensions),
-    pelvis(dimensions)
-{
-}
+    bodyBobSpeed(GetRandomValue(6, 14) / 10.0f)
+{}
 
 // Initialise every component that makes up the robot's body.
 void Body::Initialise()
@@ -56,51 +53,39 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     arms.Update(dt);
     pelvis.Update(dt);
     
-    PlayIdleBodyTransform(dt);
+    //PlayIdleBodyTransform(dt);
 }
 
 void Body::Draw() const
 {
-    pelvis.Draw();
+    //pelvis.Draw();
     bodyBase.Draw();
-    arms.Draw();
-    neck.Draw();
+    //arms.Draw();
+    //neck.Draw();
 }
 
-void Body::SetAnchorPoint(Vector2 anchorPoint)
+void Body::SetTransform(MyTransform transform)
 {
-    this->homeAnchorPoint = anchorPoint;
-    ApplyAnchorPoint(anchorPoint);
+    this->transform = transform;
+
+    bodyBase.SetTransform(this->transform);
+
+    //neck.SetTransform(this->transform);
+
+    //arms.SetTransform(this->transform);
+
+    //pelvis.SetTransform(this->transform);
 }
 
-void Body::ApplyAnchorPoint(Vector2 anchorPoint)
+MyTransform Body::GetTransform() const
 {
-    this->anchorPoint = anchorPoint;
-
-    bodyBase.SetAnchorPoint(anchorPoint);
-
-    neck.SetAnchorPoint(anchorPoint);
-
-    arms.SetAnchorPoint(anchorPoint);
-
-    pelvis.SetAnchorPoint(anchorPoint);
-}
-
-Vector2 Body::GetAnchorPoint() const
-{
-    return anchorPoint;
+    return transform;
 }
 
 void Body::SetRotation(float rotation)
 {
-    homeRotation = rotation;
-    ApplyRotation(rotation);
-}
+    transform.rotation = rotation;
 
-void Body::ApplyRotation(float rotation)
-{
-    this->rotation = rotation;
-   
     bodyBase.SetRotation(rotation);
     arms.SetRotation(rotation);
 
@@ -110,10 +95,10 @@ void Body::ApplyRotation(float rotation)
 
 float Body::GetRotation()
 {
-    return rotation;
+    return transform.rotation;
 }
 
-void Body::PlayIdleBodyTransform(float dt)
+/*void Body::PlayIdleBodyTransform(float dt)
 {
     PlayBodyBob(dt);
     ApplyAnchorPoint(anchorPoint);
@@ -174,14 +159,14 @@ void Body::PlayBodyBob(float dt)
 
     anchorPoint.x = homeAnchorPoint.x + bodyBobOffset.x;
     anchorPoint.y = homeAnchorPoint.y + bodyBobOffset.y;
-}
+}*/
 
 Head& Body::GetHead()
 {
     return neck.GetHead();
 }
 
-void Body::SwingArm(std::string side,  bool swing)
+/*void Body::SwingArm(std::string side,  bool swing)
 {
     arms.SwingArm(side, swing);
 }
@@ -189,4 +174,4 @@ void Body::SwingArm(std::string side,  bool swing)
 Vector2 Body::GetHeadWorldPosition()
 {
     return neck.GetHead().GetWorldPosition();
-}
+}*/

@@ -41,6 +41,9 @@ public:
     float upperArmWidth;
     float upperArmHeight;
 
+    float elbowWidth;
+    float elbowHeight;
+
     float forearmWidth;
     float forearmHeight;
 

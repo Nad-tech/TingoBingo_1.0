@@ -2,6 +2,7 @@
 
 #include "Sprite.h"
 #include "BodyDimensions.h"
+#include "MyTransform.h"
 class BodyBase : public Sprite 
 {
     public:
@@ -9,9 +10,10 @@ class BodyBase : public Sprite
         void Initialise() override;
         int GetFrame() const;
         void SetRotation(float rotation);
-        float GetFrameWidth() const;
-        float GetFrameHeight() const;
+        void SetTransform(MyTransform transform);
     
     private:
         BodyDimensions& dimensions;
+        MyTransform transform;
+
 };

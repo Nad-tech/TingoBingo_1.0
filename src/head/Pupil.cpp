@@ -44,7 +44,7 @@ void Pupil::Initialise()
         FRAME_DURATION
     );
 
-    rotation = ROTATION;
+    /*rotation = ROTATION;
     scale = SCALE;
 
     if(side == "left")
@@ -68,7 +68,7 @@ void Pupil::Initialise()
             dimensions.neckHeight +
             dimensions.eyesYoffset
         };
-    }
+    }*/
 }
 
 // Advance the pupil animation.

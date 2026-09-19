@@ -14,14 +14,14 @@ void Neck::Initialise()
 
     head.Initialise();
 
-    rotation = 0.0f;
+    /*rotation = 0.0f;
     scale = SCALE;
 
     anchorOffset = {
         0, 
         -dimensions.bodyHeight / 2.0f - 
         dimensions.neckHeight / 2.0f
-    };
+    };*/
 }
 
 void Neck::Update(float dt, bool speaking, Emotion emotion) {
@@ -31,7 +31,7 @@ void Neck::Update(float dt, bool speaking, Emotion emotion) {
 
 void Neck::Draw() const
 {
-    Rectangle neck =
+    /*Rectangle neck =
     {
         anchorPoint.x,
         anchorPoint.y,
@@ -51,18 +51,18 @@ void Neck::Draw() const
         BROWN
     );
 
-    head.Draw();
+    head.Draw();*/
 }
 
 void Neck::SetRotation(float rotation)
 {
-    this->rotation = rotation;
+    //this->rotation = rotation;
     head.SetRotation(rotation);
 }
 
 void Neck::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->anchorPoint = anchorPoint;
+    //this->anchorPoint = anchorPoint;
 
     head.SetAnchorPoint(anchorPoint);
 }

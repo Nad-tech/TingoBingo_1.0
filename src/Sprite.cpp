@@ -75,19 +75,28 @@ void Sprite::Draw() const
     // Get the source rectangle for the current animation frame.
     Rectangle source = animation.GetSourceRectangle();
 
+    //Convert cartesion transform.position to screen coords
+    float screenX = SCREEN_WIDTH / 2.0f + transform.position.x;
+    float screenY = SCREEN_HEIGHT / 2.0f - transform.position.y;
+
+    //convert cartesion pivot coords to screen pivot coords
+    float screenPivotX = 
+        animation.GetFrameWidth() * transform.scale / 2.0f + 
+        transform.pivot.x;
+
+    float screenPivotY = 
+        animation.GetFrameHeight() * transform.scale / 2.0f - 
+        transform.pivot.y;
+    
+    Vector2 screenPivot = {screenPivotX, screenPivotY};
+
     // Define the sprite's world-space position and scaled size.
     Rectangle destination =
     {
-        anchorPoint.x,
-        anchorPoint.y,
-        animation.GetFrameWidth() * scale,
-        animation.GetFrameHeight() * scale
-    };
-
-    // Scale the local anchor offset to match the sprite's scale.
-    Vector2 drawAnchorOffset = {
-        anchorOffset.x * scale,
-        anchorOffset.y * scale
+        screenX,
+        screenY,
+        animation.GetFrameWidth() * transform.scale,
+        animation.GetFrameHeight() * transform.scale
     };
 
     // Draw the selected animation frame at the anchor point,
@@ -96,8 +105,8 @@ void Sprite::Draw() const
         texture,
         source,
         destination,
-        drawAnchorOffset,
-        rotation,
+        screenPivot,
+        transform.rotation,
         WHITE
     );
 }
@@ -109,19 +118,24 @@ void Sprite::Shutdown()
 }
 
 // Set the sprite's world-space anchor point.
-void Sprite::SetAnchorPoint(Vector2 anchorPoint)
+void Sprite::SetPosition(Vector2 position)
 {
-    this->anchorPoint = anchorPoint;
+    this->transform.position = position;
 }
 
 // Return the sprite's current anchor point.
-Vector2 Sprite::GetAnchorPoint() const
+Vector2 Sprite::GetPosition() const
 {
-    return anchorPoint;
+    return transform.position;
 }
 
 // Set the sprite's rotation in degrees.
 void Sprite::SetRotation(float rotation)
 {
-    this->rotation = rotation;
+    this->transform.rotation = rotation;
+}
+
+void Sprite::SetTransform(MyTransform transform)
+{
+    this->transform = transform;
 }

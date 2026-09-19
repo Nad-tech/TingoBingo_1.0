@@ -428,10 +428,10 @@ void RobotBrain::Update(float dt)
 
         if(targetObject->IsHeldByMouse())
         {
-            robot.LookAt(targetObject->GetAnchorPoint());
+            //robot.LookAt(targetObject->GetAnchorPoint());
             SetState(State::Reacting);
 
-            P = targetObject->GetAnchorPoint();
+            //P = targetObject->GetAnchorPoint();
 
             // ------------------------------------------------
             // Ball and banana are currently recognised as
@@ -514,7 +514,7 @@ void RobotBrain::Update(float dt)
         //
         // Instead, Tingo looks directly at the object's current
         // position.
-            robot.LookAt(detectedObject->GetAnchorPoint());
+        //robot.LookAt(detectedObject->GetAnchorPoint());
 
         // The object has become the focus of Tingo's behaviour.
         SetState(State::Reacting);
@@ -780,8 +780,8 @@ void RobotBrain::Search(float dt)
     // that visually represents where Tingo is looking from.
     // --------------------------------------------------------
 
-    searchRayOrigin = robot.GetHeadWorldPosition();
-    searchRayOrigin.y = robot.GetHeadWorldPosition().y - dimensions.eyesYoffset * SCALE;
+    //searchRayOrigin = robot.GetHeadWorldPosition();
+    //searchRayOrigin.y = robot.GetHeadWorldPosition().y - dimensions.eyesYoffset * SCALE;
 
 
     // --------------------------------------------------------

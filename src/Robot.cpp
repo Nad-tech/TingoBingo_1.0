@@ -9,6 +9,7 @@
 // Initialise the robot's brain 
 Robot::Robot() : 
     dimensions(),
+    transform(),
     body(dimensions),
     robotBrain(*this, dimensions)
 {}
@@ -18,7 +19,7 @@ Robot::Robot() :
 void Robot::Initialise()
 {
     body.Initialise();
-
+    body.SetTransform(transform);   
     sfxController.Initialise();
 }
 
@@ -31,14 +32,12 @@ void Robot::Update(float dt)
     body.Update(dt, speaking, robotBrain.GetEmotion());
 }
 
-
 // Pass a speech request to RobotBrain.
 // RobotBrain is responsible for handling the speech behaviour.
 void Robot::Speak(const std::string& text)
 {
     robotBrain.Speak(text);
 }
-
 
 // Set whether the robot is currently speaking.
 // The head uses this state to drive facial animations.
@@ -50,25 +49,24 @@ void Robot::SetSpeaking(bool state)
 
 // Set the robot's anchor point and move the head to the
 // same anchor point.
-void Robot::SetAnchorPoint(Vector2 anchorPoint)
+void Robot::SetTransform(MyTransform transform)
 {
-    this->anchorPoint = anchorPoint;
-    body.SetAnchorPoint(anchorPoint);
+    this->transform = transform;
+    body.SetTransform(this->transform);
 }
-
 
 // Return the robot's current anchor point.
-Vector2 Robot::GetAnchorPoint() const
+MyTransform Robot::GetTransform()
 {
-    return anchorPoint;
+    return transform;
 }
 
-
-// Return the current anchor point of the robot's head.
-Vector2 Robot::GetHeadAnchorPoint()
+/*
+// Return the current transform of the robot's head.
+Vector2 Robot::GetHeadTransform() const
 {
-    return body.GetHead().GetAnchorPoint();
-}
+    return body.GetHeadTransform();
+}*/
 
 
 // Draw the robot.
@@ -139,10 +137,10 @@ void Robot::PlaySfx(std::string sound)
 
 void Robot::SwingArm(std::string side, bool swinging)
 {
-    body.SwingArm(side, swinging);
+    //body.SwingArm(side, swinging);
 }
 
-Vector2 Robot::GetHeadWorldPosition()
+/*Vector2 Robot::GetHeadWorldPosition()
 {
     return body.GetHeadWorldPosition();
-}
+}*/

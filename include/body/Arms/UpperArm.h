@@ -22,15 +22,14 @@ class UpperArm : public Sprite
 
     private:
         BodyDimensions& dimensions;
+        Vector2 armAnchorPosition;
         float localRotation = 0.0f;
-        float homeRotation = 0.0f;
         std::string side = "";
 
         const float SWING_MIN = 0.0f;
         const float SWING_MAX = 180.0f;
-        const float SWING_SPEED = 10.0f;
+        const float SWING_SPEED = 1.0f;
         float swingTime = 0;
 
-        Elbow leftElbow;
-        Elbow rightElbow;
+        Elbow elbow;
 };

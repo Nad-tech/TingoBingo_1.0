@@ -3,22 +3,14 @@
 #include "raylib.h"
 #include "Animation.h"
 #include "Constants.h"
+#include "MyTransform.h"
 
 class Sprite
 {
 protected:
     Texture2D texture;
     Animation animation;
-
-    // World-space position of the sprite's anchor point.
-    Vector2 anchorPoint = {0,0};
-
-    // Local offset from the sprite's anchor point used for drawing and rotation
-    //and calculating world space coordinates.
-    Vector2 anchorOffset = {0,0};
-
-    float rotation = 0.0f;
-    float scale = 1.0f;
+    MyTransform transform;
 
 public:
     virtual void Initialise() = 0;
@@ -26,11 +18,14 @@ public:
     virtual void Update(float dt);
     virtual void Draw() const;
     void Shutdown();
+
+    void SetTransform(MyTransform transform);
     
-    void SetAnchorPoint(Vector2 anchorPoint);
-    Vector2 GetAnchorPoint() const;
+    void SetPosition(Vector2 position);
+    Vector2 GetPosition() const;
 
     void SetRotation(float rotation);
+    float GetRotation();
 
     virtual ~Sprite() = default;
 };

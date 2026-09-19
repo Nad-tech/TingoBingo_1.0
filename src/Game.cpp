@@ -32,6 +32,7 @@
 #include "Game.h"
 #include "Constants.h"
 #include "Emotion.h"
+#include "MyTransform.h"
 
 
 // Initialise the game and load required resources.
@@ -41,24 +42,32 @@ void Game::Initialise()
     InitAudioDevice();
 
     // Initialise robot
+	robotWorldPos = {0, 0};
     robot.Initialise();
-	robot.SetAnchorPoint(robotWorldPos);
+	MyTransform initialTransform
+	{
+		.position = robotWorldPos,
+		.pivot = {0, 0},
+		.rotation = 0.0f,
+		.scale = SCALE
+	};
+	robot.SetTransform(initialTransform);
 
     // Initialise ball
-    ball.SetTextureFilename("./assets/images/toys/ball.png");
-    ball.Initialise();
-	ball.SetAnchorPoint({100, 100});
-    ball.SetName("ball");
+    //ball.SetTextureFilename("./assets/images/toys/ball.png");
+    //ball.Initialise();
+	//ball.SetAnchorPoint({100, 100});
+    //ball.SetName("ball");
 
     // Initialise banana
-    banana.SetTextureFilename("./assets/images/toys/banana.png");
-    banana.Initialise();
-	banana.SetAnchorPoint({300, 300});
-    banana.SetName("banana");
+    //banana.SetTextureFilename("./assets/images/toys/banana.png");
+    //banana.Initialise();
+	//banana.SetAnchorPoint({300, 300});
+    //banana.SetName("banana");
 
-    objects = {&ball, &banana};
+    //objects = {&ball, &banana};
 
-    robot.SetObjectPointers(objects);
+    //robot.SetObjectPointers(objects);
 
     SetTargetFPS(TARGET_FPS);
 

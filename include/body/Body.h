@@ -8,50 +8,35 @@
 #include "Body/Head/Head.h"
 #include "Body/Neck.h"
 #include "BodyDimensions.h"
+#include "MyTransform.h"
+
 
 class Body
 {
 public:
-
     Body(BodyDimensions& dimensions);
-
     void Initialise();
-    
     void Shutdown();
-    
     void Update(float dt, bool speaking, Emotion emotion);
-
     void Draw() const;
-    
-    void SetAnchorPoint(Vector2 anchorPoint);
-    
-    void ApplyAnchorPoint(Vector2 anchorPoint);
-
-    Vector2 GetAnchorPoint() const;
-
+    void SetTransform(MyTransform transform);
+    MyTransform GetTransform() const;
     void SetRotation(float rotation);
-
-    void ApplyRotation(float rotation);
-
-    float GetRotation();
-
-    void PlayIdleBodyTransform(float dt);
-
-    void PlayBodyWiggle(float dt);
-
-    void PlayBodyBob(float dt);
-
     Head& GetHead();
-
-    void SwingArm(std::string side, bool swing);
-
-    Vector2 GetHeadWorldPosition();
+    float GetRotation();
+    //void PlayIdleBodyTransform(float dt);
+    //void PlayBodyWiggle(float dt);
+    //void PlayBodyBob(float dt);
+    //void SwingArm(std::string side, bool swing);
 
 private:
-    Vector2 anchorPoint;
-
-    float rotation;
-    float scale;
+    BodyDimensions &dimensions;
+    MyTransform transform;
+    BodyBase bodyBase;
+    Neck neck;
+    Pelvis pelvis;
+    Arms arms;
+    Vector2 homeAnchorPoint;
     float homeRotation;
 
     // Tracks the progress of the current wiggle.
@@ -96,19 +81,4 @@ private:
 
     // Speed of the bobbing motion.
     float bodyBobSpeed;
-
-    // Anchor point the body returns to after applying
-    // its idle movement.
-    Vector2 homeAnchorPoint;
-
-    BodyDimensions &dimensions;
-
-    BodyBase bodyBase;
-
-    Neck neck;
-
-    Pelvis pelvis;
-
-    Arms arms;
-
 };

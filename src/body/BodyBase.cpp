@@ -21,8 +21,6 @@ void BodyBase::Initialise()
     dimensions.bodyWidth = texture.width / COLUMNS;
     dimensions.bodyHeight = texture.height / ROWS;
 
-    std::cout << dimensions.bodyWidth << " x " << dimensions.bodyHeight << "\n";
-
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
     // Animation settings.
@@ -38,14 +36,6 @@ void BodyBase::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
-
-    rotation = ROTATION;
-    scale = SCALE;
-
-    anchorOffset = {
-        dimensions.bodyWidth / 2.0f, 
-        dimensions.bodyHeight / 2.0f
-    };
 }
 
 // Return the current head animation frame.
@@ -57,16 +47,12 @@ int BodyBase::GetFrame() const
 // Apply a rotation transform to the head sprite.
 void BodyBase::SetRotation(float rotation)
 {
-    Sprite::SetRotation(rotation);
+    this->transform.rotation = rotation;
+    Sprite::SetRotation(this->transform.rotation);
 }
 
-float BodyBase::GetFrameWidth() const
+void BodyBase::SetTransform(MyTransform transform)
 {
-    return animation.GetFrameWidth();
+    this->transform = transform;
+    Sprite::SetTransform(this->transform);
 }
-
-float BodyBase::GetFrameHeight() const
-{
-    return animation.GetFrameHeight();
-}
-

@@ -9,6 +9,7 @@
 class Neck : public Sprite
 {
     public:
+        using Sprite::Update;
         Neck(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt, bool speaking, Emotion emotion);

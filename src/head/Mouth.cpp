@@ -41,8 +41,8 @@ void Mouth::Initialise()
         FRAME_DURATION
     );
 
-    rotation = ROTATION;
-    scale = SCALE;
+    //rotation = ROTATION;
+    //scale = SCALE;
 
     localPositionOffset =
     {
@@ -54,7 +54,7 @@ void Mouth::Initialise()
         + mouthDisplayOffset
     };
 
-    anchorOffset = localPositionOffset;
+    //anchorOffset = localPositionOffset;
 }
 
 // Advance the mouth animation.

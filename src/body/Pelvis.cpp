@@ -10,14 +10,14 @@ void Pelvis::Initialise()
     dimensions.pelvisWidth = 260.0f;
     dimensions.pelvisHeight = 70.0f;
 
-    rotation = 0;
+    /*rotation = 0;
     scale = SCALE;
 
     anchorOffset = {
         0,
         dimensions.bodyHeight / 2.0f +
         dimensions.pelvisHeight / 2.0f
-    };
+    };*/
 
     legs.Initialise();
 }
@@ -30,7 +30,7 @@ void Pelvis::Update(float dt)
 
 void Pelvis::Draw() const
 {
-    Rectangle pelvis =
+    /*Rectangle pelvis =
     {
         anchorPoint.x,
         anchorPoint.y,
@@ -50,20 +50,20 @@ void Pelvis::Draw() const
         drawAnchorOffset,
         rotation,
         BROWN
-    );
+    );*/
     //DrawCircle(anchorPoint.x + anchorOffset.x*scale, anchorPoint.y + anchorOffset.y*scale, 10, RED);
 }
 
 void Pelvis::SetRotation(float rotation)
 {
-    this->rotation = rotation;
+    //this->rotation = rotation;
     legs.SetRotation(rotation);
 
 }
 
 void Pelvis::SetAnchorPoint(Vector2 anchorPoint)
 {
-    this->anchorPoint = anchorPoint;
+    //this->anchorPoint = anchorPoint;
 
     legs.SetAnchorPoint(anchorPoint);
 }

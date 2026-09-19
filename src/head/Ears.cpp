@@ -41,7 +41,7 @@ void Ears::Initialise()
         FRAME_DURATION
     );
 
-    rotation = ROTATION;
+    /*rotation = ROTATION;
     scale = SCALE;
 
     anchorOffset =
@@ -51,7 +51,7 @@ void Ears::Initialise()
         + dimensions.bodyHeight / 2.0f
         + dimensions.headHeight / 2.0f
         + dimensions.neckHeight
-    };
+    };*/
 }
 
 void Ears::Update(float dt)

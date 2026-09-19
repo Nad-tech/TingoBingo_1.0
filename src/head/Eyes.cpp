@@ -45,6 +45,7 @@ void Eyes::Initialise()
         FRAME_DURATION
     );
 
+    /*
     rotation = ROTATION;
     scale = SCALE;
 
@@ -55,7 +56,7 @@ void Eyes::Initialise()
         dimensions.headHeight / 2.0f + 
         dimensions.neckHeight +
         dimensions.eyesYoffset
-    };
+    };*/
 }
 
 void Eyes::Update(float dt)

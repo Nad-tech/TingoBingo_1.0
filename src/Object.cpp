@@ -30,7 +30,7 @@ void Object::Initialise()
     // Starting at (0, 0) means the object begins at
     // the top-left corner of the world.
     //
-    anchorPoint = Vector2(0, 0);
+    //anchorPoint = Vector2(0, 0);
 
 
     // -------------------------------------------------
@@ -128,7 +128,7 @@ void Object::Initialise()
 
 
     // Set the object's starting rotation.
-    rotation = ROTATION;
+    //rotation = ROTATION;
 
 
     // Set the object's starting scale.
@@ -137,7 +137,7 @@ void Object::Initialise()
     // 0.5 would be half size.
     // 2 would be double size.
     //
-    scale = 1;
+    //scale = 1;
 
 
     //=================================================
@@ -478,9 +478,9 @@ void Object::Initialise()
     //
     collisionOffset =
     {
-        (left - FRAME_WIDTH / 2.0f) * scale,
+      /*  (left - FRAME_WIDTH / 2.0f) * scale,
 
-        (top - FRAME_HEIGHT / 2.0f) * scale
+        (top - FRAME_HEIGHT / 2.0f) * scale*/
     };
 
 
@@ -499,11 +499,11 @@ void Object::Initialise()
     //     half the frame width
     //     half the frame height
     //
-    anchorOffset =
+    /*anchorOffset =
     {
         FRAME_WIDTH / 2.0f,
         FRAME_HEIGHT / 2.0f
-    };
+    };*/
 
 
     //=================================================
@@ -522,14 +522,14 @@ void Object::Initialise()
     //
     collisionBox = Rectangle
     (
-        anchorPoint.x + collisionOffset.x,
-        anchorPoint.y + collisionOffset.y,
+        //anchorPoint.x + collisionOffset.x,
+        //anchorPoint.y + collisionOffset.y,
 
         // Width of the visible part.
-        visibleWidth * scale,
+        //visibleWidth * scale,
 
         // Height of the visible part.
-        visibleHeight * scale
+        //visibleHeight * scale
     );
 }
 
@@ -633,8 +633,8 @@ void Object::UpdateObject(
         //
         mouseGrabOffset =
         {
-            mousePosition.x - anchorPoint.x,
-            mousePosition.y - anchorPoint.y
+           // mousePosition.x - anchorPoint.x,
+           // mousePosition.y - anchorPoint.y
         };
     }
 
@@ -651,11 +651,11 @@ void Object::UpdateObject(
         // stays grabbed at the same point where the user
         // originally clicked it.
         //
-        anchorPoint =
+        /*anchorPoint =
         {
             mousePosition.x - mouseGrabOffset.x,
             mousePosition.y - mouseGrabOffset.y
-        };
+        };*/
     }
 
 
@@ -669,11 +669,11 @@ void Object::UpdateObject(
     // We add collisionOffset because the visible image
     // may not be centred inside the sprite frame.
     //
-    collisionBox.x =
-        anchorPoint.x + collisionOffset.x;
+    //collisionBox.x =
+        //anchorPoint.x + collisionOffset.x;
 
-    collisionBox.y =
-        anchorPoint.y + collisionOffset.y;
+    //collisionBox.y =
+        //anchorPoint.y + collisionOffset.y;
 }
 
 

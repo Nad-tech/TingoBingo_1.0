@@ -43,7 +43,7 @@ void Eyebrows::Initialise()
     );
 
     // Apply the default sprite transform.
-    rotation = ROTATION;
+    /*rotation = ROTATION;
     scale = SCALE;
 
     anchorOffset =
@@ -55,7 +55,7 @@ void Eyebrows::Initialise()
         + dimensions.headHeight / 2.0f
         + dimensions.neckHeight
         + foreheadOffset
-    };
+    };*/
 }
 
 void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)

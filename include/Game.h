@@ -7,11 +7,9 @@
 class Game
 {
 public:
-	
 	void Run();
 	
 private:
-	
 	void Initialise();
 	void Shutdown();
 
@@ -19,12 +17,8 @@ private:
 	void Update(const float dt);
 	void Draw();
 	
-
 	Robot robot;
-	
-	Vector2 robotWorldPos = {
-		SCREEN_WIDTH / 2.0f, SCREEN_HEIGHT / 2.0f
-	};
+	Vector2 robotWorldPos;
 	Input input;
 	Object ball;
 	Object banana;
