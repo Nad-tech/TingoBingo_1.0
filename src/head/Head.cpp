@@ -21,8 +21,6 @@
 
 // Initialise the head's transform and idle animation state.
 Head::Head(BodyDimensions& dimensions) :
-    rotation(0.0f),
-    scale(0.0f),
     dimensions(dimensions),
     headBase(dimensions),
     eyes(dimensions),
@@ -39,103 +37,76 @@ Head::Head(BodyDimensions& dimensions) :
 void Head::Initialise()
 {
     headBase.Initialise();
-    antenna.Initialise();
-    ears.Initialise();
-    eyebrows.Initialise();
-    eyes.Initialise();
-    mouth.Initialise();
-    nose.Initialise();
-    pupils.Initialise();
+    positionOffset = {
+        0,
+        dimensions.neckHeight / 2.0f + dimensions.headHeight / 2.0f  
+    };
+
+    //antenna.Initialise();
+    //ears.Initialise();
+    //eyebrows.Initialise();
+    //eyes.Initialise();
+    //mouth.Initialise();
+    //nose.Initialise();
+    //pupils.Initialise();
 }
 
 // Release resources used by each head component.
 void Head::Shutdown()
 {
     headBase.Shutdown();
-    antenna.Shutdown();
-    ears.Shutdown();
-    eyebrows.Shutdown();
-    eyes.Shutdown();
-    mouth.Shutdown();
-    nose.Shutdown();
-    pupils.Shutdown();
+    //antenna.Shutdown();
+    //ears.Shutdown();
+    //eyebrows.Shutdown();
+    //eyes.Shutdown();
+    //mouth.Shutdown();
+    //nose.Shutdown();
+    //pupils.Shutdown();
 }
 
 // Update every animated head component.
 void Head::Update(float dt, bool speaking, Emotion emotion)
 {
     headBase.Update(dt);
-    antenna.Update(dt);
-    ears.Update(dt);
-    eyebrows.UpdateEyebrows(dt, speaking, emotion);
-    eyes.Update(dt);
-    mouth.UpdateMouth(dt, speaking, emotion);
-    nose.Update(dt);
-    pupils.Update(dt);
+    //antenna.Update(dt);
+    //ears.Update(dt);
+    //eyebrows.UpdateEyebrows(dt, speaking, emotion);
+    //eyes.Update(dt);
+    //mouth.UpdateMouth(dt, speaking, emotion);
+    //nose.Update(dt);
+    //pupils.Update(dt);
 }
 
 void Head::Draw() const
 {
-    ears.Draw();
+    //ears.Draw();
     headBase.Draw();
-    eyes.Draw();
-    mouth.Draw();
-    nose.Draw();
-    eyebrows.Draw();
-    antenna.Draw();
-    pupils.Draw();
+    //eyes.Draw();
+    //mouth.Draw();
+    //nose.Draw();
+    //eyebrows.Draw();
+    //antenna.Draw();
+    //pupils.Draw();
 }
 
-// Set the head's home anchor point and apply it to every component.
-void Head::SetAnchorPoint(Vector2 anchorPoint)
+void Head::SetTransform(MyTransform parentTransform)
 {
-    ApplyAnchorPoint(anchorPoint);
-}
+    transform.position =
+    {
+        parentTransform.position.x + positionOffset.x,
+        parentTransform.position.y + positionOffset.y
+    };
 
-// Move every head component to the same world-space anchor point.
-void Head::ApplyAnchorPoint(Vector2 anchorPoint)
-{
-    this->anchorPoint = anchorPoint;
+    transform.pivot =
+    {
+        0,
+        -positionOffset.y - dimensions.bodyHeight / 2.0f
+    };
+    
+    transform.rotation = parentTransform.rotation;
+    transform.scale = parentTransform.scale;
 
-    /*headBase.SetAnchorPoint(anchorPoint);
-    antenna.SetAnchorPoint(anchorPoint);
-    ears.SetAnchorPoint(anchorPoint);
-    eyebrows.SetAnchorPoint(anchorPoint);
-    eyes.SetAnchorPoint(anchorPoint);
-    mouth.SetAnchorPoint(anchorPoint);
-    nose.SetAnchorPoint(anchorPoint);
-    pupils.SetAnchorPoint(anchorPoint);*/
-}
-
-Vector2 Head::GetAnchorPoint()
-{
-    return anchorPoint;
-}
-
-// Set the head's home rotation.
-void Head::SetRotation(float rotation)
-{
-    ApplyRotation(rotation);
-}
-
-// Apply the current rotation to every head component.
-void Head::ApplyRotation(float rotation)
-{
-    this->rotation = rotation;
-
-    headBase.SetRotation(rotation);
-    /*antenna.SetRotation(rotation);
-    ears.SetRotation(rotation);
-    eyebrows.SetRotation(rotation);
-    eyes.SetRotation(rotation);
-    mouth.SetRotation(rotation);
-    nose.SetRotation(rotation);
-    pupils.SetRotation(rotation);*/
-}
-
-float Head::GetRotation()
-{
-    return rotation;
+    headBase.SetTransform(transform);
 }
 
 // Rotate the pupils to look towards the given point.
@@ -147,9 +118,4 @@ void Head::LookAt(Vector2 point)
 void Head::LookForward()
 {
     pupils.LookForward();
-}
-
-Vector2 Head::GetWorldPosition() const
-{
-    return headBase.GetWorldPosition();
 }

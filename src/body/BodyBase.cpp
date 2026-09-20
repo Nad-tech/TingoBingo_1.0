@@ -35,9 +35,3 @@ void BodyBase::Initialise()
     );
 }
 
-// Return the current head animation frame.
-int BodyBase::GetFrame() const
-{
-    return animation.GetFrame();
-}
-

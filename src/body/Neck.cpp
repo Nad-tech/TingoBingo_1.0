@@ -25,6 +25,12 @@ void Neck::Update(float dt, bool speaking, Emotion emotion) {
     head.Update(dt, speaking, emotion);
 }
 
+void Neck::Draw() const
+{
+    Shape::Draw();
+    head.Draw();
+}
+
 void Neck::SetTransform(MyTransform parentTransform)
 {
     transform.position =
@@ -43,6 +49,7 @@ void Neck::SetTransform(MyTransform parentTransform)
     transform.scale = parentTransform.scale;
 
     Shape::SetTransform(transform);
+    head.SetTransform(transform);
 }
 
 Head& Neck::GetHead()
