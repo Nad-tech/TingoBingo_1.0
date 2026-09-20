@@ -134,7 +134,7 @@ int UpperArm::GetFrame() const
 // Set the upper arm's base rotation.
 void UpperArm::SetRotation(float rotation)
 {
-    Sprite::SetRotation(rotation);
+   // Sprite::SetRotation(rotation);
     elbow.SetRotation(rotation + localRotation);
 }
 

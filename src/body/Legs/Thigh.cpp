@@ -23,7 +23,7 @@ void Thigh::Initialise()
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
     // Animation settings.
-    const float ROTATION = 0.0f;
+    //const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.02f;
 
     // Initialise the animation using the sprite sheet information.
@@ -65,7 +65,7 @@ int Thigh::GetFrame() const
 // Apply a rotation transform to the head sprite.
 void Thigh::SetRotation(float rotation)
 {
-    Sprite::SetRotation(rotation);
+    //Sprite::SetRotation(rotation);
 }
 
 void Thigh::Draw() const

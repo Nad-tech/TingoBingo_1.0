@@ -23,8 +23,6 @@ public:
     
     void SetTransform(MyTransform transform);
     
-    void SetRotation(float rotation);
-    
     Head& GetHead();
     
     void PlayIdleBodyTransform(float dt);

@@ -1,24 +1,24 @@
 #pragma once
 
 #include "raylib.h"
-#include "Animation.h"
 #include "Constants.h"
 #include "MyTransform.h"
-class Sprite
+#include "BodyDimensions.h"
+
+class Shape
 {
 protected:
-    Texture2D texture;
-    Animation animation;
+    BodyDimensions& dimensions;
     MyTransform transform;
 
 public:
+    Shape(BodyDimensions& dimensions);
     virtual void Initialise() = 0;
     void Shutdown();
-
-    virtual void Update(float dt);
+    
     virtual void Draw() const;
     
     void SetTransform(MyTransform transform);
 
-    virtual ~Sprite() = default;
+    virtual ~Shape() = default;
 };

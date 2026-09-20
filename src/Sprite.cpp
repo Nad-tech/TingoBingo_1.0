@@ -9,7 +9,100 @@
 //====================================================
 
 #include "Sprite.h"
-#include <iostream>
+#include <cmath>
+
+/*
+    Tingo uses its own Cartesian coordinate system for all transform
+    calculations. In our system, (0, 0) is the centre of the screen,
+    +X points right, and +Y points up.
+
+    Raylib uses screen coordinates instead: (0, 0) is the top-left
+    of the screen, +X points right, and +Y points down.
+
+    Therefore, before rendering, we convert our Cartesian coordinates
+    into Raylib's screen coordinates. This conversion happens here,
+    at the rendering boundary, so the rest of Tingo's transform system
+    can continue to work entirely in Cartesian coordinates.
+
+    DrawTexturePro() also combines the sprite's position and rotation
+    around an origin. Its destination position represents where that
+    origin is located on screen. Our transform system keeps position
+    and pivot as separate concepts, so we calculate the screen-space
+    position of our pivot and give that to DrawTexturePro() as its
+    destination position.
+
+    The origin must also be converted into Raylib's local coordinate
+    system. Raylib measures the origin from the top-left of the
+    destination rectangle, whereas our pivot is stored as a Cartesian
+    offset from the centre of the sprite. Therefore, we start at the
+    centre of the rendered sprite (width / 2, height / 2) and add the
+    pivot offset. The Y component is inverted because Cartesian +Y
+    points upward while Raylib's local +Y points downward.
+
+    In other words:
+
+        Tingo coordinates
+                |
+                |  Cartesian -> screen conversion
+                v
+        screenPosition / pivotScreen
+                |
+                |  translate our position + pivot into
+                |  Raylib's destination + origin system
+                v
+        DrawTexturePro()
+                |
+                v
+            Rendered sprite
+
+    This keeps Raylib's coordinate/origin requirements contained
+    inside this function without changing the meaning of MyTransform.
+*/
+
+void DrawTextureCartesian(
+    Texture2D texture,
+    Rectangle source,
+    MyTransform transform
+)
+{
+    Vector2 screenPosition =
+    {
+        SCREEN_WIDTH / 2.0f + transform.position.x * transform.scale,
+        SCREEN_HEIGHT / 2.0f - transform.position.y * transform.scale
+    };
+
+    Vector2 pivotScreen =
+    {
+        screenPosition.x + transform.pivot.x * transform.scale,
+        screenPosition.y - transform.pivot.y * transform.scale
+    };
+
+    float width = source.width * transform.scale;
+    float height = source.height * transform.scale;
+
+    Vector2 origin =
+    {
+        width / 2.0f + transform.pivot.x * transform.scale,
+        height / 2.0f - transform.pivot.y * transform.scale
+    };
+
+    Rectangle destination =
+    {
+        pivotScreen.x,
+        pivotScreen.y,
+        width,
+        height
+    };
+
+    DrawTexturePro(
+        texture,
+        source,
+        destination,
+        origin,
+        transform.rotation,
+        WHITE
+    );
+}
 
 // Update the sprite's animation.
 void Sprite::Update(float dt)
@@ -17,121 +110,17 @@ void Sprite::Update(float dt)
     animation.Update(dt);
 }
 
-//====================================================
-// Sprite Positioning
-//
-// anchorPoint is the world-space reference point and
-// initial position for the sprite. It is also the point
-// around which the sprite rotates.
-//
-// anchorOffset defines how far the sprite is offset
-// from the anchorPoint.
-//
-// anchorPoint and anchorOffset work together to define
-// the sprite's actual position in world space.
-//
-//====================================================
-// DrawTexturePro()
-//
-// DrawTexturePro(
-//     texture,
-//     source,
-//     destination,
-//     origin,
-//     rotation,
-//     tint
-// );
-//
-// texture
-//     The texture to draw.
-//
-// source
-//     Defines which part of the texture is drawn.
-//     Used here to select the current animation frame.
-//
-// destination
-//     Defines where the reference position is and the
-//     size of the sprite when it is drawn.
-//
-// origin
-//     Defines how far the sprite is offset from the
-//     reference position.
-//
-// rotation
-//     The rotation angle in degrees around the reference
-//     position.
-//
-// tint
-//     The colour applied to the sprite. WHITE draws the
-//     sprite using its original colours.
-//====================================================
-//
-// The anchorOffset is scaled with the sprite so that
-// the offset remains correctly aligned when the sprite
-// is drawn at different scales.
-//====================================================
 void Sprite::Draw() const
 {
-    // Get the source rectangle for the current animation frame.
     Rectangle source = animation.GetSourceRectangle();
 
-    //Convert cartesion transform.position to screen coords
-    float screenX = SCREEN_WIDTH / 2.0f + transform.position.x;
-    float screenY = SCREEN_HEIGHT / 2.0f - transform.position.y;
-
-    //convert cartesion pivot coords to screen pivot coords
-    float screenPivotX = 
-        animation.GetFrameWidth() * transform.scale / 2.0f + 
-        transform.pivot.x;
-
-    float screenPivotY = 
-        animation.GetFrameHeight() * transform.scale / 2.0f - 
-        transform.pivot.y;
-    
-    Vector2 screenPivot = {screenPivotX, screenPivotY};
-
-    // Define the sprite's world-space position and scaled size.
-    Rectangle destination =
-    {
-        screenX,
-        screenY,
-        animation.GetFrameWidth() * transform.scale,
-        animation.GetFrameHeight() * transform.scale
-    };
-
-    // Draw the selected animation frame at the position
-    DrawTexturePro(
-        texture,
-        source,
-        destination,
-        screenPivot,
-        transform.rotation,
-        WHITE
-    );
+    DrawTextureCartesian(texture, source, transform);
 }
 
 // Release the sprite's texture.
 void Sprite::Shutdown()
 {
     UnloadTexture(texture);
-}
-
-// Set the sprite's world-space anchor point.
-void Sprite::SetPosition(Vector2 position)
-{
-    this->transform.position = position;
-}
-
-// Return the sprite's current anchor point.
-Vector2 Sprite::GetPosition() const
-{
-    return transform.position;
-}
-
-// Set the sprite's rotation in degrees.
-void Sprite::SetRotation(float rotation)
-{
-    this->transform.rotation = rotation;
 }
 
 void Sprite::SetTransform(MyTransform transform)

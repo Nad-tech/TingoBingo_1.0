@@ -64,7 +64,7 @@ int Headbase::GetFrame() const
 // Apply a rotation transform to the head sprite.
 void Headbase::SetRotation(float rotation)
 {
-    Sprite::SetRotation(rotation);
+   // Sprite::SetRotation(rotation);
 }
 
 Vector2 Headbase::GetWorldPosition() const

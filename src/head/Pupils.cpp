@@ -104,8 +104,8 @@ void Pupils::SetRotation(float rotation)
         headAnchorPoint.y + rotatedRight.y
     });*/
 
-    leftPupil.SetRotation(rotation);
-    rightPupil.SetRotation(rotation);
+    //leftPupil.SetRotation(rotation);
+    //rightPupil.SetRotation(rotation);
 }
 
 // Move the pupils towards a target point while limiting

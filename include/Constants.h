@@ -18,8 +18,6 @@ constexpr int SCREEN_HEIGHT = 700;
 constexpr char WINDOW_TITLE[] = "Tingo Bingo";
 constexpr int TARGET_FPS = 60;
 
-constexpr int ROBOT_WIDTH = 0;
-constexpr int ROBOT_HEIGHT = 0;
 constexpr float SCALE = 0.7f;
 
 constexpr Color CARDBOARD_LIGHT = { 181, 150, 105, 255 };

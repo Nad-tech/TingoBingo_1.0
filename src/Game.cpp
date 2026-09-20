@@ -70,7 +70,7 @@ void Game::Initialise()
 
     // Initialise robot
 	robotWorldPos = {0, 0};
-    robot.Initialise();
+    
 	MyTransform initialTransform
 	{
 		.position = robotWorldPos,
@@ -79,6 +79,7 @@ void Game::Initialise()
 		.scale = SCALE
 	};
 	robot.SetTransform(initialTransform);
+	robot.Initialise();
 
     // Initialise ball
     //ball.SetTextureFilename("./assets/images/toys/ball.png");
@@ -162,10 +163,10 @@ void Game::Draw()
 	robot.Draw();
 	
 	//ball.DrawCollisionBox();
-	ball.Draw();
+	//ball.Draw();
 	
 	//banana.DrawCollisionBox();
-	banana.Draw();
+	//banana.Draw();
 	
 	//DrawLineEx(robot.GetSearchRayOrigin(), robot.GetSearchRayEnd(), 2.0f, RED);
 

@@ -124,13 +124,13 @@ void Head::ApplyRotation(float rotation)
     this->rotation = rotation;
 
     headBase.SetRotation(rotation);
-    antenna.SetRotation(rotation);
+    /*antenna.SetRotation(rotation);
     ears.SetRotation(rotation);
     eyebrows.SetRotation(rotation);
     eyes.SetRotation(rotation);
     mouth.SetRotation(rotation);
     nose.SetRotation(rotation);
-    pupils.SetRotation(rotation);
+    pupils.SetRotation(rotation);*/
 }
 
 float Head::GetRotation()

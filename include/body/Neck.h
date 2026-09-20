@@ -1,25 +1,25 @@
 #pragma once
 
 #include "Body/Head/Head.h"
-#include "Sprite.h"
-
+#include "Shape.h"
 #include "Emotion.h"
 #include "BodyDimensions.h"
+#include "MyTransform.h"
 
-class Neck : public Sprite
+class Neck : public Shape
 {
     public:
-        using Sprite::Update;
         Neck(BodyDimensions& dimensions);
         void Initialise() override;
-        void Update(float dt, bool speaking, Emotion emotion);
-        void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
-        Head& GetHead();
         void Shutdown();
-    
+        
+        void Update(float dt, bool speaking, Emotion emotion);
+        
+        void SetTransform(MyTransform parentTransform);
+        
+        Head& GetHead();
+        
     private:
-        BodyDimensions& dimensions;
+        Vector2 positionOffset;
         Head head;
 };

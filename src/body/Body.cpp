@@ -57,31 +57,16 @@ void Body::Draw() const
     //pelvis.Draw();
     bodyBase.Draw();
     //arms.Draw();
-    //neck.Draw();
+    neck.Draw();
 }
 
 void Body::SetTransform(MyTransform transform)
 {
     this->transform = transform;
-
     bodyBase.SetTransform(this->transform);
-
-    //neck.SetTransform(this->transform);
-
+    neck.SetTransform(this->transform);
     //arms.SetTransform(this->transform);
-
     //pelvis.SetTransform(this->transform);
-}
-
-void Body::SetRotation(float rotation)
-{
-    transform.rotation = rotation;
-
-    bodyBase.SetRotation(rotation);
-    //arms.SetRotation(rotation);
-
-    //pelvis.SetRotation(rotation);
-    //neck.SetRotation(rotation);
 }
 
 void Body::PlayIdleBodyTransform(float dt)
@@ -118,6 +103,7 @@ void Body::PlayBodyWiggle(float dt)
             transform.rotation = homeTransform.rotation;
         }
         bodyBase.SetTransform(transform);
+        neck.SetTransform(transform);
     }
 }
 
@@ -145,6 +131,7 @@ void Body::PlayBodyBob(float dt)
     transform.position.y = homeTransform.position.y + bodyBobOffset.y;
 
     bodyBase.SetTransform(transform);
+    neck.SetTransform(transform);
 }
 
 Head& Body::GetHead()

@@ -152,10 +152,10 @@ int Shoulder::GetFrame() const
 // down to the child upper arm.
 void Shoulder::SetRotation(float rotation)
 {
-    Sprite::SetRotation(rotation);
+    //Sprite::SetRotation(rotation);
 
     // Keep the upper arm aligned with the shoulder's rotation.
-    upperArm.SetRotation(rotation);
+   // upperArm.SetRotation(rotation);
 }
 
 // Draw the shoulder and its child upper arm.
