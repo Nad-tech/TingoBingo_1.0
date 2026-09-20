@@ -17,8 +17,6 @@
 #include <cmath>
 #include "Emotion.h"
 
-//TODO adjust all features of head with repect to neck
-
 // Initialise the head's transform and idle animation state.
 Head::Head(BodyDimensions& dimensions) :
     dimensions(dimensions),
@@ -28,8 +26,7 @@ Head::Head(BodyDimensions& dimensions) :
     ears(dimensions),
     eyebrows(dimensions),
     mouth(dimensions),
-    nose(dimensions),
-    pupils(dimensions)
+    nose(dimensions)
 {
 }
 
@@ -42,51 +39,47 @@ void Head::Initialise()
         dimensions.neckHeight / 2.0f + dimensions.headHeight / 2.0f  
     };
 
-    //antenna.Initialise();
-    //ears.Initialise();
-    //eyebrows.Initialise();
-    //eyes.Initialise();
-    //mouth.Initialise();
-    //nose.Initialise();
-    //pupils.Initialise();
+    antenna.Initialise();
+    ears.Initialise();
+    eyebrows.Initialise();
+    eyes.Initialise();
+    mouth.Initialise();
+    nose.Initialise();
 }
 
 // Release resources used by each head component.
 void Head::Shutdown()
 {
     headBase.Shutdown();
-    //antenna.Shutdown();
-    //ears.Shutdown();
-    //eyebrows.Shutdown();
-    //eyes.Shutdown();
-    //mouth.Shutdown();
-    //nose.Shutdown();
-    //pupils.Shutdown();
+    antenna.Shutdown();
+    ears.Shutdown();
+    eyebrows.Shutdown();
+    eyes.Shutdown();
+    mouth.Shutdown();
+    nose.Shutdown();
 }
 
 // Update every animated head component.
 void Head::Update(float dt, bool speaking, Emotion emotion)
 {
     headBase.Update(dt);
-    //antenna.Update(dt);
-    //ears.Update(dt);
-    //eyebrows.UpdateEyebrows(dt, speaking, emotion);
-    //eyes.Update(dt);
-    //mouth.UpdateMouth(dt, speaking, emotion);
-    //nose.Update(dt);
-    //pupils.Update(dt);
+    antenna.Update(dt);
+    ears.Update(dt);
+    eyebrows.Update(dt, speaking, emotion);
+    eyes.Update(dt);
+    mouth.UpdateMouth(dt, speaking, emotion);
+    nose.Update(dt);
 }
 
 void Head::Draw() const
 {
-    //ears.Draw();
+    ears.Draw();
     headBase.Draw();
-    //eyes.Draw();
-    //mouth.Draw();
-    //nose.Draw();
-    //eyebrows.Draw();
-    //antenna.Draw();
-    //pupils.Draw();
+    eyes.Draw();
+    mouth.Draw();
+    nose.Draw();
+    eyebrows.Draw();
+    antenna.Draw();
 }
 
 void Head::SetTransform(MyTransform parentTransform)
@@ -107,15 +100,20 @@ void Head::SetTransform(MyTransform parentTransform)
     transform.scale = parentTransform.scale;
 
     headBase.SetTransform(transform);
+    eyes.SetTransform(transform);
+    eyebrows.SetTransform(transform);
+    ears.SetTransform(transform);
+    antenna.SetTransform(transform);
+    nose.SetTransform(transform);
+    mouth.SetTransform(transform);
 }
 
-// Rotate the pupils to look towards the given point.
 void Head::LookAt(Vector2 point)
 {
-    pupils.LookAt(point);
+    eyes.GetPupils().LookAt(point);
 }
 
 void Head::LookForward()
 {
-    pupils.LookForward();
+    eyes.GetPupils().LookForward();
 }

@@ -40,18 +40,6 @@ void Ears::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
-
-    /*rotation = ROTATION;
-    scale = SCALE;
-
-    anchorOffset =
-    {
-        dimensions.earsWidth / 2.0f,
-        dimensions.earsHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-    };*/
 }
 
 void Ears::Update(float dt)
@@ -69,4 +57,9 @@ void Ears::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Ears::SetTransform(MyTransform parentTransform)
+{
+    transform = parentTransform;
 }

@@ -99,7 +99,7 @@ void DrawTextureCartesian(
         source,
         destination,
         origin,
-        transform.rotation,
+        -transform.rotation,
         WHITE
     );
 }

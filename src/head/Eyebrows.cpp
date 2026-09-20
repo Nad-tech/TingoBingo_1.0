@@ -27,9 +27,6 @@ void Eyebrows::Initialise()
     dimensions.eyeBrowsHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Configure the eyebrow animation timing and orientation.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.3f;
 
     // Create the animation from the sprite sheet.
@@ -42,23 +39,13 @@ void Eyebrows::Initialise()
         FRAME_DURATION
     );
 
-    // Apply the default sprite transform.
-    /*rotation = ROTATION;
-    scale = SCALE;
-
-    anchorOffset =
-    {
-        dimensions.eyeBrowsWidth / 2.0f,
-
-        dimensions.eyeBrowsHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-        + foreheadOffset
-    };*/
+    positionOffset = {
+        0,
+        foreheadOffset
+    };
 }
 
-void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
+void Eyebrows::Update(float dt, bool speaking, Emotion emotion)
 {
     // Update the base sprite behaviour before handling eyebrow animation.
     Sprite::Update(dt);
@@ -125,4 +112,11 @@ void Eyebrows::UpdateEyebrows(float dt, bool speaking, Emotion emotion)
         nextIdleAnimation =
             GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Eyebrows::SetTransform(MyTransform parentTransform) 
+{
+    transform = parentTransform;
+    transform.position.y += positionOffset.y;
+    Sprite::SetTransform(transform);
 }

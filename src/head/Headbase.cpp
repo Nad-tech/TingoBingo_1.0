@@ -30,7 +30,6 @@ void Headbase::Initialise()
     dimensions.headHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
     const float FRAME_DURATION = 0.02f;
 
     // Initialise the animation using the sprite sheet information.

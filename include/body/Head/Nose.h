@@ -11,11 +11,13 @@ class Nose : public Sprite
         void Initialise() override;
         void Update(float dt) override;
         void Draw() const override;
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
         float slightPositionOffset = 5.0f;
-        
+
         //Idle
         float localRotation = 0.0f;
         float idleTimer = 0.0f;
@@ -24,7 +26,7 @@ class Nose : public Sprite
         float noseRotateTimer = 0;
         
         //Wiggle
-        Vector2 homeAnchorPoint = {0,0};
+        Vector2 homePosition = {0,0};
         float wiggleTimer = 0.0f;
         bool noseWiggling = false;
         float nextNoseWiggle = 0;

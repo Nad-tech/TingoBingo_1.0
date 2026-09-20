@@ -17,6 +17,7 @@ Vector2 L;
 
 Pupils::Pupils(BodyDimensions& dimensions) : 
     dimensions(dimensions),
+    transform(),
     leftPupil(dimensions),
     rightPupil(dimensions)
 {}
@@ -54,24 +55,13 @@ void Pupils::Draw() const
 }
 
 // Set both pupil anchor points relative to the head.
-void Pupils::SetAnchorPoint(Vector2 anchorPoint)
+void Pupils::SetTransform(MyTransform parentTransform)
 {
-    headAnchorPoint = anchorPoint;
-
-    /*leftPupil.SetAnchorPoint(
-    {
-        anchorPoint.x,
-        anchorPoint.y
-    });
-
-    rightPupil.SetAnchorPoint(
-    {
-        anchorPoint.x,
-        anchorPoint.y
-    });*/
+    transform = parentTransform;
+    leftPupil.SetTransform(parentTransform);
+    rightPupil.SetTransform(parentTransform);
 }
 
-// Rotate an anchor offset around the anchor point.
 Vector2 Pupils::RotateVector(Vector2 v, float rotation)
 {
     float r = rotation * DEG2RAD;
@@ -92,45 +82,48 @@ void Pupils::SetRotation(float rotation)
     Vector2 rotatedRight =
         RotateVector(rightLookOffset, rotation);
 
-    /*leftPupil.SetAnchorPoint(
+    leftPupil.SetRotation(rotation);
+    rightPupil.SetRotation(rotation);
+
+    leftPupil.SetPosition(
     {
-        headAnchorPoint.x + rotatedLeft.x,
-        headAnchorPoint.y + rotatedLeft.y
+        transform.position.x + rotatedLeft.x,
+        transform.position.y + rotatedLeft.y
     });
 
-    rightPupil.SetAnchorPoint(
+    rightPupil.SetPosition(
     {
-        headAnchorPoint.x + rotatedRight.x,
-        headAnchorPoint.y + rotatedRight.y
-    });*/
+        transform.position.x + rotatedRight.x,
+        transform.position.y + rotatedRight.y
+    });
 
-    //leftPupil.SetRotation(rotation);
-    //rightPupil.SetRotation(rotation);
 }
 
 // Move the pupils towards a target point while limiting
 // how far they can travel within the eye.
 void Pupils::LookAt(Vector2 point)
 {
+    float scale = transform.scale;
+
     Vector2 leftEyeCentre =
     {
-        headAnchorPoint.x + leftPupil.GetSideOffset() * SCALE,
-        headAnchorPoint.y -
+        transform.position.x + leftPupil.GetSideOffset() * scale,
+        transform.position.y -
         (dimensions.bodyHeight / 2 
         + dimensions.headHeight / 2 
         + dimensions.neckHeight 
-        + dimensions.eyesYoffset) * SCALE
+        + dimensions.eyesYoffset) * scale
 
     };
 
     Vector2 rightEyeCentre =
     {
-        headAnchorPoint.x - rightPupil.GetSideOffset() * SCALE,
-        headAnchorPoint.y -  
+        transform.position.x - rightPupil.GetSideOffset() * scale,
+        transform.position.y -  
         (dimensions.bodyHeight / 2 
         + dimensions.headHeight / 2 
         + dimensions.neckHeight 
-        + dimensions.eyesYoffset) * SCALE
+        + dimensions.eyesYoffset) * scale
     };
 
     L = rightEyeCentre;
@@ -163,6 +156,8 @@ void Pupils::LookAt(Vector2 point)
         rightDirection.x * LOOK_DISTANCE,
         rightDirection.y * LOOK_DISTANCE
     };
+
+    SetRotation(transform.rotation);
 }
 
 void Pupils::LookForward()
@@ -170,15 +165,15 @@ void Pupils::LookForward()
     leftLookOffset = {0.0f, 0.0f};
     rightLookOffset = {0.0f, 0.0f};
 
-   /* leftPupil.SetAnchorPoint(
+    leftPupil.SetPosition(
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y
+        transform.position.x,
+        transform.position.y
     });
 
-    rightPupil.SetAnchorPoint(
+    rightPupil.SetPosition(
     {
-        headAnchorPoint.x,
-        headAnchorPoint.y
-    });*/
+        transform.position.x,
+        transform.position.y
+    });
 }

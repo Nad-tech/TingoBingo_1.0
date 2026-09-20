@@ -27,9 +27,6 @@ void Antenna::Initialise()
     dimensions.antennaHeight = texture.height / ROWS;
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Animation settings.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.06f;
 
     // Initialise the animation using the sprite sheet information.
@@ -42,18 +39,10 @@ void Antenna::Initialise()
         FRAME_DURATION
     );
 
-    //rotation = ROTATION;
-    //scale = SCALE;
-
-    /*anchorOffset =
-    {
-        dimensions.antennaWidth / 2.0f,
-        dimensions.antennaHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-        + topOfHeadOffset
-    };*/
+    positionOffset = {
+        0,
+        topOfHeadOffset
+    };
 }
 
 void Antenna::Update(float dt)
@@ -71,4 +60,10 @@ void Antenna::Update(float dt)
         antennaAnimationTimer = 0.0f;
         nextAntennaAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+}
+
+void Antenna::SetTransform(MyTransform parentTransform)
+{
+    transform = parentTransform;
+    transform.position.y += positionOffset.y;
 }

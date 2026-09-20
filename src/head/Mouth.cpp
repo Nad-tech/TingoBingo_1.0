@@ -28,9 +28,6 @@ void Mouth::Initialise()
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
-    // Animation settings.
-    const float ROTATION = 0.0f;
-    
     // Initialise the animation using the sprite sheet information.
     animation.Initialise
     (
@@ -41,27 +38,17 @@ void Mouth::Initialise()
         FRAME_DURATION
     );
 
-    //rotation = ROTATION;
-    //scale = SCALE;
-
-    localPositionOffset =
-    {
-        dimensions.mouthWidth / 2.0f,
-        dimensions.mouthHeight / 2.0f
-        + dimensions.bodyHeight / 2.0f
-        + dimensions.headHeight / 2.0f
-        + dimensions.neckHeight
-        + mouthDisplayOffset
+    positionOffset = {
+        0,
+        0
     };
-
-    //anchorOffset = localPositionOffset;
 }
 
 // Advance the mouth animation.
 void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 {
     Sprite::Update(dt);
-
+    
     if (emotion == Emotion::Happy && !speaking)
     {
         frame = 0;
@@ -87,4 +74,10 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
         frame = (frame == 1) ? 2 : 1;
         animation.SetFrame(frame);
     }
+}
+
+void Mouth::SetTransform(MyTransform parentTransform)
+{
+    transform = parentTransform;
+    transform.position.y += positionOffset.y;
 }

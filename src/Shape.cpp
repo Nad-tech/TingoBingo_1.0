@@ -40,7 +40,7 @@ void Shape::Draw() const
     DrawRectanglePro(
         rectangle,
         origin,
-        transform.rotation,
+        -transform.rotation,
         CARDBOARD_DARK
     );
 }

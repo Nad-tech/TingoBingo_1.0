@@ -10,6 +10,7 @@ class Mouth : public Sprite
         Mouth(BodyDimensions& dimensions);
         void Initialise() override;
         void UpdateMouth(float dt, bool speaking, Emotion emotion);
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
@@ -18,6 +19,6 @@ class Mouth : public Sprite
         float frameTimer = 0.0f;
         const float FRAME_DURATION = 0.3f;
 
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset = {};
         float mouthDisplayOffset = 28.0f;
 };

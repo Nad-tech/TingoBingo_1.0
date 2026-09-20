@@ -10,7 +10,9 @@
 #include "Body/Head/Eyes.h"
 #include "Constants.h"
 
-Eyes::Eyes(BodyDimensions& dimensions) : dimensions(dimensions)
+Eyes::Eyes(BodyDimensions& dimensions) : 
+    dimensions(dimensions),
+    pupils(dimensions)
 {
 }
 
@@ -27,12 +29,7 @@ void Eyes::Initialise()
     dimensions.eyesWidth = texture.width / COLUMNS;
     dimensions.eyesHeight = texture.height / ROWS;
 
-    dimensions.eyesYoffset = 30.0f;
-
     const int TOTAL_FRAMES = COLUMNS * ROWS;
-
-    // Animation settings.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.06f;
 
     // Initialise the animation using the sprite sheet information.
@@ -45,18 +42,13 @@ void Eyes::Initialise()
         FRAME_DURATION
     );
 
-    /*
-    rotation = ROTATION;
-    scale = SCALE;
+    dimensions.eyesYoffset = 30.0f;
 
-    anchorOffset = {
-        dimensions.eyesWidth / 2.0f,
-        dimensions.eyesHeight / 2.0f + 
-        dimensions.bodyHeight / 2.0f + 
-        dimensions.headHeight / 2.0f + 
-        dimensions.neckHeight +
-        dimensions.eyesYoffset
-    };*/
+    positionOffset = {
+        0, dimensions.eyesYoffset
+    };
+
+    pupils.Initialise();
 }
 
 void Eyes::Update(float dt)
@@ -74,4 +66,41 @@ void Eyes::Update(float dt)
         idleAnimationTimer = 0.0f;
         nextIdleAnimation = GetRandomValue(1000, 5000) / 1000.0f;
     }
+
+    pupils.Update(dt);
+}
+
+void Eyes::Draw() const
+{
+    Sprite::Draw();
+    pupils.Draw();
+}
+
+void Eyes::SetTransform(MyTransform parentTransform)
+{
+    transform = parentTransform;
+    transform.position.y += positionOffset.y;
+    Sprite::SetTransform(transform);
+    pupils.SetTransform(transform);
+}
+
+Pupils& Eyes::GetPupils()
+{
+    return pupils;
+}
+
+void Eyes::LookAt(Vector2 point)
+{
+    pupils.LookAt(point);
+}
+
+void Eyes::LookForward()
+{
+    pupils.LookForward();
+}
+
+void Eyes::ShutDown()
+{
+    pupils.Shutdown();
+    Sprite::Shutdown();
 }

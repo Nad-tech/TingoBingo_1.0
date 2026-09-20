@@ -40,7 +40,6 @@ public:
     void SetTransform(MyTransform parentTransform);
 
     void LookAt(Vector2 point);
-
     void LookForward();
     
 private:
@@ -55,5 +54,4 @@ private:
     Eyebrows eyebrows;
     Mouth mouth;
     Nose nose;
-    Pupils pupils;
 };

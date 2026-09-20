@@ -47,8 +47,6 @@ Nose::Nose(BodyDimensions& dimensions) : dimensions(dimensions)
 
 void Nose::Initialise()
 {
-    std::cout << "NOSE INITIALISE\n";
-
     // Load the nose texture.
     texture = LoadTexture(
         "assets/images/TingoBingo/head/nose.png"
@@ -84,53 +82,12 @@ void Nose::Initialise()
         FRAME_DURATION
     );
 
-    //================================================
-    // Sprite Transform
-    //================================================
+    positionOffset = {
+        0,
+        -slightPositionOffset
+    };
 
-    // The nose initially has no local rotation.
-    //rotation = 0.0f;
-
-    // Use the global robot sprite scale.
-    //scale = SCALE;
-
-    //================================================
-    // Nose Position
-    //================================================
-    //
-    // localPositionOffset is expressed in LOCAL coordinates
-    // relative to anchorPoint.
-    //
-    // X:
-    // Position the nose horizontally relative to the
-    // parent anchor using half of the nose frame width.
-    //
-    // Y:
-    // Position the nose vertically using the nose frame
-    // height and the stored body/head dimensions.
-    //
-    // The offset is rotated around anchorPoint in Draw()
-    // when the head rotates.
-    //
-    //================================================
-
-    /*anchorOffset =
-    {
-        dimensions.noseWidth / 2.0f,
-
-        dimensions.noseHeight / 2.0f
-        - dimensions.bodyHeight / 2.0f
-        - dimensions.headHeight / 2.0f
-        + slightPositionOffset
-        - dimensions.neckHeight
-    };*/
-
-    // Store the original LOCAL offset.
-    //
-    // This is deliberately not a world-space position.
-    // The wiggle animation uses this as the nose's
-    // permanent home position.
-    //homeAnchorPoint = anchorOffset;
+    homePosition = positionOffset;
 }
 
 //====================================================
@@ -220,8 +177,8 @@ void Nose::Update(float dt)
         // Randomise the delay before the following wiggle.
         nextNoseWiggle = (float)GetRandomValue(5, 7);
 
-        // The original local anchor position is already
-        // stored in homeAnchorPoint.
+        // The original local parent position is already
+        // stored in home position.
     }
 
     if (noseWiggling)
@@ -242,8 +199,8 @@ void Nose::Update(float dt)
         // Using homeAnchorPoint as the starting position
         // prevents the wiggle from accumulating movement
         // from one frame to the next.
-        /*anchorOffset.x =
-            homeAnchorPoint.x + wiggleOffSetX;*/
+        positionOffset.x =
+            homePosition.x + wiggleOffSetX;
 
         // The wiggle lasts for one second.
         if (noseWiggleTimer >= 1.0f)
@@ -256,153 +213,60 @@ void Nose::Update(float dt)
             wiggleOffSetX = 0.0f;
 
             // Restore the original LOCAL anchor position.
-            //anchorOffset.x = homeAnchorPoint.x;
+            positionOffset.x = homePosition.x;
         }
     }
 }
 
-//====================================================
-// Draw
-//====================================================
-//
-// The nose uses two separate transforms.
-//
-// Parent transform:
-//     Rotates the nose's POSITION around anchorPoint.
-//
-// Local transform:
-//     Rotates the nose SPRITE around its own centre.
-//
-// This creates the following transform hierarchy:
-//
-//     Body / Head Pivot
-//            |
-//            v
-//     Rotate nose position
-//            |
-//            v
-//       Nose Centre
-//            |
-//            v
-//     Rotate nose sprite
-//
-// The parent rotation controls where the nose is
-// positioned around the head.
-//
-// The local rotation controls the nose's own rotation.
-//
-//====================================================
-
 void Nose::Draw() const
 {
-    // Get the current animation frame.
-    Rectangle source = animation.GetSourceRectangle();
+    Sprite::Draw();
+}
 
-    // Calculate the scaled dimensions of the nose.
-    //float width = animation.GetFrameWidth() * scale;
+void Nose::SetTransform(MyTransform parentTransform)
+{
+    transform = parentTransform;
 
-    //float height = animation.GetFrameHeight() * scale;
-
-    //================================================
-    // Parent Transform
-    //================================================
-    //
-    // localPositionOffset represents the nose's LOCAL position
-    // relative to the body/head anchor point.
-    //
-    // Rotate this local offset around the parent anchor
-    // so the nose follows the head when it rotates.
-    //
-    //Vector2 offset = anchorOffset;
-
-    // Raylib rotation values are measured in degrees,
-    // while sinf() and cosf() require radians.
-    //float radians = rotation * DEG2RAD;
-
-    // Rotate the nose's local position around the
-    // body/head pivot.
-    Vector2 rotatedOffset =
+    // Vector from the parent's rotation pivot to the nose.
+    Vector2 noseFromPivot =
     {
-      //  offset.x * cosf(radians) - offset.y * sinf(radians),
-       // offset.x * sinf(radians) + offset.y * cosf(radians)
+        -parentTransform.pivot.x + positionOffset.x,
+        -parentTransform.pivot.y + positionOffset.y
     };
 
-    //================================================
-    // Nose World Position
-    //================================================
-    //
-    // Add the rotated local offset to the parent's
-    // world-space anchor point.
-    //
-    // The result is the nose's world-space centre
-    // after the parent/head rotation has been applied.
-    //
-    Vector2 nosePosition =
+    float radians = parentTransform.rotation * DEG2RAD;
+
+    Vector2 rotatedPosition =
     {
-        //anchorPoint.x + rotatedOffset.x * scale,
-        //anchorPoint.y + rotatedOffset.y * scale
+        noseFromPivot.x * cosf(radians) -
+        noseFromPivot.y * sinf(radians),
+
+        noseFromPivot.x * sinf(radians) +
+        noseFromPivot.y * cosf(radians)
     };
 
-    //================================================
-    // Nose Destination
-    //================================================
-    //
-    // Build the destination rectangle around the
-    // calculated nose centre.
-    //
-    // Subtracting half the width and height means
-    // nosePosition represents the centre of the sprite
-    // rather than its top-left corner.
-    //
-    Rectangle destination =
+    // Position of the pivot in world space.
+    Vector2 pivotPosition =
     {
-        //nosePosition.x - width / 2.0f,
-       // nosePosition.y - height / 2.0f,
-       // width,
-       // height
+        parentTransform.position.x +
+            parentTransform.pivot.x,
+
+        parentTransform.position.y +
+            parentTransform.pivot.y
     };
 
-    //================================================
-    // Local Rotation Pivot
-    //================================================
-    //
-    // The destination rectangle is centred around
-    // nosePosition.
-    //
-    // Therefore, the centre of the rectangle is simply
-    // half its width and half its height.
-    //
-    // This is the nose's LOCAL rotation origin.
-    //
-    // It is separate from anchorPoint, which remains
-    // the parent/body/head rotation reference point.
-    //
-    Vector2 origin =
+    // Nose position = rotated vector from pivot.
+    transform.position =
     {
-        //width / 2.0f,
-       // height / 2.0f
+        pivotPosition.x +
+            rotatedPosition.x,
+
+        pivotPosition.y +
+            rotatedPosition.y
     };
 
-    //================================================
-    // Draw
-    //================================================
-    //
-    // rotation:
-    //     Parent/head rotation.
-    //
-    // localRotation:
-    //     Independent nose rotation.
-    //
-    // Adding the two rotations causes the nose to
-    // inherit the head's rotation while also applying
-    // its own independent local rotation.
-    /*
-    DrawTexturePro(
-        texture,
-        source,
-        destination,
-        origin,
-        rotation + localRotation,
-        WHITE
-    );*/
+    transform.rotation =
+        parentTransform.rotation + localRotation;
+
+    transform.pivot = { 0.0f, 0.0f };
 }

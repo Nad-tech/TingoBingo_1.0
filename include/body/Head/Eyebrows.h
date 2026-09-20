@@ -8,11 +8,16 @@ class Eyebrows : public Sprite
 {
     public:
         Eyebrows(BodyDimensions& dimensions);
+        
         void Initialise() override;
-        void UpdateEyebrows(float dt, bool speaking, Emotion emotion);
-       
+
+        void Update(float dt, bool speaking, Emotion emotion);
+        void SetTransform(MyTransform transform);
+
     private:
         BodyDimensions& dimensions;
+
+        Vector2 positionOffset;
 
         float foreheadOffset = 65; 
 

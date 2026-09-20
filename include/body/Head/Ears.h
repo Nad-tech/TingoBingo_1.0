@@ -9,6 +9,7 @@ class Ears : public Sprite
         Ears(BodyDimensions& dimensions);
         void Initialise() override;
         void Update(float dt) override;
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;

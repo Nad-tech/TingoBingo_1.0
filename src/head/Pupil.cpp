@@ -9,6 +9,7 @@
 
 #include "Body/Head/Pupil.h"
 #include "Constants.h"
+#include <cmath>
 #include <string>
 
 Pupil::Pupil(BodyDimensions& dimensions) :
@@ -30,8 +31,6 @@ void Pupil::Initialise()
 
     const int TOTAL_FRAMES = COLUMNS * ROWS;
 
-    // Animation settings.
-    const float ROTATION = 0.0f;
     const float FRAME_DURATION = 0.08f;
 
     // Initialise the animation using the sprite sheet information.
@@ -44,31 +43,15 @@ void Pupil::Initialise()
         FRAME_DURATION
     );
 
-    /*rotation = ROTATION;
-    scale = SCALE;
-
-    if(side == "left")
-    {
-        anchorOffset = {
-            dimensions.pupilWidth / 2.0f - sideOffset, 
-            dimensions.pupilHeight / 2.0f + 
-            dimensions.bodyHeight / 2.0f + 
-            dimensions.headHeight / 2.0f +
-            dimensions.neckHeight +
-            dimensions.eyesYoffset
-        };
+    if(side == "left") {
+        positionOffset = {sideOffset, 0};
     }
-    else if(side == "right")
+
+    if(side == "right")
     {
-        anchorOffset = {
-            dimensions.pupilWidth / 2.0f + sideOffset, 
-            dimensions.pupilHeight / 2.0f + 
-            dimensions.bodyHeight / 2.0f + 
-            dimensions.headHeight / 2.0f +
-            dimensions.neckHeight +
-            dimensions.eyesYoffset
-        };
-    }*/
+        positionOffset = {-sideOffset, 0};
+    }
+    
 }
 
 // Advance the pupil animation.
@@ -85,4 +68,27 @@ void Pupil::SetSide(std::string side)
 float Pupil::GetSideOffset()
 {
     return sideOffset;
+}
+
+void Pupil::SetPosition(Vector2 position)
+{
+    float radians = transform.rotation * DEG2RAD;
+    float X = positionOffset.x;
+    float Y = positionOffset.y;
+
+    transform.position = {
+            position.x + X * cosf(radians) - Y * sinf(radians),
+            position.y + X * sinf(radians) + Y * cosf(radians)
+    };
+}
+
+void Pupil::SetRotation(float rotation)
+{
+    transform.rotation = rotation;
+}
+
+void Pupil::SetTransform(MyTransform parentTransform) 
+{
+    transform = parentTransform;
+    SetPosition(parentTransform.position);
 }
