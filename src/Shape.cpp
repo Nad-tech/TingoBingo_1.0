@@ -3,10 +3,6 @@
 #include "Shape.h"
 #include <cmath>
 
-Shape::Shape(BodyDimensions& dimensions) :
-    dimensions(dimensions)
-{}
-
 void Shape::Draw() const
 {
     Vector2 screenPosition =
@@ -21,20 +17,20 @@ void Shape::Draw() const
         screenPosition.y - transform.pivot.y * transform.scale
     };
 
-    float width = dimensions.neckWidth * transform.scale;
-    float height = dimensions.neckHeight * transform.scale;
+    float scaledWidth = width * transform.scale;
+    float scaledHeight = height * transform.scale;
 
     Rectangle rectangle = {
         pivotScreen.x,
         pivotScreen.y,
-        width,
-        height
+        scaledWidth,
+        scaledHeight
     };
 
     Vector2 origin =
     {
-        width / 2.0f + transform.pivot.x * transform.scale,
-        height / 2.0f - transform.pivot.y * transform.scale
+        scaledWidth / 2.0f + transform.pivot.x * transform.scale,
+        scaledHeight / 2.0f - transform.pivot.y * transform.scale
     };
 
     DrawRectanglePro(
@@ -43,6 +39,12 @@ void Shape::Draw() const
         -transform.rotation,
         CARDBOARD_DARK
     );
+}
+
+void Shape::SetDimensions(float width, float height)
+{
+    this->width = width;
+    this->height = height;
 }
 
 void Shape::Shutdown()

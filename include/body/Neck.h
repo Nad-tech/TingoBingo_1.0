@@ -21,6 +21,7 @@ class Neck : public Shape
         Head& GetHead();
         
     private:
+        BodyDimensions& dimensions;
         Vector2 positionOffset;
         Head head;
 };

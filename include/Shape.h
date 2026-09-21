@@ -8,16 +8,18 @@
 class Shape
 {
 protected:
-    BodyDimensions& dimensions;
     MyTransform transform;
+    float width = 0.0f;
+    float height = 0.0f;
 
 public:
-    Shape(BodyDimensions& dimensions);
+    Shape() = default;
     virtual void Initialise() = 0;
     void Shutdown();
     
     virtual void Draw() const;
     
+    void SetDimensions(float width, float height);
     void SetTransform(MyTransform transform);
 
     virtual ~Shape() = default;

@@ -1,20 +1,21 @@
 #pragma once
 #include "body/Legs/Legs.h"
-#include "Sprite.h"
+#include "Shape.h"
 #include "BodyDimensions.h"
-class Pelvis : Sprite
+class Pelvis : Shape
 {
     public:
         Pelvis(BodyDimensions& dimensions);
         void Initialise() override;
-        void Update(float dt) override;
-        void Draw() const;
-        void SetRotation(float rotation);
-        void SetAnchorPoint(Vector2 anchorPoint);
         void Shutdown();
+        
+        void Update(float dt);
+        void Draw() const;
+        
+        void SetTransform(MyTransform parentTransform);
 
     private:
         BodyDimensions& dimensions;
-        Vector2 localPositionOffset = {};
+        Vector2 positionOffset = {};
         Legs legs;
 };

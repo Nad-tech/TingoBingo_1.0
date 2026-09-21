@@ -1,8 +1,8 @@
 #include "Body/Neck.h"
 #include "raylib.h"
 
-Neck::Neck(BodyDimensions& dimensions) : 
-    Shape(dimensions),
+Neck::Neck(BodyDimensions& dimensions) :
+    dimensions(dimensions),
     positionOffset(),
     head(dimensions)
 {
@@ -12,6 +12,7 @@ void Neck::Initialise()
 {
     dimensions.neckWidth = 50.0f;
     dimensions.neckHeight = 30.0f;
+    SetDimensions(dimensions.neckWidth, dimensions.neckHeight);
 
     head.Initialise();
 

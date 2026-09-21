@@ -54,10 +54,11 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
 
 void Body::Draw() const
 {
-    //pelvis.Draw();
+    
     bodyBase.Draw();
     //arms.Draw();
     neck.Draw();
+    pelvis.Draw();
 }
 
 void Body::SetTransform(MyTransform transform)
@@ -66,7 +67,7 @@ void Body::SetTransform(MyTransform transform)
     bodyBase.SetTransform(this->transform);
     neck.SetTransform(this->transform);
     //arms.SetTransform(this->transform);
-    //pelvis.SetTransform(this->transform);
+    pelvis.SetTransform(this->transform);
 }
 
 void Body::PlayIdleBodyTransform(float dt)
@@ -104,6 +105,7 @@ void Body::PlayBodyWiggle(float dt)
         }
         bodyBase.SetTransform(transform);
         neck.SetTransform(transform);
+        pelvis.SetTransform(transform);
     }
 }
 
@@ -132,6 +134,7 @@ void Body::PlayBodyBob(float dt)
 
     bodyBase.SetTransform(transform);
     neck.SetTransform(transform);
+    pelvis.SetTransform(transform);
 }
 
 Head& Body::GetHead()
