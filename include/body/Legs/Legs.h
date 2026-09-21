@@ -2,8 +2,9 @@
 
 #include "body/Legs/Thigh.h"
 #include "BodyDimensions.h"
+#include "Shape.h"
 
-class Legs
+class Legs : Shape
 {
     public:
         Legs(BodyDimensions& dimensions);

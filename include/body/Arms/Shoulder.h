@@ -20,7 +20,6 @@ class Shoulder : public Shape
 
     private:
         BodyDimensions& dimensions;
-        MyTransform transform;
         Vector2 positionOffset = {0, 0};
 
         std::string side = "";

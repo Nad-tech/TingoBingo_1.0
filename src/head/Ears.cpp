@@ -40,6 +40,8 @@ void Ears::Initialise()
         COLUMNS,
         FRAME_DURATION
     );
+
+    positionOffset = {0, 0};
 }
 
 void Ears::Update(float dt)
@@ -61,5 +63,5 @@ void Ears::Update(float dt)
 
 void Ears::SetTransform(MyTransform parentTransform)
 {
-    transform = parentTransform;
+    transform = MakeChildTransform(parentTransform, positionOffset);
 }

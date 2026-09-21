@@ -16,7 +16,6 @@ class Eyebrows : public Sprite
 
     private:
         BodyDimensions& dimensions;
-
         Vector2 positionOffset;
 
         float foreheadOffset = 65; 

@@ -78,6 +78,5 @@ void Mouth::UpdateMouth(float dt, bool speaking, Emotion emotion)
 
 void Mouth::SetTransform(MyTransform parentTransform)
 {
-    transform = parentTransform;
-    transform.position.y += positionOffset.y;
+    transform = MakeChildTransform(parentTransform, positionOffset);
 }

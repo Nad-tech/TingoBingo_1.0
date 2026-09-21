@@ -64,6 +64,5 @@ void Antenna::Update(float dt)
 
 void Antenna::SetTransform(MyTransform parentTransform)
 {
-    transform = parentTransform;
-    transform.position.y += positionOffset.y;
+    transform = MakeChildTransform(parentTransform, positionOffset);
 }

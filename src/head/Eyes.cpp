@@ -9,6 +9,7 @@
 
 #include "Body/Head/Eyes.h"
 #include "Constants.h"
+#include <cmath>
 
 Eyes::Eyes(BodyDimensions& dimensions) : 
     dimensions(dimensions),
@@ -78,9 +79,8 @@ void Eyes::Draw() const
 
 void Eyes::SetTransform(MyTransform parentTransform)
 {
-    transform = parentTransform;
-    transform.position.y += positionOffset.y;
-    Sprite::SetTransform(transform);
+    transform = MakeChildTransform(parentTransform, positionOffset);
+
     pupils.SetTransform(transform);
 }
 

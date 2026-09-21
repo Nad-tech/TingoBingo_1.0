@@ -37,7 +37,7 @@ void Shape::Draw() const
         rectangle,
         origin,
         -transform.rotation,
-        CARDBOARD_DARK
+        color
     );
 }
 

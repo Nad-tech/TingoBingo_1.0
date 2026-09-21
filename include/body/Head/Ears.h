@@ -13,6 +13,7 @@ class Ears : public Sprite
 
     private:
         BodyDimensions& dimensions;
+        Vector2 positionOffset;
 
         float idleAnimationTimer = 0.0f;
         float nextIdleAnimation = 0.0;

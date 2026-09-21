@@ -48,8 +48,9 @@ void Body::Update(float dt, bool speaking, Emotion emotion)
     bodyBase.Update(dt);
     arms.Update(dt);
     pelvis.Update(dt);
-    
+
     PlayIdleBodyTransform(dt);
+    SetTransform(transform);
 }
 
 void Body::Draw() const
@@ -103,10 +104,6 @@ void Body::PlayBodyWiggle(float dt)
             bodyWiggling = false;
             transform.rotation = homeTransform.rotation;
         }
-        bodyBase.SetTransform(transform);
-        neck.SetTransform(transform);
-        pelvis.SetTransform(transform);
-        arms.SetTransform(transform);
     }
 }
 
@@ -132,11 +129,6 @@ void Body::PlayBodyBob(float dt)
 
     transform.position.x = homeTransform.position.x + bodyBobOffset.x;
     transform.position.y = homeTransform.position.y + bodyBobOffset.y;
-
-    bodyBase.SetTransform(transform);
-    neck.SetTransform(transform);
-    pelvis.SetTransform(transform);
-    arms.SetTransform(transform);
 }
 
 Head& Body::GetHead()
@@ -144,10 +136,9 @@ Head& Body::GetHead()
     return neck.GetHead();
 }
 
-/*
 void Body::SwingArm(std::string side,  bool swing)
 {
     arms.SwingArm(side, swing);
-}*/
+}
 
 

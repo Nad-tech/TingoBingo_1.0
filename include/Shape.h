@@ -11,9 +11,10 @@ protected:
     MyTransform transform;
     float width = 0.0f;
     float height = 0.0f;
+    Color color;
 
 public:
-    Shape() = default;
+    explicit Shape(Color color = CARDBOARD_DARK) : color(color) {}
     virtual void Initialise() = 0;
     void Shutdown();
     

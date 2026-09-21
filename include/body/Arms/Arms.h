@@ -21,7 +21,6 @@ class Arms
         
     private:
         BodyDimensions& dimensions;
-        MyTransform transform;
 
         Shoulder leftShoulder;
         Shoulder rightShoulder;

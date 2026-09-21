@@ -28,7 +28,7 @@ public:
     void PlayIdleBodyTransform(float dt);
     void PlayBodyWiggle(float dt);
     void PlayBodyBob(float dt);
-    //void SwingArm(std::string side, bool swing);
+    void SwingArm(std::string side, bool swing);
 
 private:
     BodyDimensions &dimensions;

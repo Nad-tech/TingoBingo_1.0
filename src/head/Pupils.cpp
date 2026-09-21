@@ -51,15 +51,18 @@ void Pupils::Draw() const
 {
     leftPupil.Draw();
     rightPupil.Draw();
-    //DrawCircle(L.x, L.y, 10, RED);
+    DrawCircle(L.x, L.y, 50, RED);
 }
 
 // Set both pupil anchor points relative to the head.
 void Pupils::SetTransform(MyTransform parentTransform)
 {
     transform = parentTransform;
+
     leftPupil.SetTransform(parentTransform);
     rightPupil.SetTransform(parentTransform);
+
+    SetRotation(transform.rotation);
 }
 
 Vector2 Pupils::RotateVector(Vector2 v, float rotation)

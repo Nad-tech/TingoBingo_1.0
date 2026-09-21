@@ -14,8 +14,8 @@
 //====================================================
 
 #include "Body/Head/Head.h"
-#include <cmath>
 #include "Emotion.h"
+#include <cmath>
 
 // Initialise the head's transform and idle animation state.
 Head::Head(BodyDimensions& dimensions) :
@@ -84,26 +84,13 @@ void Head::Draw() const
 
 void Head::SetTransform(MyTransform parentTransform)
 {
-    transform.position =
-    {
-        parentTransform.position.x + positionOffset.x,
-        parentTransform.position.y + positionOffset.y
-    };
-
-    transform.pivot =
-    {
-        0,
-        -positionOffset.y - dimensions.bodyHeight / 2.0f
-    };
-    
-    transform.rotation = parentTransform.rotation;
-    transform.scale = parentTransform.scale;
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
     headBase.SetTransform(transform);
     eyes.SetTransform(transform);
-    eyebrows.SetTransform(transform);
-    ears.SetTransform(transform);
     antenna.SetTransform(transform);
+    ears.SetTransform(transform);
+    eyebrows.SetTransform(transform);
     nose.SetTransform(transform);
     mouth.SetTransform(transform);
 }

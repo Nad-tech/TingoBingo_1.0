@@ -83,7 +83,7 @@ void Nose::Initialise()
     );
 
     positionOffset = {
-        0,
+        0.0f,
         -slightPositionOffset
     };
 
@@ -225,45 +225,7 @@ void Nose::Draw() const
 
 void Nose::SetTransform(MyTransform parentTransform)
 {
-    transform = parentTransform;
-
-    // Vector from the parent's rotation pivot to the nose.
-    Vector2 noseFromPivot =
-    {
-        -parentTransform.pivot.x + positionOffset.x,
-        -parentTransform.pivot.y + positionOffset.y
-    };
-
-    float radians = parentTransform.rotation * DEG2RAD;
-
-    Vector2 rotatedPosition =
-    {
-        noseFromPivot.x * cosf(radians) -
-        noseFromPivot.y * sinf(radians),
-
-        noseFromPivot.x * sinf(radians) +
-        noseFromPivot.y * cosf(radians)
-    };
-
-    // Position of the pivot in world space.
-    Vector2 pivotPosition =
-    {
-        parentTransform.position.x +
-            parentTransform.pivot.x,
-
-        parentTransform.position.y +
-            parentTransform.pivot.y
-    };
-
-    // Nose position = rotated vector from pivot.
-    transform.position =
-    {
-        pivotPosition.x +
-            rotatedPosition.x,
-
-        pivotPosition.y +
-            rotatedPosition.y
-    };
+    transform = MakeChildTransform(parentTransform, positionOffset);
 
     transform.rotation =
         parentTransform.rotation + localRotation;
