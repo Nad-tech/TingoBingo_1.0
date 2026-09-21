@@ -2,6 +2,7 @@
 
 #include "Shoulder.h"
 #include "BodyDimensions.h"
+#include "MyTransform.h"
 
 class Arms
 {
@@ -9,15 +10,18 @@ class Arms
         Arms(BodyDimensions& dimensions);
 
         void Initialise();
-        void Update(float dt);
-        void Draw() const;
-        void SetAnchorPoint(Vector2 anchorPoint);
-        void SetRotation(float rotation);
-        void SwingArm(std::string side, bool swing);
         void Shutdown();
 
+        void Update(float dt);
+        void Draw() const;
+        
+        void SetTransform(MyTransform parentTransform);
+        
+        void SwingArm(std::string side, bool swing);
+        
     private:
         BodyDimensions& dimensions;
+        MyTransform transform;
 
         Shoulder leftShoulder;
         Shoulder rightShoulder;

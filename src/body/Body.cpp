@@ -56,7 +56,7 @@ void Body::Draw() const
 {
     
     bodyBase.Draw();
-    //arms.Draw();
+    arms.Draw();
     neck.Draw();
     pelvis.Draw();
 }
@@ -66,7 +66,7 @@ void Body::SetTransform(MyTransform transform)
     this->transform = transform;
     bodyBase.SetTransform(this->transform);
     neck.SetTransform(this->transform);
-    //arms.SetTransform(this->transform);
+    arms.SetTransform(this->transform);
     pelvis.SetTransform(this->transform);
 }
 
@@ -106,6 +106,7 @@ void Body::PlayBodyWiggle(float dt)
         bodyBase.SetTransform(transform);
         neck.SetTransform(transform);
         pelvis.SetTransform(transform);
+        arms.SetTransform(transform);
     }
 }
 
@@ -135,6 +136,7 @@ void Body::PlayBodyBob(float dt)
     bodyBase.SetTransform(transform);
     neck.SetTransform(transform);
     pelvis.SetTransform(transform);
+    arms.SetTransform(transform);
 }
 
 Head& Body::GetHead()

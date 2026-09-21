@@ -41,16 +41,10 @@ void Arms::Draw() const
     rightShoulder.Draw();
 }
 
-void Arms::SetAnchorPoint(Vector2 anchorPoint)
+void Arms::SetTransform(MyTransform parentTransform)
 {
-    leftShoulder.SetAnchorPoint(anchorPoint);
-    rightShoulder.SetAnchorPoint(anchorPoint);
-}
-
-void Arms::SetRotation(float rotation) 
-{
-    leftShoulder.SetRotation(rotation);
-    rightShoulder.SetRotation(rotation);
+    leftShoulder.SetTransform(parentTransform);
+    rightShoulder.SetTransform(parentTransform);
 }
 
 void Arms::SwingArm(std::string side, bool swing)
