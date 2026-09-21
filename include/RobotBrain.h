@@ -34,8 +34,8 @@ class RobotBrain
         void OnObjectPickedUp(Object& object);
         
         void Search(float dt);
-        Vector2 GetSearchRayOrigin();
-        Vector2 GetSearchRayEnd();
+        Vector2 GetSearchRayOrigin() const;
+        Vector2 GetSearchRayEnd() const;
 
         void SetObjectPointers(std::vector<Object*> objects);
 

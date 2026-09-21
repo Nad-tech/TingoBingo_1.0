@@ -56,7 +56,7 @@ void Robot::SetTransform(MyTransform transform)
 }
 
 // Return the robot's current anchor point.
-MyTransform Robot::GetTransform()
+MyTransform Robot::GetTransform() const
 {
     return transform;
 }
@@ -111,14 +111,14 @@ void Robot::LookForward()
 
 
 // Return the origin point of RobotBrain's search ray.
-Vector2 Robot::GetSearchRayOrigin()
+Vector2 Robot::GetSearchRayOrigin() const
 {
     return robotBrain.GetSearchRayOrigin();
 }
 
 
 // Return the end point of RobotBrain's search ray.
-Vector2 Robot::GetSearchRayEnd()
+Vector2 Robot::GetSearchRayEnd() const
 {
     return robotBrain.GetSearchRayEnd();
 }

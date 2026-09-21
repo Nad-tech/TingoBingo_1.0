@@ -21,7 +21,7 @@ public:
     void Draw() const;
     
     void SetTransform(MyTransform transform);
-    MyTransform GetTransform();
+    MyTransform GetTransform() const;
     
     void LookAt(Vector2 point);
     
@@ -34,8 +34,8 @@ public:
     
     void LookForward();
     
-    Vector2 GetSearchRayOrigin();
-    Vector2 GetSearchRayEnd();
+    Vector2 GetSearchRayOrigin() const;
+    Vector2 GetSearchRayEnd() const;
     
     void SetObjectPointers(std::vector<Object*> objects);
     void PlaySfx(std::string sound);

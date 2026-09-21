@@ -107,6 +107,11 @@ void Game::Initialise()
 // Process keyboard input.
 void Game::HandleInput()
 {
+	if (IsKeyPressed(KEY_F3))
+	{
+		drawDebugOverlay = !drawDebugOverlay;
+	}
+
 	if (input.SpacePressed())
 	{
 		robot.Speak("Hello Alby, my name is tingo bingo");
@@ -173,6 +178,53 @@ void Game::Draw()
 	if(drawGrid) {
 		DrawDebugGrid();
 	}
+
+	if (drawDebugOverlay)
+	{
+		DrawDebugOverlay();
+	}
+}
+
+void Game::DrawDebugOverlay() const
+{
+	MyTransform robotTransform = robot.GetTransform();
+
+	Vector2 robotScreenPosition =
+	{
+		SCREEN_WIDTH / 2.0f + robotTransform.position.x * robotTransform.scale,
+		SCREEN_HEIGHT / 2.0f - robotTransform.position.y * robotTransform.scale
+	};
+
+	Vector2 pivotScreenPosition =
+	{
+		robotScreenPosition.x + robotTransform.pivot.x * robotTransform.scale,
+		robotScreenPosition.y - robotTransform.pivot.y * robotTransform.scale
+	};
+
+	Vector2 searchOrigin = robot.GetSearchRayOrigin();
+	Vector2 searchEnd = robot.GetSearchRayEnd();
+
+	DrawLineEx(searchOrigin, searchEnd, 2.0f, YELLOW);
+	DrawCircleV(searchOrigin, 6.0f, ORANGE);
+	DrawCircleV(searchEnd, 6.0f, RED);
+
+	DrawCircleV(robotScreenPosition, 7.0f, GREEN);
+	DrawCircleV(pivotScreenPosition, 5.0f, MAGENTA);
+	DrawLineEx(
+		robotScreenPosition,
+		{
+			robotScreenPosition.x + cosf(robotTransform.rotation * DEG2RAD) * 40.0f,
+			robotScreenPosition.y - sinf(robotTransform.rotation * DEG2RAD) * 40.0f
+		},
+		2.0f,
+		BLUE
+	);
+
+	DrawRectangle(8, 8, 285, 92, Fade(BLACK, 0.75f));
+	DrawText("F3 Debug Overlay", 18, 16, 18, WHITE);
+	DrawText("Green: robot position", 18, 39, 14, GREEN);
+	DrawText("Magenta: transform pivot", 18, 57, 14, MAGENTA);
+	DrawText("Yellow: search ray", 18, 75, 14, YELLOW);
 }
 
 // Release resources before exiting.

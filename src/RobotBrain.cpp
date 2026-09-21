@@ -900,7 +900,7 @@ void RobotBrain::Search(float dt)
 // RobotBrain member.
 // ============================================================
 
-Vector2 RobotBrain::GetSearchRayOrigin()
+Vector2 RobotBrain::GetSearchRayOrigin() const
 {
     return searchRayOrigin;
 }
@@ -916,7 +916,7 @@ Vector2 RobotBrain::GetSearchRayOrigin()
 // another system to draw or inspect the current search ray.
 // ============================================================
 
-Vector2 RobotBrain::GetSearchRayEnd()
+Vector2 RobotBrain::GetSearchRayEnd() const
 {
     return searchRayEnd;
 }

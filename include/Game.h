@@ -16,6 +16,7 @@ private:
 	void HandleInput();
 	void Update(const float dt);
 	void Draw();
+	void DrawDebugOverlay() const;
 	
 	Robot robot;
 	Vector2 robotWorldPos;
@@ -24,4 +25,5 @@ private:
 	Object banana;
 	Texture2D background;
 	std::vector<Object*> objects; 
+	bool drawDebugOverlay = false;
 };
